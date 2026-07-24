@@ -11,10 +11,10 @@
           </div>
         </div>
         <nav class="flex gap-8 text-sm">
-          <a href="#" class="hover:text-blue-600 transition-colors">产品中心</a>
-          <a href="#" class="hover:text-blue-600 transition-colors">账号中心</a>
-          <a href="#" class="hover:text-blue-600 transition-colors">下载中心</a>
-          <a href="#" class="hover:text-blue-600 transition-colors">后台管理</a>
+          <NuxtLink to="/" class="hover:text-blue-600 transition-colors">首页</NuxtLink>
+          <NuxtLink to="/account" class="hover:text-blue-600 transition-colors">账号中心</NuxtLink>
+          <NuxtLink to="/download" class="hover:text-blue-600 transition-colors">下载中心</NuxtLink>
+          <NuxtLink to="/admin" class="hover:text-blue-600 transition-colors">后台管理</NuxtLink>
         </nav>
         <div class="flex gap-4">
           <button @click="showLogin = !showLogin" class="px-4 py-2 text-sm font-medium border border-gray-300 rounded-full hover:bg-gray-100 transition-colors">登录 / 注册</button>
