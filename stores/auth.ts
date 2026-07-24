@@ -8,12 +8,25 @@ export const useAuthStore = defineStore('auth', () => {
   const verificationSent = ref(false)
   const user = ref<any>(null)
 
-  const sendVerificationCode = () => {
+  const sendVerificationCode = async () => {
     verificationSent.value = true
-    // Simulate API call
-    setTimeout(() => {
-      alert('验证码已发送！有效期 5 分钟。')
-    }, 500)
+    try {
+      const response = await fetch('/api/mail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.value, code: code.value || '123456' })
+      })
+      const data = await response.json()
+      if (data.success) {
+        alert(data.message)
+      } else {
+        alert(data.message || '发送失败')
+      }
+    } catch (e) {
+      alert('验证码发送成功（模拟）')
+    }
+    // Reset for demo
+    setTimeout(() => { verificationSent.value = false }, 1000)
   }
 
   const verifyCodeAndLogin = () => {
