@@ -159,20 +159,23 @@
   <!-- Modals and scripts can be in script tag -->
   <script setup lang="ts">
   import { ref } from 'vue'
+  import { useAuthStore } from '~/stores/auth'
+
+  const authStore = useAuthStore()
   const showLogin = ref(false)
   const showLoginModal = ref(false)
-  const email = ref('')
-  const code = ref('')
   const showDemo = () => alert('演示功能即将上线！')
   const scrollToDownload = () => {
     document.querySelector('section:last-of-type')?.scrollIntoView({ behavior: 'smooth' })
   }
   const downloadProduct = () => alert('下载功能已启用（模拟）')
+
   const sendVerificationCode = () => {
-    alert('验证码已发送！（模拟）')
+    authStore.sendVerificationCode()
   }
+
   const login = () => {
-    alert(`欢迎回来，${email.value || '用户'}！`)
+    authStore.verifyCodeAndLogin()
     showLogin.value = false
   }
   </script>
