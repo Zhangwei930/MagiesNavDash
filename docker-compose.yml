@@ -10,7 +10,7 @@ services:
       - "443:443"  # HTTPS via Nginx
     environment:
       - NODE_ENV=production
-      - API_URL=http://api.magies.top
+      - API_URL=http://api:8080
     depends_on:
       - postgres
       - redis

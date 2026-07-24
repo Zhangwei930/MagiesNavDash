@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useRuntimeConfig } from '#imports'
 
 export const useAuthStore = defineStore('auth', () => {
   const email = ref('')
@@ -8,10 +9,13 @@ export const useAuthStore = defineStore('auth', () => {
   const verificationSent = ref(false)
   const user = ref<any>(null)
 
+  const config = useRuntimeConfig()
+  const apiBase = config.public.apiBase
+
   const sendVerificationCode = async () => {
     verificationSent.value = true
     try {
-      const response = await fetch('/api/mail', {
+      const response = await fetch(`${apiBase}/api/mail`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.value, code: code.value || '123456' })
