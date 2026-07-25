@@ -51,7 +51,8 @@ async function download(item: any) {
       method: 'POST',
       body: JSON.stringify({ productId: item.product.id, releaseId: item.release.id })
     })
-    toast.value = res.message
+    if (res.downloadUrl) window.open(res.downloadUrl, '_blank', 'noopener')
+    else toast.value = res.message
   } catch (e: any) {
     toast.value = e.message || '失败'
   }

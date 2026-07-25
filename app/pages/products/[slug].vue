@@ -105,7 +105,10 @@ async function download(releaseId: number) {
       method: 'POST',
       body: JSON.stringify({ productId: detail.value.product.id, releaseId })
     })
-    msg.value = res.message
+    // The endpoint only logs the download and hands back the URL — actually go there.
+    // MagiesTerminal points at its own site's download section rather than a Hub-hosted file.
+    if (res.downloadUrl) window.open(res.downloadUrl, '_blank', 'noopener')
+    else msg.value = res.message
   } catch (e: any) {
     msg.value = e.message || '下载失败'
   }

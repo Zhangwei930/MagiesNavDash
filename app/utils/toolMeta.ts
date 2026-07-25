@@ -56,8 +56,10 @@ export function toolColor(product: { slug?: string; accentColor?: string }): str
     'magies-hrp': '#a78bfa',
     'magies-game': '#fb923c',
     'magies-hub': '#c084fc',
-    'magies-shell': '#e879f9',
-    'magies-terminal': '#e879f9'
+    // MagiesTerminal is its own sub-brand — this is the mid stop of the
+    // shell.magies.top wordmark gradient (#c6ff4d → #2ad4c8 → #3d7bff).
+    'magies-shell': '#2ad4c8',
+    'magies-terminal': '#2ad4c8'
   }
   if (product.slug && map[product.slug]) return map[product.slug]
   if (product.accentColor) return product.accentColor

@@ -107,8 +107,9 @@ const error = ref('')
 const ORDER = ['magies-terminal', 'magies-shell', 'magies-nav', 'magies-hrp', 'magies-game', 'magies-hub']
 
 const NAME_ALIAS: Record<string, string> = {
-  'magies-terminal': 'Terminal',
-  'magies-shell': 'Terminal',
+  // Sub-brand with its own site — keep the official one-word spelling.
+  'magies-terminal': 'MagiesTerminal',
+  'magies-shell': 'MagiesTerminal',
   'magies-nav': 'Nav',
   'magies-hrp': 'Data Studio',
   'magies-game': 'Game',
