@@ -43,7 +43,7 @@
               </div>
               <div>
                 <h3>{{ displayName(p) }}</h3>
-                <div class="tag">{{ p.tagline || categoryLabel(p.categoryId) }}</div>
+                <div class="tag">{{ p.tagline }}</div>
               </div>
             </div>
             <p class="desc">{{ shortDesc(p) }}</p>
@@ -97,22 +97,20 @@
 </template>
 
 <script setup lang="ts">
-import { categoryLabel, toolColor, toolIcon } from '~/utils/toolMeta'
+import { toolColor, toolIcon } from '~/utils/toolMeta'
 
 const { t } = useI18n()
 const products = useState<any[]>('hub-products', () => [])
 const loading = ref(true)
 const error = ref('')
 
-const ORDER = ['magies-terminal', 'magies-shell', 'magies-nav', 'magies-hrp', 'magies-game', 'magies-hub']
+const ORDER = ['magies-terminal', 'magies-shell', 'magies-nav', 'magies-hub']
 
 const NAME_ALIAS: Record<string, string> = {
   // Sub-brand with its own site — keep the official one-word spelling.
   'magies-terminal': 'MagiesTerminal',
   'magies-shell': 'MagiesTerminal',
   'magies-nav': 'Nav',
-  'magies-hrp': 'Data Studio',
-  'magies-game': 'Game',
   'magies-hub': 'Hub'
 }
 

@@ -8,6 +8,7 @@
       </div>
       <div v-if="auth.isAdmin" style="display:flex;gap:8px">
         <button class="btn btn-secondary" :disabled="loading" @click="load">刷新</button>
+        <button class="btn btn-secondary" @click="openCatCreate">添加分类</button>
         <button class="btn btn-primary" @click="openCreate">添加产品</button>
       </div>
     </div>
@@ -59,6 +60,36 @@
         </table>
       </div>
 
+      <div class="panel" style="overflow:hidden;margin-bottom:12px">
+        <div class="panel-hd">分类管理</div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>名称</th>
+              <th>slug</th>
+              <th>排序</th>
+              <th>产品数</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="c in categories" :key="c.id">
+              <td style="font-weight:600">{{ c.name }}</td>
+              <td class="muted" style="font-family:ui-monospace,monospace;font-size:12px">{{ c.slug }}</td>
+              <td class="muted">{{ c.sortOrder }}</td>
+              <td class="muted">{{ productCount(c.id) }}</td>
+              <td style="text-align:right;white-space:nowrap">
+                <button class="btn btn-secondary" @click="openCatEdit(c)">编辑</button>
+                <button class="btn btn-danger" @click="removeCat(c)">删除</button>
+              </td>
+            </tr>
+            <tr v-if="!categories.length">
+              <td colspan="5" class="muted">暂无分类</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <div class="panel" style="overflow:hidden">
         <div class="panel-hd">邮件日志</div>
         <table class="table">
@@ -101,9 +132,7 @@
           <div class="form-row">
             <label class="label">分类</label>
             <select v-model.number="form.categoryId" class="field">
-              <option :value="1">工具站</option>
-              <option :value="2">企业应用</option>
-              <option :value="3">平台服务</option>
+              <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
             </select>
           </div>
           <div class="form-row">
@@ -135,21 +164,52 @@
         </div>
       </div>
     </div>
+
+    <div v-if="showCatForm" class="modal-mask" @click.self="showCatForm = false">
+      <div class="modal">
+        <h2>{{ catForm.id ? '编辑分类' : '添加分类' }}</h2>
+        <div class="form-row">
+          <label class="label">名称 *</label>
+          <input v-model="catForm.name" class="field" placeholder="工具站" />
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-row">
+            <label class="label">slug</label>
+            <input v-model="catForm.slug" class="field" placeholder="留空自动生成" />
+          </div>
+          <div class="form-row">
+            <label class="label">排序</label>
+            <input v-model.number="catForm.sortOrder" class="field" type="number" />
+          </div>
+        </div>
+        <p v-if="catFormError" class="err">{{ catFormError }}</p>
+        <div class="form-actions">
+          <button class="btn btn-secondary" type="button" @click="showCatForm = false">取消</button>
+          <button class="btn btn-primary" type="button" :disabled="catSaving" @click="saveCat">
+            {{ catSaving ? '保存中…' : '保存' }}
+          </button>
+        </div>
+      </div>
+    </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ICON_OPTIONS, categoryLabel } from '~/utils/toolMeta'
+import { ICON_OPTIONS } from '~/utils/toolMeta'
 
 const auth = useAuthStore()
 const data = ref<any>(null)
 const products = ref<any[]>([])
+const categories = ref<any[]>([])
 const loading = ref(false)
 const error = ref('')
 const showForm = ref(false)
 const saving = ref(false)
 const formError = ref('')
+const showCatForm = ref(false)
+const catSaving = ref(false)
+const catFormError = ref('')
 
 const emptyForm = () => ({
   id: null as number | null,
@@ -163,6 +223,18 @@ const emptyForm = () => ({
   status: 'PUBLISHED'
 })
 const form = reactive(emptyForm())
+
+const emptyCatForm = () => ({ id: null as number | null, name: '', slug: '', sortOrder: 0 })
+const catForm = reactive(emptyCatForm())
+
+function categoryLabel(categoryId?: number) {
+  if (!categoryId) return '—'
+  return categories.value.find((c) => c.id === categoryId)?.name || '—'
+}
+
+function productCount(categoryId: number) {
+  return products.value.filter((p) => p.categoryId === categoryId).length
+}
 
 const cards = computed(() => {
   const s = data.value?.stats || {}
@@ -234,6 +306,58 @@ async function save() {
   }
 }
 
+function openCatCreate() {
+  Object.assign(catForm, emptyCatForm())
+  catFormError.value = ''
+  showCatForm.value = true
+}
+
+function openCatEdit(c: any) {
+  Object.assign(catForm, { id: c.id, name: c.name || '', slug: c.slug || '', sortOrder: c.sortOrder ?? 0 })
+  catFormError.value = ''
+  showCatForm.value = true
+}
+
+async function saveCat() {
+  if (!catForm.name.trim()) {
+    catFormError.value = '请填写分类名称'
+    return
+  }
+  catSaving.value = true
+  catFormError.value = ''
+  try {
+    const { api } = useApi()
+    const body = {
+      name: catForm.name.trim(),
+      slug: catForm.slug.trim() || undefined,
+      sortOrder: catForm.sortOrder ?? 0
+    }
+    if (catForm.id) {
+      await api(`/api/admin/categories/${catForm.id}`, { method: 'PUT', body: JSON.stringify(body) })
+    } else {
+      await api('/api/admin/categories', { method: 'POST', body: JSON.stringify(body) })
+    }
+    showCatForm.value = false
+    await load()
+  } catch (e: any) {
+    catFormError.value = e.message || '保存失败'
+  } finally {
+    catSaving.value = false
+  }
+}
+
+async function removeCat(c: any) {
+  if (!confirm(`删除分类「${c.name}」？`)) return
+  try {
+    const { api } = useApi()
+    await api(`/api/admin/categories/${c.id}`, { method: 'DELETE' })
+    await load()
+  } catch (e: any) {
+    // 后端会拒绝删除仍有产品的分类，把原因原样带出来
+    alert(e.message || '删除失败')
+  }
+}
+
 async function remove(p: any) {
   if (!confirm(`删除产品「${p.name}」？`)) return
   try {
@@ -251,8 +375,13 @@ async function load() {
   error.value = ''
   try {
     const { api } = useApi()
-    data.value = await api('/api/admin/dashboard')
-    products.value = data.value?.products || []
+    const [dashboard, cats] = await Promise.all([
+      api('/api/admin/dashboard'),
+      api<any[]>('/api/admin/categories')
+    ])
+    data.value = dashboard
+    products.value = dashboard?.products || []
+    categories.value = cats
   } catch (e: any) {
     error.value = e.message || '加载失败'
   } finally {

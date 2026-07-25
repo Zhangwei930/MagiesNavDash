@@ -10,12 +10,8 @@ import {
   Server,
   type LucideIcon
 } from 'lucide-vue-next'
-
-export const CATEGORY_LABELS: Record<number, string> = {
-  1: '工具站',
-  2: '企业应用',
-  3: '平台服务'
-}
+// Gamepad2 / Users stay imported: they remain selectable icons in the admin UI
+// even though no product currently uses them.
 
 /** 后台可选图标（存 product.icon） */
 export const ICON_OPTIONS: { key: string; label: string; icon: LucideIcon }[] = [
@@ -32,8 +28,6 @@ export const ICON_OPTIONS: { key: string; label: string; icon: LucideIcon }[] = 
 
 const SLUG_ICON: Record<string, LucideIcon> = {
   'magies-nav': Compass,
-  'magies-hrp': Users,
-  'magies-game': Gamepad2,
   'magies-hub': Boxes,
   'magies-shell': Terminal,
   'magies-terminal': Terminal
@@ -53,8 +47,6 @@ export function toolColor(product: { slug?: string; accentColor?: string }): str
   // Prefer palette aligned with star-ring logo (blue / violet / orange)
   const map: Record<string, string> = {
     'magies-nav': '#60a5fa',
-    'magies-hrp': '#a78bfa',
-    'magies-game': '#fb923c',
     'magies-hub': '#c084fc',
     // MagiesTerminal is its own sub-brand — this is the mid stop of the
     // shell.magies.top wordmark gradient (#c6ff4d → #2ad4c8 → #3d7bff).
@@ -66,7 +58,3 @@ export function toolColor(product: { slug?: string; accentColor?: string }): str
   return '#a78bfa'
 }
 
-export function categoryLabel(categoryId?: number): string {
-  if (!categoryId) return '其他'
-  return CATEGORY_LABELS[categoryId] || '其他'
-}

@@ -3,9 +3,11 @@ package com.magies.backend.web;
 import com.magies.backend.entity.Feedback;
 import com.magies.backend.entity.MailLog;
 import com.magies.backend.entity.Product;
+import com.magies.backend.entity.ProductCategory;
 import com.magies.backend.entity.SysUser;
 import com.magies.backend.repository.FeedbackRepository;
 import com.magies.backend.repository.MailLogRepository;
+import com.magies.backend.repository.ProductCategoryRepository;
 import com.magies.backend.repository.ProductRepository;
 import com.magies.backend.repository.SysUserRepository;
 import com.magies.backend.service.StatsService;
@@ -23,6 +25,7 @@ public class AdminController {
     private final StatsService statsService;
     private final SysUserRepository userRepository;
     private final ProductRepository productRepository;
+    private final ProductCategoryRepository categoryRepository;
     private final MailLogRepository mailLogRepository;
     private final FeedbackRepository feedbackRepository;
 
@@ -30,12 +33,14 @@ public class AdminController {
             StatsService statsService,
             SysUserRepository userRepository,
             ProductRepository productRepository,
+            ProductCategoryRepository categoryRepository,
             MailLogRepository mailLogRepository,
             FeedbackRepository feedbackRepository
     ) {
         this.statsService = statsService;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
         this.mailLogRepository = mailLogRepository;
         this.feedbackRepository = feedbackRepository;
     }
@@ -86,6 +91,63 @@ public class AdminController {
         }
         productRepository.deleteById(id);
         return Map.of("success", true);
+    }
+
+    @GetMapping("/categories")
+    public List<ProductCategory> categories() {
+        return categoryRepository.findAllByOrderBySortOrderAsc();
+    }
+
+    @PostMapping("/categories")
+    public ProductCategory createCategory(@RequestBody Map<String, Object> body) {
+        ProductCategory c = new ProductCategory();
+        applyCategory(c, body, true);
+        return categoryRepository.save(c);
+    }
+
+    @PutMapping("/categories/{id}")
+    public ProductCategory updateCategory(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        ProductCategory c = categoryRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("分类不存在"));
+        applyCategory(c, body, false);
+        return categoryRepository.save(c);
+    }
+
+    @DeleteMapping("/categories/{id}")
+    public Map<String, Object> deleteCategory(@PathVariable Long id) {
+        if (!categoryRepository.existsById(id)) {
+            throw new IllegalArgumentException("分类不存在");
+        }
+        // 不静默把产品变成孤儿——先要求把产品移走。
+        long inUse = productRepository.findAll().stream()
+                .filter(p -> id.equals(p.getCategoryId()))
+                .count();
+        if (inUse > 0) {
+            throw new IllegalArgumentException("该分类下还有 " + inUse + " 个产品，请先移到其他分类");
+        }
+        categoryRepository.deleteById(id);
+        return Map.of("success", true);
+    }
+
+    private void applyCategory(ProductCategory c, Map<String, Object> body, boolean creating) {
+        String name = str(body.get("name"));
+        String slug = str(body.get("slug"));
+
+        if (creating) {
+            if (name == null || name.isBlank()) throw new IllegalArgumentException("分类名称必填");
+            c.setName(name.trim());
+            c.setSlug(slugify(slug == null || slug.isBlank() ? name : slug));
+        } else {
+            if (name != null && !name.isBlank()) c.setName(name.trim());
+            if (slug != null && !slug.isBlank()) c.setSlug(slugify(slug));
+        }
+
+        if (body.containsKey("sortOrder")) {
+            Object s = body.get("sortOrder");
+            c.setSortOrder(s == null || String.valueOf(s).isBlank() ? 0 : Integer.valueOf(String.valueOf(s)));
+        } else if (creating) {
+            c.setSortOrder(0);
+        }
     }
 
     @GetMapping("/mail-logs")

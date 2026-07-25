@@ -5,60 +5,100 @@
 
       <div v-if="loading" class="muted">{{ t('products.loading') }}</div>
       <div v-else-if="error" class="err">{{ error }}</div>
-      <div v-else-if="!list.length" class="empty">{{ t('products.empty') }}</div>
-      <div v-else class="grid grid-3 p-grid">
-        <NuxtLink v-for="p in list" :key="p.id" class="card p-card" :to="`/products/${p.slug}`">
-          <div class="p-head">
-            <div class="icon-circle" :style="{ '--tint': toolColor(p) }">
-              <component :is="toolIcon(p)" :size="20" :stroke-width="2" />
-            </div>
-            <div class="p-id">
-              <h3>{{ p.name }}</h3>
-              <span class="p-tag">{{ p.tagline || categoryLabel(p.categoryId) }}</span>
-            </div>
-          </div>
+      <template v-else>
+        <!-- Only worth a filter row once there is more than one category to switch between. -->
+        <div v-if="usedCategories.length > 1" class="cat-bar">
+          <button
+            type="button"
+            class="cat-chip"
+            :class="{ active: activeCategory === null }"
+            @click="activeCategory = null"
+          >{{ t('products.all') }}</button>
+          <button
+            v-for="c in usedCategories"
+            :key="c.id"
+            type="button"
+            class="cat-chip"
+            :class="{ active: activeCategory === c.id }"
+            @click="activeCategory = c.id"
+          >{{ c.name }}</button>
+        </div>
 
-          <p v-if="p.description" class="p-desc">{{ p.description }}</p>
+        <div v-if="!list.length" class="empty">{{ t('products.empty') }}</div>
+        <div v-else class="grid grid-3 p-grid">
+          <NuxtLink v-for="p in list" :key="p.id" class="card p-card" :to="`/products/${p.slug}`">
+            <div class="p-head">
+              <div class="icon-circle" :style="{ '--tint': toolColor(p) }">
+                <component :is="toolIcon(p)" :size="20" :stroke-width="2" />
+              </div>
+              <div class="p-id">
+                <h3>{{ p.name }}</h3>
+                <span class="p-tag">{{ p.tagline }}</span>
+              </div>
+              <button
+                v-if="categoryLabel(p.categoryId)"
+                type="button"
+                class="p-cat"
+                :class="{ active: activeCategory === p.categoryId }"
+                @click.stop.prevent="toggleCategory(p.categoryId)"
+              >{{ categoryLabel(p.categoryId) }}</button>
+            </div>
 
-          <div class="p-foot">
-            <span class="p-more">{{ t('products.detail') }} →</span>
-            <button
-              v-if="p.homepageUrl"
-              type="button"
-              class="p-open"
-              @click.stop.prevent="open(p.homepageUrl)"
-            >{{ t('products.open') }} ↗</button>
-          </div>
-        </NuxtLink>
-      </div>
+            <p v-if="p.description" class="p-desc">{{ p.description }}</p>
+
+            <div class="p-foot">
+              <span class="p-more">{{ t('products.detail') }} →</span>
+              <button
+                v-if="p.homepageUrl"
+                type="button"
+                class="p-open"
+                @click.stop.prevent="open(p.homepageUrl)"
+              >{{ t('products.open') }} ↗</button>
+            </div>
+          </NuxtLink>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { categoryLabel, toolColor, toolIcon } from '~/utils/toolMeta'
+import { toolColor, toolIcon } from '~/utils/toolMeta'
 
 const { t } = useI18n()
+const { categories, loadCategories, categoryLabel } = useCategories()
 const products = useState<any[]>('hub-products', () => [])
 const loading = ref(true)
 const error = ref('')
+const activeCategory = ref<number | null>(null)
+
+/** Never render a chip for a category nobody is in. */
+const usedCategories = computed(() => {
+  const inUse = new Set(products.value.map((p) => p.categoryId))
+  return categories.value.filter((c) => inUse.has(c.id))
+})
 
 const list = computed(() =>
-  [...products.value].sort((a, b) => (a.sortOrder ?? 99) - (b.sortOrder ?? 99))
+  products.value
+    .filter((p) => activeCategory.value === null || p.categoryId === activeCategory.value)
+    .sort((a, b) => (a.sortOrder ?? 99) - (b.sortOrder ?? 99))
 )
+
+function toggleCategory(id: number) {
+  activeCategory.value = activeCategory.value === id ? null : id
+}
 
 function open(url: string) {
   window.open(url, '_blank', 'noopener')
 }
 
 onMounted(async () => {
-  if (products.value.length) {
-    loading.value = false
-    return
-  }
   try {
     const { api } = useApi()
-    products.value = await api('/api/products')
+    await Promise.all([
+      loadCategories(),
+      products.value.length ? Promise.resolve() : api('/api/products').then((r: any) => (products.value = r))
+    ])
   } catch (e: any) {
     error.value = e.message || '加载失败'
   } finally {
@@ -68,8 +108,38 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.cat-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.cat-chip {
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+
+.cat-chip:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.cat-chip.active {
+  background: var(--badge-bg);
+  border-color: rgba(167, 139, 250, 0.45);
+  color: var(--badge-text);
+}
+
 .p-grid {
-  margin-top: 24px;
+  margin-top: 20px;
 }
 
 .p-card {
@@ -92,6 +162,11 @@ onMounted(async () => {
   align-items: center;
 }
 
+.p-id {
+  flex: 1;
+  min-width: 0;
+}
+
 .p-id h3 {
   margin: 0;
   font-size: 1rem;
@@ -101,6 +176,27 @@ onMounted(async () => {
 .p-tag {
   font-size: 0.78rem;
   color: var(--text-muted);
+}
+
+.p-cat {
+  flex-shrink: 0;
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+
+.p-cat:hover,
+.p-cat.active {
+  background: var(--badge-bg);
+  border-color: rgba(167, 139, 250, 0.45);
+  color: var(--badge-text);
 }
 
 .p-desc {

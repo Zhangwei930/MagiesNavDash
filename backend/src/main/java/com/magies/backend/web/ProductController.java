@@ -1,7 +1,9 @@
 package com.magies.backend.web;
 
 import com.magies.backend.entity.Product;
+import com.magies.backend.entity.ProductCategory;
 import com.magies.backend.entity.ProductRelease;
+import com.magies.backend.repository.ProductCategoryRepository;
 import com.magies.backend.service.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +16,21 @@ import java.util.Map;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductCategoryRepository categoryRepository;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, ProductCategoryRepository categoryRepository) {
         this.productService = productService;
+        this.categoryRepository = categoryRepository;
     }
 
     @GetMapping("/products")
     public List<Product> list() {
         return productService.listPublished();
+    }
+
+    @GetMapping("/categories")
+    public List<ProductCategory> categories() {
+        return categoryRepository.findAllByOrderBySortOrderAsc();
     }
 
     @GetMapping("/products/{slug}")
