@@ -155,31 +155,30 @@
       </div>
     </div>
   </div>
-
-  <!-- Modals and scripts can be in script tag -->
-  <script setup lang="ts">
-  import { ref } from 'vue'
-  import { useAuthStore } from '~/stores/auth'
-
-  const authStore = useAuthStore()
-  const showLogin = ref(false)
-  const showLoginModal = ref(false)
-  const showDemo = () => alert('演示功能即将上线！')
-  const scrollToDownload = () => {
-    document.querySelector('section:last-of-type')?.scrollIntoView({ behavior: 'smooth' })
-  }
-  const downloadProduct = () => alert('下载功能已启用（模拟）')
-
-  const sendVerificationCode = () => {
-    authStore.sendVerificationCode()
-  }
-
-  const login = () => {
-    authStore.verifyCodeAndLogin()
-    showLogin.value = false
-  }
-  </script>
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useAuthStore } from '~/stores/auth'
+
+const authStore = useAuthStore()
+const showLogin = ref(false)
+const showLoginModal = ref(false)
+const showDemo = () => alert('演示功能即将上线！')
+const scrollToDownload = () => {
+  document.querySelector('section:last-of-type')?.scrollIntoView({ behavior: 'smooth' })
+}
+const downloadProduct = () => alert('下载功能已启用（模拟）')
+
+const sendVerificationCode = () => {
+  authStore.sendVerificationCode()
+}
+
+const login = () => {
+  authStore.verifyCodeAndLogin()
+  showLogin.value = false
+}
+</script>
 
 <style scoped>
 /* Additional styles if needed */

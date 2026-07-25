@@ -49,28 +49,28 @@
       </div>
     </div>
   </div>
-
-  <script setup lang="ts">
-  import { ref } from 'vue'
-  import { useAuthStore } from '~/stores/auth'
-
-  const authStore = useAuthStore()
-  const email = ref('')
-  const code = ref('')
-
-  const sendVerificationCode = () => {
-    authStore.sendVerificationCode()
-  }
-
-  const login = () => {
-    authStore.verifyCodeAndLogin()
-  }
-
-  const logout = () => {
-    authStore.isLoggedIn = false
-    authStore.verificationSent = false
-    authStore.user = null
-    alert('已退出登录')
-  }
-  </script>
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useAuthStore } from '~/stores/auth'
+
+const authStore = useAuthStore()
+const email = ref('')
+const code = ref('')
+
+const sendVerificationCode = () => {
+  authStore.sendVerificationCode()
+}
+
+const login = () => {
+  authStore.verifyCodeAndLogin()
+}
+
+const logout = () => {
+  authStore.isLoggedIn = false
+  authStore.verificationSent = false
+  authStore.user = null
+  alert('已退出登录')
+}
+</script>

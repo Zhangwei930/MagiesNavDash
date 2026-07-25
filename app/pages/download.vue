@@ -46,17 +46,17 @@
       </div>
     </div>
   </div>
-
-  <script setup lang="ts">
-  import { useRouter } from 'vue-router'
-  const router = useRouter()
-
-  const downloadProduct = () => {
-    alert('下载请求已模拟发送（Phase1 完整版）\n实际集成后将触发签名验证流程。')
-  }
-
-  const backToHome = () => {
-    router.push('/')
-  }
-  </script>
 </template>
+
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+const downloadProduct = () => {
+  alert('下载请求已模拟发送（Phase1 完整版）\n实际集成后将触发签名验证流程。')
+}
+
+const backToHome = () => {
+  router.push('/')
+}
+</script>
