@@ -8,7 +8,7 @@ Magies Hub — a unified product portal (marketing site + account center + downl
 
 Two independent app halves live in this repo:
 - **Frontend**: Nuxt 4 / Vue 3 SPA at the repo root.
-- **Backend**: a bare-bones Spring Boot 3 (Java 21) service in `backend/`, currently just a stub `MailController` mirroring the frontend's mock mail API. It has no `settings.gradle`, no Gradle wrapper, and no `application.properties` yet — it is not runnable as-is without adding those.
+- **Backend**: a bare-bones Spring Boot 3 (Java 21) service in `backend/`, currently just a stub `MailController` mirroring the frontend's mock mail API. It has no `application.properties` yet, so it will build and boot but has no real datasource/config wired up.
 
 ## Commands
 
@@ -23,7 +23,14 @@ npm run generate     # static site generation
 
 There is no lint, test, or typecheck script configured in `package.json` — don't assume one exists.
 
-Backend (`backend/`): the `build.gradle` declares a standard Spring Boot/JPA/Redis/Flyway stack, but there is no Gradle wrapper or `settings.gradle` checked in, so `./gradlew` will not work until those are added.
+Backend (`backend/`):
+```bash
+./gradlew build   # compiles + runs tests + produces build/libs/*.jar (auto-provisions a JDK 21 toolchain via the Foojay resolver if none is installed)
+./gradlew bootRun  # run locally
+```
+`build.gradle` declares a standard Spring Boot/JPA/Redis/Flyway stack targeting Java 21.
+
+Docker images: `Dockerfile` (root, builds the Nuxt frontend) and `backend/Dockerfile` (builds the Spring Boot jar) are multi-stage builds matching what `docker-compose.yml` expects at `build: .` / `build: ./backend`.
 
 ## Architecture
 
@@ -35,7 +42,7 @@ Backend (`backend/`): the `build.gradle` declares a standard Spring Boot/JPA/Red
 
 **Mock API layer**: `server/api/mail.ts` is a Nuxt/Nitro server route that simulates the mail-gateway response (validates a 6-digit code, logs to console, returns a canned template). `backend/.../MailController.java` is the Spring Boot equivalent of the same simulated endpoint — the two are meant to converge as the real backend is built out, so keep their request/response shapes in sync when editing either.
 
-**Deployment**: `docker-compose.yml` defines the target production topology — `product-server` (this Nuxt app), `api` (Spring Boot), `postgres`, `redis`, `mail-gateway` (SMTP relay via Google SMTP), and `nginx` as reverse proxy/SSL terminator for `dash.magies.top`. `nginx.conf` routes `/` to the product server and `/api/` to the Spring Boot API. Note several of these services (`mail-gateway` build context, `ssl/` certs) don't exist in the repo yet — the compose file describes the intended end state, not the current runnable state.
+**Deployment**: the target server (`150.230.47.207`) is shared with sibling projects (`games.magies.top`, `hrp.magies.top`, `nav.magies.top`) and runs a single host-level nginx (systemd, not containerized) that owns ports 80/443 for all of them. So `docker-compose.yml` only publishes `product-server` (port 3000) and `api` (port 8080) to `127.0.0.1` — it does not run its own nginx/SSL container. `nginx.conf` in this repo is a host vhost file (not a container config) meant to be copied to `/etc/nginx/sites-available/dash.magies.top` on the server, following the same pattern as the existing `nav.magies.top` vhost (Cloudflare-origin certs at `/etc/ssl/cloudflare/`, proxying `/` and `/api/` to the two `127.0.0.1` ports above). `mail-gateway`'s build context (`./mail-gateway`) still doesn't exist in the repo — that service isn't runnable yet.
 
 ## Styling
 
