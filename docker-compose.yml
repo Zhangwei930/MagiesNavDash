@@ -1,29 +1,28 @@
 version: '3.9'
 
 services:
-  # Product Server (dash.magies.top)
+  # Product Server (dash.magies.top) - reverse-proxied by the host's nginx (see nginx.conf), not exposed directly
   product-server:
     image: magies-hub/product
     build: .
     ports:
-      - "8080:80"
-      - "8443:443"  # HTTPS via Nginx
+      - "127.0.0.1:8110:3000"
     environment:
       - NODE_ENV=production
       - API_URL=http://api:8080
     depends_on:
-      - postgres
-      - redis
       - api
 
-  # API Server (Spring Boot)
+  # API Server (Spring Boot) - reverse-proxied by the host's nginx, not exposed directly
   api:
     image: magies-hub/api
     build: ./backend
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8111:8080"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/magies
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=magies123
       - SPRING_REDIS_HOST=redis
     depends_on:
       - postgres
@@ -42,8 +41,6 @@ services:
   # Redis Cache
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
 
   # Mail Gateway (129.146.112.178)
   mail-gateway:
@@ -54,22 +51,6 @@ services:
     environment:
       - SMTP_HOST=smtp.google.com
       - SMTP_PORT=587
-    depends_on:
-      - nginx
-
-  # Nginx (reverse proxy + SSL)
-  nginx:
-    image: nginx:alpine
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-    ports:
-      - "8080:80"
-      - "8443:443"
-    depends_on:
-      - product-server
-      - api
-      - mail-gateway
 
 volumes:
   postgres_data:
