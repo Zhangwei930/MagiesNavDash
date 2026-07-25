@@ -20,12 +20,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'com.zaxxer:HikariCP:5.1.0'
-    implementation 'org.flywaydb:flyway-core:10.15.1'
-    implementation 'org.springframework.boot:spring-boot-starter-test' {
+    implementation 'org.flywaydb:flyway-core:10.15.2'
+    runtimeOnly 'org.flywaydb:flyway-database-postgresql:10.15.2'
+    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.h2database:h2'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
-    runtimeOnly 'com.h2database:h2'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
