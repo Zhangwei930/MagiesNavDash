@@ -2,26 +2,51 @@
   <div class="page">
     <div class="container">
       <h1 class="page-title">{{ t('products.title') }}</h1>
+      <p class="page-desc">{{ t('products.desc') }}</p>
 
       <div v-if="loading" class="muted">{{ t('products.loading') }}</div>
       <div v-else-if="error" class="err">{{ error }}</div>
       <template v-else>
-        <!-- Only worth a filter row once there is more than one category to switch between. -->
-        <div v-if="usedCategories.length > 1" class="cat-bar">
-          <button
-            type="button"
-            class="cat-chip"
-            :class="{ active: activeCategory === null }"
-            @click="activeCategory = null"
-          >{{ t('products.all') }}</button>
-          <button
-            v-for="c in usedCategories"
-            :key="c.id"
-            type="button"
-            class="cat-chip"
-            :class="{ active: activeCategory === c.id }"
-            @click="activeCategory = c.id"
-          >{{ c.name }}</button>
+        <div class="filters">
+          <div class="filter-block">
+            <span class="filter-label">{{ t('products.filterLine') }}</span>
+            <div class="cat-bar">
+              <button
+                type="button"
+                class="cat-chip"
+                :class="{ active: !activeCategorySlug }"
+                @click="setCategory(null)"
+              >{{ t('products.all') }}</button>
+              <button
+                v-for="c in usedCategories"
+                :key="c.id"
+                type="button"
+                class="cat-chip"
+                :class="{ active: activeCategorySlug === c.slug }"
+                @click="setCategory(c.slug)"
+              >{{ c.name }}</button>
+            </div>
+          </div>
+
+          <div class="filter-block">
+            <span class="filter-label">{{ t('products.filterStatus') }}</span>
+            <div class="cat-bar">
+              <button
+                type="button"
+                class="cat-chip"
+                :class="{ active: !activeStatus }"
+                @click="setStatus(null)"
+              >{{ t('products.all') }}</button>
+              <button
+                v-for="s in usedStatuses"
+                :key="s"
+                type="button"
+                class="cat-chip"
+                :class="{ active: activeStatus === s }"
+                @click="setStatus(s)"
+              >{{ statusLabel(s, locale) }}</button>
+            </div>
+          </div>
         </div>
 
         <div v-if="!list.length" class="empty">{{ t('products.empty') }}</div>
@@ -35,25 +60,20 @@
                 <h3>{{ p.name }}</h3>
                 <span class="p-tag">{{ p.tagline }}</span>
               </div>
-              <button
-                v-if="categoryLabel(p.categoryId)"
-                type="button"
-                class="p-cat"
-                :class="{ active: activeCategory === p.categoryId }"
-                @click.stop.prevent="toggleCategory(p.categoryId)"
-              >{{ categoryLabel(p.categoryId) }}</button>
+            </div>
+
+            <div class="p-meta">
+              <span v-if="categoryLabel(p.categoryId)" class="p-cat">{{ categoryLabel(p.categoryId) }}</span>
+              <span class="status-badge" :data-tone="statusMeta(p.status).tone">
+                {{ statusLabel(p.status, locale) }}
+              </span>
             </div>
 
             <p v-if="p.description" class="p-desc">{{ p.description }}</p>
 
             <div class="p-foot">
               <span class="p-more">{{ t('products.detail') }} →</span>
-              <button
-                v-if="p.homepageUrl"
-                type="button"
-                class="p-open"
-                @click.stop.prevent="open(p.homepageUrl)"
-              >{{ t('products.open') }} ↗</button>
+              <span class="p-action">{{ actionLabel(p) }}</span>
             </div>
           </NuxtLink>
         </div>
@@ -64,32 +84,75 @@
 
 <script setup lang="ts">
 import { toolColor, toolIcon } from '~/utils/toolMeta'
+import { primaryAction, statusLabel, statusMeta, statusSortRank } from '~/utils/productStatus'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+const route = useRoute()
+const router = useRouter()
 const { categories, loadCategories, categoryLabel } = useCategories()
 const products = useState<any[]>('hub-products', () => [])
 const loading = ref(true)
 const error = ref('')
-const activeCategory = ref<number | null>(null)
 
-/** Never render a chip for a category nobody is in. */
+const activeCategorySlug = computed(() => {
+  const q = route.query.category
+  return typeof q === 'string' && q ? q : null
+})
+
+const activeStatus = computed(() => {
+  const q = route.query.status
+  return typeof q === 'string' && q ? q.toUpperCase() : null
+})
+
 const usedCategories = computed(() => {
   const inUse = new Set(products.value.map((p) => p.categoryId))
   return categories.value.filter((c) => inUse.has(c.id))
 })
 
-const list = computed(() =>
-  products.value
-    .filter((p) => activeCategory.value === null || p.categoryId === activeCategory.value)
-    .sort((a, b) => (a.sortOrder ?? 99) - (b.sortOrder ?? 99))
-)
+const usedStatuses = computed(() => {
+  const set = new Set(products.value.map((p) => (p.status || '').toUpperCase()).filter(Boolean))
+  return [...set].sort((a, b) => statusSortRank(a) - statusSortRank(b))
+})
 
-function toggleCategory(id: number) {
-  activeCategory.value = activeCategory.value === id ? null : id
+const list = computed(() => {
+  const catId = activeCategorySlug.value
+    ? categories.value.find((c) => c.slug === activeCategorySlug.value)?.id
+    : null
+
+  return products.value
+    .filter((p) => {
+      if (catId != null && p.categoryId !== catId) return false
+      if (activeStatus.value && (p.status || '').toUpperCase() !== activeStatus.value) return false
+      return true
+    })
+    .sort((a, b) => {
+      const rank = statusSortRank(a.status) - statusSortRank(b.status)
+      if (rank !== 0) return rank
+      return (a.sortOrder ?? 99) - (b.sortOrder ?? 99)
+    })
+})
+
+function setCategory(slug: string | null) {
+  const query = { ...route.query } as Record<string, string>
+  if (slug) query.category = slug
+  else delete query.category
+  router.replace({ query })
 }
 
-function open(url: string) {
-  window.open(url, '_blank', 'noopener')
+function setStatus(status: string | null) {
+  const query = { ...route.query } as Record<string, string>
+  if (status) query.status = status
+  else delete query.status
+  router.replace({ query })
+}
+
+function actionLabel(p: any) {
+  const a = primaryAction(p)
+  if (a === 'download') return t('action.download')
+  if (a === 'use') return t('action.use')
+  if (a === 'preview') return t('action.preview')
+  if (a === 'contact') return t('action.contact')
+  return t('action.learn')
 }
 
 onMounted(async () => {
@@ -108,11 +171,26 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.filters {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.filter-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
 .cat-bar {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 22px;
 }
 
 .cat-chip {
@@ -125,6 +203,7 @@ onMounted(async () => {
   font-size: 0.85rem;
   cursor: pointer;
   transition: background 0.18s, border-color 0.18s, color 0.18s;
+  min-height: 36px;
 }
 
 .cat-chip:hover {
@@ -145,7 +224,7 @@ onMounted(async () => {
 .p-card {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   text-decoration: none;
   color: inherit;
 }
@@ -178,25 +257,20 @@ onMounted(async () => {
   color: var(--text-muted);
 }
 
+.p-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
 .p-cat {
-  flex-shrink: 0;
-  align-self: flex-start;
   padding: 3px 10px;
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text-muted);
-  font: inherit;
   font-size: 0.72rem;
-  cursor: pointer;
-  transition: background 0.18s, border-color 0.18s, color 0.18s;
-}
-
-.p-cat:hover,
-.p-cat.active {
-  background: var(--badge-bg);
-  border-color: rgba(167, 139, 250, 0.45);
-  color: var(--badge-text);
 }
 
 .p-desc {
@@ -205,6 +279,10 @@ onMounted(async () => {
   font-size: 0.88rem;
   line-height: 1.65;
   color: var(--text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .p-foot {
@@ -220,28 +298,14 @@ onMounted(async () => {
 .p-more {
   color: var(--accent-hover);
   opacity: 0.75;
-  transition: opacity 0.18s;
 }
 
 .p-card:hover .p-more {
   opacity: 1;
 }
 
-.p-open {
-  padding: 5px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  font: inherit;
-  font-size: 0.82rem;
-  cursor: pointer;
-  transition: background 0.18s, border-color 0.18s, color 0.18s;
-}
-
-.p-open:hover {
-  background: var(--surface-hover);
-  border-color: rgba(167, 139, 250, 0.45);
-  color: var(--accent-hover);
+.p-action {
+  color: var(--text-muted);
+  font-weight: 550;
 }
 </style>

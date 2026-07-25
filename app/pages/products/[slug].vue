@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="container">
-      <NuxtLink to="/products" class="back">← {{ t('products.title') }}</NuxtLink>
+      <NuxtLink to="/products" class="back">← {{ t('detail.back') }}</NuxtLink>
 
       <div v-if="loading" class="muted">{{ t('products.loading') }}</div>
       <div v-else-if="error" class="err">{{ error }}</div>
@@ -12,17 +12,42 @@
             <component :is="icon" :size="22" :stroke-width="2" />
           </div>
           <div class="d-id">
-            <h1>{{ detail.product.name }}</h1>
+            <div class="d-title-row">
+              <h1>{{ detail.product.name }}</h1>
+              <span class="status-badge" :data-tone="statusMeta(detail.product.status).tone">
+                {{ statusLabel(detail.product.status, locale) }}
+              </span>
+            </div>
             <p class="d-tag">{{ detail.product.tagline }}</p>
+            <p v-if="lineName" class="d-line">{{ lineName }}</p>
           </div>
-          <a
-            v-if="detail.product.homepageUrl"
-            class="btn btn-primary"
-            :href="detail.product.homepageUrl"
-            target="_blank"
-            rel="noopener"
-          >{{ t('detail.open') }}</a>
+          <div class="d-actions">
+            <a
+              v-if="primaryHref"
+              class="btn btn-primary"
+              :href="primaryHref"
+              :target="primaryExternal ? '_blank' : undefined"
+              :rel="primaryExternal ? 'noopener' : undefined"
+              @click="onPrimary($event)"
+            >{{ primaryLabel }}</a>
+            <a
+              v-if="detail.product.homepageUrl && primaryActionKey !== 'use'"
+              class="btn btn-outline"
+              :href="detail.product.homepageUrl"
+              target="_blank"
+              rel="noopener"
+            >{{ t('detail.open') }}</a>
+          </div>
         </header>
+
+        <p
+          v-if="isDev"
+          class="note note-dev"
+        >{{ t('detail.previewNote') }}</p>
+        <p
+          v-else-if="isEnterprise"
+          class="note note-ent"
+        >{{ t('detail.enterpriseNote') }}</p>
 
         <p v-if="detail.product.description" class="d-desc">{{ detail.product.description }}</p>
 
@@ -63,6 +88,15 @@
 
           <p v-if="msg" class="muted r-msg">{{ msg }}</p>
         </section>
+
+        <section class="d-section">
+          <h2>{{ t('detail.related') }}</h2>
+          <div class="related-row">
+            <NuxtLink class="btn btn-outline btn-sm" to="/solutions">{{ t('nav.solutions') }}</NuxtLink>
+            <NuxtLink class="btn btn-outline btn-sm" to="/download">{{ t('nav.download') }}</NuxtLink>
+            <NuxtLink class="btn btn-outline btn-sm" to="/contact">{{ t('detail.contact') }}</NuxtLink>
+          </div>
+        </section>
       </template>
     </div>
   </div>
@@ -70,9 +104,11 @@
 
 <script setup lang="ts">
 import { toolColor, toolIcon } from '~/utils/toolMeta'
+import { primaryAction, statusLabel, statusMeta } from '~/utils/productStatus'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
+const { loadCategories, categoryLabel } = useCategories()
 const detail = ref<any>(null)
 const loading = ref(true)
 const error = ref('')
@@ -80,12 +116,42 @@ const msg = ref('')
 
 const icon = computed(() => toolIcon(detail.value?.product || {}))
 const color = computed(() => toolColor(detail.value?.product || {}))
+const lineName = computed(() => categoryLabel(detail.value?.product?.categoryId))
 
 const releases = computed<any[]>(() => detail.value?.releases || [])
 const latest = computed(
   () => detail.value?.latestRelease || releases.value.find((r) => r.isLatest) || releases.value[0] || null
 )
 const older = computed(() => releases.value.filter((r) => r.id !== latest.value?.id))
+
+const primaryActionKey = computed(() => primaryAction(detail.value?.product || {}))
+const isDev = computed(() => {
+  const s = (detail.value?.product?.status || '').toUpperCase()
+  return s === 'IN_DEVELOPMENT' || s === 'COMING_SOON'
+})
+const isEnterprise = computed(() => (detail.value?.product?.status || '').toUpperCase() === 'ENTERPRISE')
+
+const primaryLabel = computed(() => {
+  const a = primaryActionKey.value
+  if (a === 'download') return t('action.download')
+  if (a === 'use') return t('action.use')
+  if (a === 'preview') return t('action.subscribe')
+  if (a === 'contact') return t('action.contact')
+  return t('action.learn')
+})
+
+const primaryHref = computed(() => {
+  const p = detail.value?.product
+  if (!p) return null
+  const a = primaryActionKey.value
+  if (a === 'download') return '/download'
+  if (a === 'use' && p.homepageUrl) return p.homepageUrl
+  if (a === 'preview') return '/roadmap'
+  if (a === 'contact') return '/contact'
+  return null
+})
+
+const primaryExternal = computed(() => !!primaryHref.value?.startsWith('http'))
 
 function releaseMeta(r: { fileSize?: number; platform?: string; publishedAt?: string }) {
   return [
@@ -97,6 +163,14 @@ function releaseMeta(r: { fileSize?: number; platform?: string; publishedAt?: st
     .join(' · ')
 }
 
+function onPrimary(e: Event) {
+  const href = primaryHref.value
+  if (href && !href.startsWith('http')) {
+    e.preventDefault()
+    navigateTo(href)
+  }
+}
+
 async function download(releaseId: number) {
   msg.value = ''
   try {
@@ -105,8 +179,6 @@ async function download(releaseId: number) {
       method: 'POST',
       body: JSON.stringify({ productId: detail.value.product.id, releaseId })
     })
-    // The endpoint only logs the download and hands back the URL — actually go there.
-    // MagiesTerminal points at its own site's download section rather than a Hub-hosted file.
     if (res.downloadUrl) window.open(res.downloadUrl, '_blank', 'noopener')
     else msg.value = res.message
   } catch (e: any) {
@@ -117,6 +189,7 @@ async function download(releaseId: number) {
 onMounted(async () => {
   try {
     const { api } = useApi()
+    await loadCategories().catch(() => {})
     detail.value = await api(`/api/products/${route.params.slug}`)
   } catch (e: any) {
     error.value = e.message || '加载失败'
@@ -141,14 +214,38 @@ onMounted(async () => {
 
 .d-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 14px;
   flex-wrap: wrap;
+}
+
+.product-icon {
+  --tint: var(--accent);
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--tint);
+  background: radial-gradient(
+    circle at 30% 25%,
+    color-mix(in srgb, var(--tint) 28%, transparent),
+    color-mix(in srgb, var(--tint) 9%, transparent)
+  );
+  border: 1px solid color-mix(in srgb, var(--tint) 38%, transparent);
 }
 
 .d-id {
   flex: 1;
   min-width: 0;
+}
+
+.d-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
 }
 
 .d-id h1 {
@@ -160,9 +257,42 @@ onMounted(async () => {
 }
 
 .d-tag {
-  margin: 2px 0 0;
-  font-size: 0.88rem;
+  margin: 6px 0 0;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.d-line {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
   color: var(--text-muted);
+}
+
+.d-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.note {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.note-dev {
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.28);
+  color: var(--text);
+}
+
+.note-ent {
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.28);
+  color: var(--text);
 }
 
 .d-desc {
@@ -307,5 +437,11 @@ onMounted(async () => {
 .r-msg {
   margin-top: 12px;
   font-size: 0.85rem;
+}
+
+.related-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 </style>

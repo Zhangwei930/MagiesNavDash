@@ -21,6 +21,11 @@
               </NuxtLink>
               <span v-else class="dl-name">—</span>
               <code class="dl-ver">v{{ item.release.version }}</code>
+              <span
+                v-if="item.product?.status"
+                class="status-badge"
+                :data-tone="statusMeta(item.product.status).tone"
+              >{{ statusLabel(item.product.status, locale) }}</span>
               <span class="dl-meta">{{ releaseMeta(item.release) }}</span>
             </div>
             <p v-if="item.release.changelog" class="dl-log">{{ item.release.changelog }}</p>
@@ -32,6 +37,7 @@
         </div>
       </div>
 
+      <p class="dl-note">{{ t('download.note') }}</p>
       <p v-if="toast" class="muted" style="margin-top:12px">{{ toast }}</p>
     </div>
   </div>
@@ -39,8 +45,9 @@
 
 <script setup lang="ts">
 import { toolColor, toolIcon } from '~/utils/toolMeta'
+import { statusLabel, statusMeta } from '~/utils/productStatus'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const loading = ref(true)
 const error = ref('')
 const toast = ref('')
@@ -161,6 +168,13 @@ onMounted(async () => {
   margin: 6px 0 0;
   font-size: 0.86rem;
   line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.dl-note {
+  margin-top: 20px;
+  font-size: 0.84rem;
+  line-height: 1.65;
   color: var(--text-muted);
 }
 </style>

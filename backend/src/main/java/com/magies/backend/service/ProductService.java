@@ -35,12 +35,15 @@ public class ProductService {
         this.downloadLogRepository = downloadLogRepository;
     }
 
+    /** Statuses hidden from the public catalog and product pages. */
+    private static final List<String> HIDDEN_STATUSES = List.of("HIDDEN", "DISCONTINUED");
+
     public List<Product> listPublished() {
-        return productRepository.findByStatusOrderBySortOrderAsc("PUBLISHED");
+        return productRepository.findByStatusNotInOrderBySortOrderAsc(HIDDEN_STATUSES);
     }
 
     public Map<String, Object> getDetail(String slug) {
-        Product product = productRepository.findBySlugAndStatus(slug, "PUBLISHED")
+        Product product = productRepository.findPublicBySlug(slug, HIDDEN_STATUSES)
                 .orElseThrow(() -> new IllegalArgumentException("产品不存在"));
         List<ProductFeature> features = featureRepository.findByProductIdOrderBySortOrderAsc(product.getId());
         List<ProductRelease> releases = releaseRepository.findByProductIdOrderByPublishedAtDesc(product.getId());

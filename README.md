@@ -68,10 +68,12 @@ docker compose up --build -d
 
 ## 页面
 
-- `/` 首页  
-- `/products` 工具站  
-- `/products/:slug` 产品详情  
-- `/account` 账号中心  
-- `/download` 下载中心  
-- `/admin` 后台  
-- `/stats` 统计  
+- `/` 品牌首页（产品线 · 重点产品 · 场景 · 统一体验）
+- `/products` 产品中心（按产品线 / 状态筛选）
+- `/products/:slug` 产品详情
+- `/solutions` · `/solutions/:slug` 解决方案
+- `/download` 下载中心
+- `/roadmap` 路线图 · `/changelog` 更新日志
+- `/about` 关于 · `/contact` 联系
+- `/privacy` · `/terms` · `/security` 信任页
+- `/account` 账号中心 · `/admin` 后台 · `/stats` 统计

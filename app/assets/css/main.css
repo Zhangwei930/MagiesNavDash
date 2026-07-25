@@ -900,6 +900,90 @@ textarea {
   flex: 1;
 }
 
+/* Product status badges (ecosystem plan lifecycle) */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  line-height: 1.3;
+}
+
+.status-badge[data-tone="ok"] {
+  color: #a7f3d0;
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.28);
+}
+
+.status-badge[data-tone="beta"] {
+  color: #c4b5fd;
+  background: rgba(167, 139, 250, 0.14);
+  border-color: rgba(167, 139, 250, 0.35);
+}
+
+.status-badge[data-tone="dev"] {
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.status-badge[data-tone="enterprise"] {
+  color: #a5b4fc;
+  background: rgba(99, 102, 241, 0.14);
+  border-color: rgba(99, 102, 241, 0.32);
+}
+
+.status-badge[data-tone="lab"] {
+  color: #cbd5e1;
+  background: rgba(148, 163, 184, 0.12);
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+.status-badge[data-tone="muted"] {
+  color: var(--text-muted);
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+:root[data-theme="light"] .status-badge[data-tone="ok"] {
+  color: #047857;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+:root[data-theme="light"] .status-badge[data-tone="beta"] {
+  color: #6d28d9;
+  background: rgba(124, 58, 237, 0.1);
+}
+
+:root[data-theme="light"] .status-badge[data-tone="dev"] {
+  color: #1d4ed8;
+  background: rgba(37, 99, 235, 0.1);
+}
+
+:root[data-theme="light"] .status-badge[data-tone="enterprise"] {
+  color: #4338ca;
+  background: rgba(99, 102, 241, 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero::after {
+    animation: none;
+  }
+
+  .card,
+  .card:hover,
+  .btn,
+  .btn-primary:hover {
+    transition: none;
+    transform: none;
+  }
+}
+
 .product-card-m .actions {
   display: flex;
   gap: 8px;

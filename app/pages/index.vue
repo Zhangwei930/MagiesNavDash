@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <!-- Hero -->
+    <!-- 1. Brand Hero -->
     <section class="hero">
       <div class="container" style="text-align:center">
         <span class="hero-badge">{{ t('home.badge') }}</span>
@@ -8,119 +8,151 @@
           <PlanetLogo />
         </div>
         <h1 class="hero-title">Build. Connect. Ship.</h1>
+        <p class="hero-claim">{{ t('home.claim') }}</p>
         <p class="subtitle">{{ t('home.lead') }}</p>
         <div class="hero-actions">
-          <NuxtLink class="btn btn-primary" to="/products">{{ t('home.browse') }}</NuxtLink>
-          <a class="btn btn-outline" href="https://shell.magies.top" target="_blank" rel="noopener">
-            {{ t('home.openTerminal') }}
-          </a>
-          <a class="btn btn-outline" href="https://nav.magies.top" target="_blank" rel="noopener">
-            {{ t('site.nav') }}
-          </a>
+          <NuxtLink class="btn btn-primary" to="/products">{{ t('home.explore') }}</NuxtLink>
+          <NuxtLink class="btn btn-outline" to="/about">{{ t('home.learn') }}</NuxtLink>
         </div>
       </div>
     </section>
 
-    <!-- Products -->
+    <!-- 2. Four product lines -->
     <section class="section">
       <div class="container">
         <div class="section-header">
-          <span class="section-label">{{ t('home.productsLabel') }}</span>
-          <h2>{{ t('home.productsTitle') }}</h2>
-          <p>{{ t('home.productsDesc') }}</p>
+          <span class="section-label">{{ t('home.linesLabel') }}</span>
+          <h2>{{ t('home.linesTitle') }}</h2>
+          <p>{{ t('home.linesDesc') }}</p>
         </div>
-
-        <div v-if="loading" class="muted text-center">{{ t('home.loading') }}</div>
-        <div v-else-if="error" class="err text-center">{{ error }}</div>
-        <div v-else class="grid grid-3">
-          <a
-            v-for="p in displayProducts"
-            :key="p.id"
-            class="card product-card-m"
-            :href="p.homepageUrl || `/products/${p.slug}`"
-            :target="p.homepageUrl ? '_blank' : undefined"
-            :rel="p.homepageUrl ? 'noopener' : undefined"
-            @click="onProductClick(p, $event)"
-          >
-            <div class="card-top">
-              <div class="icon-circle" :style="{ '--tint': toolColor(p) }">
-                <component :is="toolIcon(p)" :size="20" :stroke-width="2" />
-              </div>
-              <div>
-                <h3>{{ displayName(p) }}</h3>
-                <div class="tag">{{ p.tagline }}</div>
-              </div>
-            </div>
-            <p class="desc">{{ shortDesc(p) }}</p>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Featured: Terminal -->
-    <section class="section section-alt">
-      <div class="container">
-        <div class="feature-split">
-          <div class="feature-visual card">
-            <div class="feature-mark">
-              <BrandLogo size="lg" :show-wordmark="false" glow />
-            </div>
-            <h3 class="feature-name">MagiesTerminal</h3>
-            <p class="muted">{{ t('home.terminalTag') }}</p>
-          </div>
-          <div class="feature-body">
-            <span class="section-label">{{ t('home.featured') }}</span>
-            <h2 class="feature-title">Terminal</h2>
-            <p class="feature-desc">{{ t('home.terminalDesc') }}</p>
-            <ul class="feature-list">
-              <li>{{ t('home.terminalF1') }}</li>
-              <li>{{ t('home.terminalF2') }}</li>
-              <li>{{ t('home.terminalF3') }}</li>
-            </ul>
-            <div class="hero-actions" style="justify-content:flex-start;margin-top:20px">
-              <a class="btn btn-primary" href="https://shell.magies.top" target="_blank" rel="noopener">
-                {{ t('home.openTerminal') }}
-              </a>
-              <NuxtLink class="btn btn-outline" to="/download">{{ t('home.download') }}</NuxtLink>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- All Magies sites in one place -->
-    <section class="section">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-label">{{ t('home.sitesLabel') }}</span>
-          <h2>{{ t('home.sitesTitle') }}</h2>
-          <p>{{ t('home.sitesDesc') }}</p>
-        </div>
-        <div class="site-row">
+        <div class="grid grid-4 line-grid">
           <NuxtLink
-            v-for="s in SITE_LINKS"
-            :key="s.key"
-            class="site-entry"
-            :to="s.href"
-            :target="s.external ? '_blank' : undefined"
-            :rel="s.external ? 'noopener' : undefined"
+            v-for="line in PRODUCT_LINES"
+            :key="line.key"
+            class="card line-card"
+            :to="line.href"
           >
-            <span class="site-name">{{ t(`site.${s.key}`) }}</span>
-            <span class="site-host">{{ hostOf(s.href) }}</span>
-            <span class="site-desc">{{ t(`site.${s.key}Desc`) }}</span>
+            <span class="line-index" :style="{ color: line.color }">{{ line.index }}</span>
+            <h3>{{ t(`home.line.${line.key}`) }}</h3>
+            <p>{{ t(`home.line.${line.key}Desc`) }}</p>
+            <span class="card-link">{{ t('action.learn') }} →</span>
           </NuxtLink>
         </div>
       </div>
     </section>
 
-    <!-- Philosophy -->
+    <!-- 3. Featured products by maturity -->
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">{{ t('home.featuredLabel') }}</span>
+          <h2>{{ t('home.featuredTitle') }}</h2>
+          <p>{{ t('home.featuredDesc') }}</p>
+        </div>
+
+        <div v-if="loading" class="muted text-center">{{ t('home.loading') }}</div>
+        <div v-else-if="error" class="err text-center">{{ error }}</div>
+        <div v-else class="grid grid-3">
+          <article
+            v-for="p in featuredProducts"
+            :key="p.id"
+            class="card featured-card"
+          >
+            <div class="card-top">
+              <div class="icon-circle" :style="{ '--tint': toolColor(p) }">
+                <component :is="toolIcon(p)" :size="20" :stroke-width="2" />
+              </div>
+              <div class="featured-id">
+                <h3>{{ p.name }}</h3>
+                <span class="status-badge" :data-tone="statusMeta(p.status).tone">
+                  {{ statusLabel(p.status, locale) }}
+                </span>
+              </div>
+            </div>
+            <p class="tagline">{{ p.tagline }}</p>
+            <p class="desc">{{ shortDesc(p) }}</p>
+            <div class="featured-actions">
+              <a
+                v-if="actionHref(p)"
+                class="btn btn-primary btn-sm"
+                :href="actionHref(p)"
+                :target="isExternal(actionHref(p)!) ? '_blank' : undefined"
+                :rel="isExternal(actionHref(p)!) ? 'noopener' : undefined"
+                @click="onPrimary(p, $event)"
+              >{{ actionLabel(p) }}</a>
+              <NuxtLink class="btn btn-outline btn-sm" :to="`/products/${p.slug}`">
+                {{ t('action.learn') }}
+              </NuxtLink>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Scenarios -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">{{ t('home.scenariosLabel') }}</span>
+          <h2>{{ t('home.scenariosTitle') }}</h2>
+          <p>{{ t('home.scenariosDesc') }}</p>
+        </div>
+        <div class="grid grid-2 scenario-grid">
+          <NuxtLink
+            v-for="s in scenarios"
+            :key="s.to"
+            class="card scenario-card"
+            :to="s.to"
+          >
+            <h3>{{ t(s.titleKey) }}</h3>
+            <p>{{ t(s.descKey) }}</p>
+            <span class="card-link">{{ t('action.learn') }} →</span>
+          </NuxtLink>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Unified experience (honest stages) -->
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">{{ t('home.experienceLabel') }}</span>
+          <h2>{{ t('home.experienceTitle') }}</h2>
+          <p>{{ t('home.experienceDesc') }}</p>
+        </div>
+        <div class="grid grid-3 exp-grid">
+          <div class="card exp-card">
+            <span class="section-label">{{ t('home.exp.done') }}</span>
+            <ul class="exp-list">
+              <li v-for="k in doneKeys" :key="k">{{ t(k) }}</li>
+            </ul>
+          </div>
+          <div class="card exp-card">
+            <span class="section-label">{{ t('home.exp.doing') }}</span>
+            <ul class="exp-list">
+              <li v-for="k in doingKeys" :key="k">{{ t(k) }}</li>
+            </ul>
+          </div>
+          <div class="card exp-card">
+            <span class="section-label">{{ t('home.exp.next') }}</span>
+            <ul class="exp-list">
+              <li v-for="k in nextKeys" :key="k">{{ t(k) }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. CTA -->
     <section class="section">
       <div class="container" style="max-width:640px;text-align:center">
-        <span class="section-label">{{ t('home.philosophyLabel') }}</span>
-        <h2 style="margin:12px 0 14px">{{ t('home.philosophyTitle') }}</h2>
-        <p class="muted" style="font-size:1.05rem;line-height:1.8">
-          {{ t('home.philosophyBody') }}
-        </p>
+        <span class="section-label">{{ t('home.ctaLabel') }}</span>
+        <h2 style="margin:12px 0 20px">{{ t('home.ctaTitle') }}</h2>
+        <div class="hero-actions">
+          <NuxtLink class="btn btn-primary" to="/products">{{ t('home.ctaProducts') }}</NuxtLink>
+          <NuxtLink class="btn btn-outline" to="/roadmap">{{ t('home.ctaUpdates') }}</NuxtLink>
+          <NuxtLink class="btn btn-outline" to="/contact">{{ t('home.ctaContact') }}</NuxtLink>
+        </div>
       </div>
     </section>
   </div>
@@ -128,51 +160,73 @@
 
 <script setup lang="ts">
 import { toolColor, toolIcon } from '~/utils/toolMeta'
-import { SITE_LINKS } from '~/utils/siteLinks'
+import { PRODUCT_LINES } from '~/utils/productLines'
+import { primaryAction, statusLabel, statusMeta } from '~/utils/productStatus'
+import type { MsgKey } from '~/composables/useI18n'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const products = useState<any[]>('hub-products', () => [])
 const loading = ref(true)
 const error = ref('')
 
-const ORDER = ['magies-terminal', 'magies-shell', 'magies-nav', 'magies-hub']
+const FEATURED_ORDER = ['magies-terminal', 'magies-shell', 'magies-data-studio', 'magies-nav']
 
-const NAME_ALIAS: Record<string, string> = {
-  // Sub-brand with its own site — keep the official one-word spelling.
-  'magies-terminal': 'MagiesTerminal',
-  'magies-shell': 'MagiesTerminal',
-  'magies-nav': 'Nav',
-  'magies-hub': 'Hub'
-}
+const scenarios = [
+  { to: '/solutions/remote-servers', titleKey: 'home.scenario.remote' as MsgKey, descKey: 'home.scenario.remoteDesc' as MsgKey },
+  { to: '/solutions/data-automation', titleKey: 'home.scenario.data' as MsgKey, descKey: 'home.scenario.dataDesc' as MsgKey },
+  { to: '/solutions/enterprise', titleKey: 'home.scenario.biz' as MsgKey, descKey: 'home.scenario.bizDesc' as MsgKey },
+  { to: '/solutions/personal', titleKey: 'home.scenario.personal' as MsgKey, descKey: 'home.scenario.personalDesc' as MsgKey }
+]
 
-const displayProducts = computed(() => {
+const doneKeys: MsgKey[] = ['home.exp.done1', 'home.exp.done2', 'home.exp.done3', 'home.exp.done4']
+const doingKeys: MsgKey[] = ['home.exp.doing1', 'home.exp.doing2', 'home.exp.doing3', 'home.exp.doing4']
+const nextKeys: MsgKey[] = ['home.exp.next1', 'home.exp.next2', 'home.exp.next3', 'home.exp.next4']
+
+const featuredProducts = computed(() => {
   const list = [...products.value]
   list.sort((a, b) => {
-    const ia = ORDER.indexOf(a.slug)
-    const ib = ORDER.indexOf(b.slug)
+    const ia = FEATURED_ORDER.indexOf(a.slug)
+    const ib = FEATURED_ORDER.indexOf(b.slug)
     return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib)
   })
-  return list.slice(0, 6)
+  // Prefer Terminal / Data Studio / Nav; fall back to first 3 catalog items
+  const picked = list.filter((p) => FEATURED_ORDER.includes(p.slug)).slice(0, 3)
+  if (picked.length >= 3) return picked
+  return list.slice(0, 3)
 })
 
-function hostOf(href: string) {
-  return href.startsWith('http') ? new URL(href).host : 'dash.magies.top'
-}
-
-function displayName(p: { slug?: string; name?: string }) {
-  return (p.slug && NAME_ALIAS[p.slug]) || p.name || 'Product'
-}
-
-/** Description, not tagline — the tagline already renders as the card's tag line. */
-function shortDesc(p: { description?: string; tagline?: string }) {
+function shortDesc(p: { description?: string }) {
   const text = p.description || ''
-  return text.length > 72 ? text.slice(0, 70) + '…' : text
+  return text.length > 96 ? text.slice(0, 94) + '…' : text
 }
 
-function onProductClick(p: any, e: Event) {
-  if (!p.homepageUrl) {
+function actionLabel(p: any) {
+  const a = primaryAction(p)
+  if (a === 'download') return t('action.download')
+  if (a === 'use') return t('action.use')
+  if (a === 'preview') return t('action.preview')
+  if (a === 'contact') return t('action.contact')
+  return t('action.learn')
+}
+
+function actionHref(p: any): string | null {
+  const a = primaryAction(p)
+  if (a === 'download') return '/download'
+  if (a === 'use' && p.homepageUrl) return p.homepageUrl
+  if (a === 'preview') return `/products/${p.slug}`
+  if (a === 'contact') return '/contact'
+  return `/products/${p.slug}`
+}
+
+function isExternal(href: string) {
+  return href.startsWith('http')
+}
+
+function onPrimary(p: any, e: Event) {
+  const href = actionHref(p)
+  if (href && !isExternal(href) && href.startsWith('/')) {
     e.preventDefault()
-    navigateTo(`/products/${p.slug}`)
+    navigateTo(href)
   }
 }
 
@@ -193,47 +247,101 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.site-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 14px;
+.hero-claim {
+  margin: 0 auto 10px;
+  font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+  font-weight: 600;
+  color: var(--text-heading);
+  letter-spacing: 0.01em;
 }
 
-.site-entry {
+.line-card {
+  text-decoration: none;
+  color: inherit;
+  min-height: 100%;
+}
+
+.line-index {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+  opacity: 0.9;
+}
+
+.featured-card {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 18px 20px;
-  border-radius: 14px;
-  border: 1px solid var(--card-border);
-  background: var(--card-bg);
-  text-decoration: none;
-  transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+  gap: 12px;
 }
 
-.site-entry:hover {
-  transform: translateY(-3px);
-  border-color: rgba(167, 139, 250, 0.42);
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+.featured-id {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
 }
 
-.site-name {
-  font-size: 0.98rem;
-  font-weight: 650;
-  color: var(--text-heading);
+.featured-id h3 {
+  margin: 0;
 }
 
-.site-host {
-  font-family: ui-monospace, SFMono-Regular, monospace;
-  font-size: 0.74rem;
-  color: var(--accent-hover);
-  opacity: 0.85;
+.tagline {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 550;
+  color: var(--text);
 }
 
-.site-desc {
-  margin-top: 4px;
-  font-size: 0.84rem;
-  line-height: 1.6;
+.desc {
+  margin: 0;
+  flex: 1;
+  font-size: 0.88rem;
+  line-height: 1.65;
   color: var(--text-muted);
+}
+
+.featured-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.scenario-card {
+  text-decoration: none;
+  color: inherit;
+}
+
+.scenario-card h3 {
+  margin-bottom: 6px;
+}
+
+.exp-list {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.exp-list li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.exp-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ring-gradient);
 }
 </style>

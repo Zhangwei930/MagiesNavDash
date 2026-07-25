@@ -25,10 +25,19 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'Magies',
+      title: 'Magies — Build. Connect. Ship.',
       meta: [
-        { name: 'description', content: 'Magies — Build. Connect. Ship. 简洁的产品工具生态。' },
-        { name: 'theme-color', content: '#05060a' }
+        {
+          name: 'description',
+          content:
+            'Magies 是独立软件产品品牌：开发工具、数据自动化、在线服务与企业应用。让复杂的软件，变得简单。'
+        },
+        { name: 'theme-color', content: '#05060a' },
+        { property: 'og:title', content: 'Magies — Build. Connect. Ship.' },
+        {
+          property: 'og:description',
+          content: '开发工具 · 数据自动化 · 在线服务 · 企业应用。让复杂的软件，变得简单。'
+        }
       ],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
