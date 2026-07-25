@@ -21,8 +21,8 @@ services:
       - "127.0.0.1:8111:8080"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/magies
-      - SPRING_DATASOURCE_USERNAME=admin
-      - SPRING_DATASOURCE_PASSWORD=magies123
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-admin}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:?请在 .env 中设置数据库密码}
       - SPRING_REDIS_HOST=redis
     depends_on:
       - postgres
@@ -35,14 +35,14 @@ services:
       - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: magies
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: magies123
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?请在 .env 中设置数据库密码}
 
   # Redis Cache
   redis:
     image: redis:7-alpine
 
-  # Mail Gateway (129.146.112.178)
+  # Mail Gateway
   mail-gateway:
     image: magies-hub/mail-gateway
     build: ./mail-gateway
