@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: magies-hub-api
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:magies;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:127.0.0.1}
+      port: ${SPRING_REDIS_PORT:6379}
+      timeout: 2s
+  h2:
+    console:
+      enabled: true
+
+magies:
+  jwt:
+    secret: ${JWT_SECRET:magies-hub-enterprise-jwt-secret-key-32b}
+    expire-hours: ${JWT_EXPIRE_HOURS:72}
+  mail-gateway:
+    url: ${MAIL_GATEWAY_URL:http://127.0.0.1:8090}
+  cors:
+    origins: ${CORS_ORIGINS:http://localhost:3000,https://dash.magies.top,http://dash.magies.top}
+
+logging:
+  level:
+    com.magies: INFO

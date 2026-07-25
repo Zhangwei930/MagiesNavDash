@@ -1,56 +1,59 @@
-version: '3.9'
-
 services:
-  # Product Server (dash.magies.top) - reverse-proxied by the host's nginx (see nginx.conf), not exposed directly
   product-server:
     image: magies-hub/product
     build: .
+    restart: unless-stopped
     ports:
       - "127.0.0.1:8110:3000"
     environment:
-      - NODE_ENV=production
-      - API_URL=http://api:8080
+      NODE_ENV: production
+      NUXT_PUBLIC_API_BASE: ""
     depends_on:
       - api
 
-  # API Server (Spring Boot) - reverse-proxied by the host's nginx, not exposed directly
   api:
     image: magies-hub/api
     build: ./backend
+    restart: unless-stopped
     ports:
       - "127.0.0.1:8111:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/magies
-      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-admin}
-      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:?请在 .env 中设置数据库密码}
-      - SPRING_REDIS_HOST=redis
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/magies
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-admin}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      SPRING_REDIS_HOST: redis
+      MAIL_GATEWAY_URL: http://mail-gateway:8090
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      CORS_ORIGINS: https://dash.magies.top,http://dash.magies.top
     depends_on:
       - postgres
       - redis
+      - mail-gateway
 
-  # Database
   postgres:
     image: postgres:17
+    restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: magies
       POSTGRES_USER: ${POSTGRES_USER:-admin}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?请在 .env 中设置数据库密码}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
 
-  # Redis Cache
   redis:
     image: redis:7-alpine
+    restart: unless-stopped
 
-  # Mail Gateway
   mail-gateway:
     image: magies-hub/mail-gateway
     build: ./mail-gateway
+    restart: unless-stopped
     ports:
-      - "10025:25"  # SMTP port
+      - "127.0.0.1:8090:8090"
     environment:
-      - SMTP_HOST=smtp.google.com
-      - SMTP_PORT=587
+      PORT: 8090
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
 
 volumes:
   postgres_data:

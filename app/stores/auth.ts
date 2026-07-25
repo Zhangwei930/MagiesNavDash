@@ -1,49 +1,118 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import { useRuntimeConfig } from '#imports'
+import { computed, ref } from 'vue'
+
+export type AuthUser = {
+  id: number
+  email: string
+  displayName: string
+  role: string
+}
 
 export const useAuthStore = defineStore('auth', () => {
+  const token = ref('')
+  const user = ref<AuthUser | null>(null)
   const email = ref('')
   const code = ref('')
-  const isLoggedIn = ref(false)
-  const verificationSent = ref(false)
-  const user = ref<any>(null)
+  const loading = ref(false)
+  const message = ref('')
+  const error = ref('')
+  const codeSent = ref(false)
 
-  const config = useRuntimeConfig()
-  const apiBase = config.public.apiBase
+  const isLoggedIn = computed(() => !!token.value && !!user.value)
+  const isAdmin = computed(() => user.value?.role === 'ADMIN')
 
-  const sendVerificationCode = async () => {
-    verificationSent.value = true
-    try {
-      const response = await fetch(`${apiBase}/api/mail`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.value, code: code.value || '123456' })
-      })
-      const data = await response.json()
-      if (data.success) {
-        alert(data.message)
-      } else {
-        alert(data.message || '发送失败')
+  if (import.meta.client) {
+    const saved = localStorage.getItem('magies_auth')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        token.value = parsed.token || ''
+        user.value = parsed.user || null
+      } catch {
+        localStorage.removeItem('magies_auth')
       }
-    } catch (e) {
-      alert('验证码发送成功（模拟）')
     }
-    // Reset for demo
-    setTimeout(() => { verificationSent.value = false }, 1000)
   }
 
-  const verifyCodeAndLogin = () => {
-    if (!email.value || code.value.length !== 6) {
-      alert('请输入有效的验证码')
-      return
+  function persist() {
+    if (!import.meta.client) return
+    if (token.value && user.value) {
+      localStorage.setItem('magies_auth', JSON.stringify({ token: token.value, user: user.value }))
+    } else {
+      localStorage.removeItem('magies_auth')
     }
-    isLoggedIn.value = true
-    user.value = { email: email.value }
-    alert(`欢迎回来，${email.value}！注册/登录成功。`)
-    // Reset for demo
-    setTimeout(() => { verificationSent.value = false }, 1000)
   }
 
-  return { email, code, isLoggedIn, verificationSent, user, sendVerificationCode, verifyCodeAndLogin }
+  async function sendVerificationCode() {
+    loading.value = true
+    error.value = ''
+    message.value = ''
+    try {
+      const { api } = useApi()
+      const data = await api<{ success: boolean; message: string }>('/api/auth/send-code', {
+        method: 'POST',
+        body: JSON.stringify({ email: email.value })
+      })
+      codeSent.value = true
+      message.value = data.message
+    } catch (e: any) {
+      error.value = e.message || '发送失败'
+      codeSent.value = false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function verifyCodeAndLogin() {
+    loading.value = true
+    error.value = ''
+    message.value = ''
+    try {
+      const { api } = useApi()
+      const data = await api<{
+        success: boolean
+        message: string
+        token: string
+        user: AuthUser
+      }>('/api/auth/verify', {
+        method: 'POST',
+        body: JSON.stringify({ email: email.value, code: code.value })
+      })
+      token.value = data.token
+      user.value = data.user
+      message.value = data.message
+      codeSent.value = false
+      code.value = ''
+      persist()
+    } catch (e: any) {
+      error.value = e.message || '登录失败'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  function logout() {
+    token.value = ''
+    user.value = null
+    codeSent.value = false
+    code.value = ''
+    message.value = '已退出登录'
+    persist()
+  }
+
+  return {
+    token,
+    user,
+    email,
+    code,
+    loading,
+    message,
+    error,
+    codeSent,
+    isLoggedIn,
+    isAdmin,
+    sendVerificationCode,
+    verifyCodeAndLogin,
+    logout
+  }
 })

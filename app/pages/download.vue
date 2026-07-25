@@ -1,62 +1,93 @@
 <template>
-  <div class="min-h-screen bg-gray-50 pt-20">
-    <div class="max-w-7xl mx-auto px-6 py-12">
-      <h1 class="text-4xl font-bold text-gray-900 mb-8">下载中心</h1>
-      
-      <div class="bg-white rounded-3xl p-10 shadow-sm border border-gray-100">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-10">
-          <div>
-            <div class="uppercase text-blue-600 text-sm font-medium tracking-widest mb-2">最新稳定版</div>
-            <div class="text-5xl font-bold">Magies Hub v1.0</div>
-            <div class="text-emerald-600 font-medium">签名验证已启用 • 2026-07-24</div>
-          </div>
-          <button @click="downloadProduct" class="px-12 py-5 bg-black text-white rounded-2xl text-xl font-semibold hover:bg-gray-900 active:scale-95 transition-all flex items-center gap-4">
-            立即下载
-            <span class="text-3xl">↓</span>
-          </button>
-        </div>
+  <div class="page-shell py-12 md:py-16">
+    <div class="mb-10 max-w-2xl">
+      <div class="section-kicker">Download Center</div>
+      <h1 class="mt-3 text-4xl font-bold text-white">下载中心</h1>
+      <p class="mt-3 text-slate-400">
+        展示各产品最新稳定版，点击后写入下载日志并返回签名信息。后端接口：`POST /api/downloads`。
+      </p>
+    </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-sm">
-          <div class="bg-gray-50 p-6 rounded-2xl">
-            <div class="font-medium mb-3">签名文件</div>
-            <div class="font-mono bg-white p-3 rounded-xl text-xs break-all">magies-hub-v1.0.sig</div>
+    <div v-if="loading" class="space-y-4">
+      <div v-for="i in 3" :key="i" class="glass h-28 animate-pulse rounded-3xl" />
+    </div>
+    <div v-else-if="error" class="glass-strong rounded-3xl p-10 text-center text-rose-300">{{ error }}</div>
+    <div v-else class="space-y-4">
+      <div
+        v-for="item in items"
+        :key="item.release.id"
+        class="glass-strong flex flex-col gap-5 rounded-3xl p-6 md:flex-row md:items-center md:justify-between"
+      >
+        <div class="flex items-start gap-4">
+          <div
+            class="flex h-14 w-14 items-center justify-center rounded-2xl text-2xl"
+            :style="{ background: `${item.product?.accentColor || '#22d3ee'}22` }"
+          >
+            {{ item.product?.icon || '↓' }}
           </div>
-          <div class="bg-gray-50 p-6 rounded-2xl">
-            <div class="font-medium mb-3">支持平台</div>
-            <div class="grid grid-cols-3 gap-2 text-xs">
-              <div class="bg-white p-3 rounded-xl text-center">🪟 Windows</div>
-              <div class="bg-white p-3 rounded-xl text-center"> macOS</div>
-              <div class="bg-white p-3 rounded-xl text-center">🐧 Linux</div>
+          <div>
+            <div class="text-xl font-semibold text-white">
+              {{ item.product?.name || 'Product' }}
+              <span class="text-cyan-300">v{{ item.release.version }}</span>
+            </div>
+            <div class="mt-1 text-sm text-slate-400">{{ item.release.changelog }}</div>
+            <div class="mt-3 flex flex-wrap gap-2 text-[11px]">
+              <span class="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-slate-300">
+                {{ item.release.channel }}
+              </span>
+              <span class="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 font-mono text-slate-400">
+                {{ item.release.signature }}
+              </span>
             </div>
           </div>
-          <div class="bg-gray-50 p-6 rounded-2xl">
-            <div class="font-medium mb-3">统计</div>
-            <div class="text-2xl font-semibold text-emerald-600">12.8k</div>
-            <div class="text-xs text-gray-500">次本月下载</div>
-          </div>
         </div>
-
-        <div class="mt-10 text-xs text-gray-400 border-t border-gray-100 pt-6">
-          签名验证使用私钥保护 • 任何修改将导致下载失败 • 详情请参阅产品文档
-        </div>
-      </div>
-
-      <div class="mt-12 text-center text-sm text-gray-500">
-        <button @click="backToHome" class="hover:text-blue-600 underline">返回首页</button>
+        <button class="btn-primary shrink-0" @click="download(item)">立即下载</button>
       </div>
     </div>
+
+    <p v-if="toast" class="mt-6 text-sm text-cyan-200">{{ toast }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
-const router = useRouter()
+const loading = ref(true)
+const error = ref('')
+const toast = ref('')
+const items = ref<any[]>([])
 
-const downloadProduct = () => {
-  alert('下载请求已模拟发送（Phase1 完整版）\n实际集成后将触发签名验证流程。')
+async function download(item: any) {
+  toast.value = ''
+  try {
+    const { api } = useApi()
+    const res = await api('/api/downloads', {
+      method: 'POST',
+      body: JSON.stringify({
+        productId: item.product.id,
+        releaseId: item.release.id
+      })
+    })
+    toast.value = `${item.product.name} ${res.message}`
+  } catch (e: any) {
+    toast.value = e.message || '下载失败'
+  }
 }
 
-const backToHome = () => {
-  router.push('/')
-}
+onMounted(async () => {
+  try {
+    const { api } = useApi()
+    const [products, releases] = await Promise.all([
+      api<any[]>('/api/products'),
+      api<any[]>('/api/releases/latest')
+    ])
+    const map = Object.fromEntries(products.map((p) => [p.id, p]))
+    items.value = releases.map((r) => ({
+      release: r,
+      product: map[r.productId]
+    }))
+  } catch (e: any) {
+    error.value = e.message || '加载失败'
+  } finally {
+    loading.value = false
+  }
+})
 </script>

@@ -1,94 +1,84 @@
 <template>
-  <div class="min-h-screen bg-gray-50 font-sans">
-    <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">M</div>
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900">Magies Hub</h1>
-            <p class="text-xs text-gray-500">Enterprise</p>
-          </div>
+  <div>
+    <!-- Hero -->
+    <section class="page-shell relative overflow-hidden pb-16 pt-16 md:pb-24 md:pt-24">
+      <div class="absolute left-1/2 top-10 h-64 w-64 -translate-x-1/2 rounded-full bg-cyan-400/10 blur-3xl" />
+      <div class="relative mx-auto max-w-4xl text-center">
+        <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-1.5 text-xs text-cyan-200">
+          <span class="h-1.5 w-1.5 rounded-full bg-cyan-300 animate-pulse" />
+          Magies Hub Enterprise · 工具生态门户
         </div>
-        <nav class="flex gap-8 text-sm">
-          <NuxtLink to="/" class="hover:text-blue-600 transition-colors">首页</NuxtLink>
-          <NuxtLink to="/account" class="hover:text-blue-600 transition-colors">账号中心</NuxtLink>
-          <NuxtLink to="/download" class="hover:text-blue-600 transition-colors">下载中心</NuxtLink>
-          <NuxtLink to="/admin" class="hover:text-blue-600 transition-colors">后台管理</NuxtLink>
-        </nav>
-        <div class="flex gap-4">
-          <button @click="showLogin = !showLogin" class="px-4 py-2 text-sm font-medium border border-gray-300 rounded-full hover:bg-gray-100 transition-colors">登录 / 注册</button>
-          <button class="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors">立即体验</button>
+        <h1 class="text-4xl font-bold tracking-tight text-white sm:text-6xl sm:leading-[1.08]">
+          统一产品门户
+          <span class="text-gradient block mt-2">一站管理工具与账号</span>
+        </h1>
+        <p class="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-400 sm:text-lg">
+          把官网、工具站、账号中心、签名下载、后台与邮件中心收敛到同一入口。
+          面向 Magies Nav / HRP / Game 等产品线，打造可扩展的企业级门户。
+        </p>
+        <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+          <NuxtLink to="/products" class="btn-primary px-8 py-3.5 text-base">进入工具站</NuxtLink>
+          <NuxtLink to="/account" class="btn-ghost px-8 py-3.5 text-base">邮箱验证码登录</NuxtLink>
         </div>
-      </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="max-w-7xl mx-auto px-6 py-20 text-center">
-      <div class="max-w-3xl mx-auto">
-        <h2 class="text-5xl font-bold text-gray-900 mb-6 leading-tight">统一产品门户</h2>
-        <p class="text-xl text-gray-600 mb-10">整合官网、账号、下载、后台、文档、邮件中心，一站式管理您的产品生态。</p>
-        <div class="flex justify-center gap-4">
-          <button @click="scrollToDownload" class="px-8 py-4 bg-blue-600 text-white rounded-2xl text-lg font-semibold hover:bg-blue-700 transition-all active:scale-95">开始使用</button>
-          <button @click="showDemo" class="px-8 py-4 border-2 border-gray-300 hover:border-gray-400 rounded-2xl text-lg font-medium transition-all">观看演示</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Product Center Preview -->
-    <section class="bg-white py-16">
-      <div class="max-w-7xl mx-auto px-6">
-        <h3 class="text-3xl font-semibold text-gray-900 mb-8">产品中心</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Product card 1 -->
-          <div class="bg-gray-50 p-6 rounded-3xl hover:shadow-xl transition-shadow">
-            <div class="h-48 bg-gradient-to-br from-blue-400 to-purple-500 rounded-2xl mb-4 flex items-center justify-center text-white text-6xl">📦</div>
-            <h4 class="font-bold text-xl mb-1">产品模块</h4>
-            <p class="text-gray-600">展示、详情、版本下载、自动更新</p>
-          </div>
-          <div class="bg-gray-50 p-6 rounded-3xl hover:shadow-xl transition-shadow">
-            <div class="h-48 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-2xl mb-4 flex items-center justify-center text-white text-6xl">🔗</div>
-            <h4 class="font-bold text-xl mb-1">版本管理</h4>
-            <p class="text-gray-600">支持多版本、签名验证、自动更新</p>
-          </div>
-          <div class="bg-gray-50 p-6 rounded-3xl hover:shadow-xl transition-shadow">
-            <div class="h-48 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl mb-4 flex items-center justify-center text-white text-6xl">📊</div>
-            <h4 class="font-bold text-xl mb-1">统计分析</h4>
-            <p class="text-gray-600">访问量、下载统计、用户行为分析</p>
+        <div class="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div v-for="item in highlights" :key="item.label" class="glass rounded-2xl px-4 py-4">
+            <div class="text-2xl font-semibold text-white">{{ item.value }}</div>
+            <div class="mt-1 text-xs text-slate-400">{{ item.label }}</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Account & Email Section -->
-    <section class="max-w-7xl mx-auto px-6 py-16 bg-gradient-to-b from-gray-50 to-white">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+    <!-- Tools -->
+    <section class="page-shell pb-20">
+      <div class="mb-8 flex items-end justify-between gap-4">
         <div>
-          <h3 class="text-3xl font-semibold mb-4">统一账号中心</h3>
-          <p class="text-gray-600 mb-6">一键注册、登录、找回密码、邮件验证码</p>
-          <div class="space-y-4">
-            <div class="flex gap-3 items-start">
-              <div class="w-6 h-6 bg-green-100 text-green-600 rounded-xl flex items-center justify-center flex-shrink-0">✓</div>
-              <div>邮箱注册 / 手机号绑定</div>
-            </div>
-            <div class="flex gap-3 items-start">
-              <div class="w-6 h-6 bg-green-100 text-green-600 rounded-xl flex items-center justify-center flex-shrink-0">✓</div>
-              <div>邮件验证码（5分钟有效）</div>
-            </div>
-          </div>
-          <button @click="showLoginModal = true" class="mt-8 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-medium hover:brightness-110 transition-all">立即注册 / 登录</button>
+          <div class="section-kicker">Tools</div>
+          <h2 class="mt-2 text-3xl font-semibold text-white">工具站</h2>
+          <p class="mt-2 text-sm text-slate-400">从真实后端加载产品目录，覆盖导航、人事、游戏与门户本身。</p>
         </div>
-        <div class="bg-white p-8 rounded-3xl shadow-xl">
-          <div class="text-center mb-6">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-amber-100 rounded-2xl text-4xl mb-4">✉️</div>
-            <h4 class="text-xl font-semibold">邮件中心</h4>
+        <NuxtLink to="/products" class="btn-ghost !py-2 text-xs">全部产品</NuxtLink>
+      </div>
+
+      <div v-if="loading" class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <div v-for="i in 4" :key="i" class="glass h-56 animate-pulse rounded-3xl" />
+      </div>
+      <div v-else-if="error" class="glass-strong rounded-3xl p-8 text-center text-sm text-rose-300">
+        {{ error }}
+        <div class="mt-3 text-xs text-slate-500">请确认后端 API 已启动（/api/products）</div>
+      </div>
+      <div v-else class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <ProductCard v-for="p in products" :key="p.id" :product="p" />
+      </div>
+    </section>
+
+    <!-- Flow -->
+    <section class="page-shell pb-20">
+      <div class="glass-strong overflow-hidden rounded-[2rem]">
+        <div class="grid lg:grid-cols-2">
+          <div class="border-b border-white/5 p-8 md:p-10 lg:border-b-0 lg:border-r">
+            <div class="section-kicker">Account Flow</div>
+            <h3 class="mt-3 text-2xl font-semibold text-white">真实账号注册链路</h3>
+            <ol class="mt-6 space-y-4 text-sm text-slate-300">
+              <li v-for="(step, idx) in flow" :key="step" class="flex gap-3">
+                <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-semibold text-cyan-200">
+                  {{ idx + 1 }}
+                </span>
+                <span class="pt-1">{{ step }}</span>
+              </li>
+            </ol>
+            <NuxtLink to="/account" class="btn-primary mt-8">打开账号中心</NuxtLink>
           </div>
-          <div class="bg-gray-50 rounded-2xl p-6 text-sm">
-            <p class="font-medium mb-3">验证码邮件示例：</p>
-            <div class="bg-white border border-dashed border-gray-200 p-4 rounded-xl font-mono text-xs leading-relaxed">
-              【Magies Hub】您的验证码是：<br>
-              <span class="font-bold text-blue-600">123456</span><br>
-              有效期：5分钟<br><br>
+          <div class="bg-gradient-to-br from-slate-900/80 to-cyan-950/20 p-8 md:p-10">
+            <div class="section-kicker">Mail Center</div>
+            <h3 class="mt-3 text-2xl font-semibold text-white">邮件中心</h3>
+            <p class="mt-3 text-sm leading-relaxed text-slate-400">
+              Spring Boot 生成验证码并写入 Redis（TTL 5 分钟），再调用 Mail Gateway 发送；
+              本站不直连 SMTP，符合方案中的解耦设计。
+            </p>
+            <div class="mt-6 rounded-2xl border border-dashed border-cyan-400/20 bg-slate-950/50 p-5 font-mono text-xs leading-7 text-slate-300">
+              【Magies Hub】您的验证码是：••••••<br />
+              有效期：5 分钟<br />
               如非本人操作，请忽略此邮件。
             </div>
           </div>
@@ -96,90 +86,56 @@
       </div>
     </section>
 
-    <!-- Download Center -->
-    <section class="max-w-7xl mx-auto px-6 py-16">
-      <h3 class="text-3xl font-semibold text-gray-900 mb-8">下载中心</h3>
-      <div class="bg-white rounded-3xl p-10 shadow-sm border border-gray-100">
-        <div class="flex justify-between items-end mb-8">
+    <!-- Download CTA -->
+    <section class="page-shell pb-24">
+      <div class="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950 p-8 md:p-12">
+        <div class="absolute -right-10 top-0 h-40 w-40 rounded-full bg-cyan-400/20 blur-3xl" />
+        <div class="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
           <div>
-            <div class="uppercase tracking-widest text-blue-600 text-sm font-medium mb-1">最新版本 v1.0</div>
-            <div class="text-4xl font-bold">Magies Hub</div>
-            <div class="text-gray-500">签名验证已启用</div>
+            <div class="section-kicker">Download</div>
+            <h3 class="mt-2 text-3xl font-semibold text-white">签名下载中心</h3>
+            <p class="mt-2 max-w-xl text-sm text-slate-400">多产品最新版本、签名文件与下载统计，一站获取。</p>
           </div>
-          <button @click="downloadProduct" class="px-10 py-4 bg-black text-white rounded-2xl text-lg font-semibold hover:bg-gray-900 transition-all flex items-center gap-3">
-            <span>立即下载</span>
-            <span class="text-xl">↓</span>
-          </button>
-        </div>
-        <div class="grid grid-cols-3 gap-8 text-sm">
-          <div>签名文件：<span class="font-mono bg-gray-100 px-2 py-0.5 rounded">magies-hub-1.0.sig</span></div>
-          <div>支持格式：Windows, macOS, Linux</div>
-          <div>更新时间：2026-07-24</div>
+          <NuxtLink to="/download" class="btn-primary px-8 py-3.5">前往下载</NuxtLink>
         </div>
       </div>
     </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-400 py-12">
-      <div class="max-w-7xl mx-auto px-6 text-sm">
-        <div class="flex justify-between">
-          <div>© 2026 Magies Hub Enterprise. 保留所有权利。</div>
-          <div class="flex gap-6">
-            <a href="#" class="hover:text-white">隐私政策</a>
-            <a href="#" class="hover:text-white">支持中心</a>
-          </div>
-        </div>
-      </div>
-    </footer>
-
-    <!-- Login Modal -->
-    <div v-if="showLogin" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-6">
-      <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden">
-        <div class="p-8">
-          <h3 class="text-2xl font-bold mb-6">登录 / 注册</h3>
-          <div class="space-y-6">
-            <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1.5">邮箱地址</label>
-              <input v-model="email" type="email" class="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500" placeholder="your@email.com" />
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1.5">验证码</label>
-              <div class="flex gap-3">
-                <input v-model="code" type="text" maxlength="6" class="flex-1 px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 font-mono text-center" placeholder="123456" />
-                <button @click="sendVerificationCode" class="px-6 bg-gray-100 hover:bg-gray-200 rounded-2xl text-sm font-medium">发送验证码</button>
-              </div>
-            </div>
-          </div>
-          <button @click="login" class="mt-8 w-full py-3.5 bg-blue-600 text-white rounded-2xl font-medium">确认登录 / 注册</button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useAuthStore } from '~/stores/auth'
+const products = ref<any[]>([])
+const loading = ref(true)
+const error = ref('')
+const stats = ref<any>({})
 
-const authStore = useAuthStore()
-const showLogin = ref(false)
-const showLoginModal = ref(false)
-const showDemo = () => alert('演示功能即将上线！')
-const scrollToDownload = () => {
-  document.querySelector('section:last-of-type')?.scrollIntoView({ behavior: 'smooth' })
-}
-const downloadProduct = () => alert('下载功能已启用（模拟）')
+const highlights = computed(() => [
+  { label: '上线工具', value: products.value.length || '—' },
+  { label: '注册用户', value: stats.value.users ?? '—' },
+  { label: '累计下载', value: stats.value.downloadsTotal ?? '—' },
+  { label: '邮件发送', value: stats.value.mailSent ?? '—' }
+])
 
-const sendVerificationCode = () => {
-  authStore.sendVerificationCode()
-}
+const flow = [
+  '用户输入邮箱',
+  '后端生成 6 位验证码并写入 Redis（5 分钟）',
+  '调用 Mail Gateway 发送验证码邮件',
+  '校验通过后签发 JWT，完成登录 / 注册'
+]
 
-const login = () => {
-  authStore.verifyCodeAndLogin()
-  showLogin.value = false
-}
+onMounted(async () => {
+  const { api } = useApi()
+  try {
+    const [list, publicStats] = await Promise.all([
+      api<any[]>('/api/products'),
+      api<any>('/api/stats/public').catch(() => ({}))
+    ])
+    products.value = list
+    stats.value = publicStats
+  } catch (e: any) {
+    error.value = e.message || '加载失败'
+  } finally {
+    loading.value = false
+  }
+})
 </script>
-
-<style scoped>
-/* Additional styles if needed */
-</style>

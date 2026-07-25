@@ -1,65 +1,75 @@
 <template>
-  <div class="min-h-screen bg-gray-50 pt-20">
-    <div class="max-w-7xl mx-auto px-6 py-12">
-      <h1 class="text-4xl font-bold text-gray-900 mb-8">统计中心</h1>
-      
-      <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div class="bg-blue-50 p-6 rounded-2xl">
-            <div class="text-blue-600 text-sm font-medium">总访问量</div>
-            <div class="text-4xl font-bold mt-2">45,892</div>
-            <div class="text-green-600 text-sm mt-1">↑ 12% 本月</div>
-          </div>
-          <div class="bg-emerald-50 p-6 rounded-2xl">
-            <div class="text-emerald-600 text-sm font-medium">本月下载</div>
-            <div class="text-4xl font-bold mt-2">1,284</div>
-            <div class="text-green-600 text-sm mt-1">↑ 8%</div>
-          </div>
-          <div class="bg-purple-50 p-6 rounded-2xl">
-            <div class="text-purple-600 text-sm font-medium">注册用户</div>
-            <div class="text-4xl font-bold mt-2">8,124</div>
-            <div class="text-purple-600 text-sm mt-1">↑ 5%</div>
-          </div>
-          <div class="bg-amber-50 p-6 rounded-2xl">
-            <div class="text-amber-600 text-sm font-medium">邮件发送</div>
-            <div class="text-4xl font-bold mt-2">3,456</div>
-            <div class="text-amber-600 text-sm mt-1">↑ 3%</div>
+  <div class="page-shell py-12 md:py-16">
+    <div class="mb-10">
+      <div class="section-kicker">Analytics</div>
+      <h1 class="mt-3 text-4xl font-bold text-white">统计中心</h1>
+      <p class="mt-2 text-slate-400">公开指标来自 `/api/stats/public`，随真实业务数据增长。</p>
+    </div>
+
+    <div v-if="loading" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div v-for="i in 4" :key="i" class="glass h-28 animate-pulse rounded-3xl" />
+    </div>
+    <div v-else-if="error" class="glass-strong rounded-3xl p-10 text-center text-rose-300">{{ error }}</div>
+    <div v-else>
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div v-for="card in cards" :key="card.label" class="glass-strong rounded-3xl p-6">
+          <div class="text-xs uppercase tracking-wider text-slate-500">{{ card.label }}</div>
+          <div class="mt-3 text-4xl font-semibold text-white">{{ card.value }}</div>
+          <div class="mt-2 text-xs text-cyan-300/80">{{ card.hint }}</div>
+        </div>
+      </div>
+
+      <div class="mt-8 grid gap-6 lg:grid-cols-2">
+        <div class="glass-strong rounded-3xl p-6">
+          <h2 class="text-lg font-semibold text-white">下载趋势（本会话示意）</h2>
+          <div class="mt-6 flex h-48 items-end gap-3">
+            <div
+              v-for="(h, i) in bars"
+              :key="i"
+              class="flex-1 rounded-t-xl bg-gradient-to-t from-cyan-600/40 to-cyan-300/80"
+              :style="{ height: h + '%' }"
+            />
           </div>
         </div>
-
-        <!-- ECharts skeleton -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div>
-            <div class="text-sm font-medium mb-4">访问趋势</div>
-            <div class="h-64 bg-gray-50 rounded-2xl flex items-end justify-around p-4 border border-gray-100">
-              <!-- Mock chart area -->
-              <div class="w-1/5 h-16 bg-blue-500 rounded-t" style="height: 20%"></div>
-              <div class="w-1/5 h-16 bg-blue-500 rounded-t" style="height: 35%"></div>
-              <div class="w-1/5 h-16 bg-blue-500 rounded-t" style="height: 55%"></div>
-              <div class="w-1/5 h-16 bg-blue-500 rounded-t" style="height: 40%"></div>
-              <div class="w-1/5 h-16 bg-blue-500 rounded-t" style="height: 28%"></div>
-            </div>
-          </div>
-          
-          <div>
-            <div class="text-sm font-medium mb-4">下载 vs 注册</div>
-            <div class="h-64 bg-gray-50 rounded-2xl flex items-end justify-around p-4 border border-gray-100">
-              <div class="flex flex-col items-center">
-                <div class="w-24 h-24 bg-emerald-400 rounded-2xl mb-2"></div>
-                <div class="text-xs text-gray-500">下载</div>
-              </div>
-              <div class="flex flex-col items-center">
-                <div class="w-24 h-24 bg-purple-400 rounded-2xl mb-2"></div>
-                <div class="text-xs text-gray-500">注册</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-12 text-xs text-gray-400">
-          邮件中心日志 • 下载签名统计 • 用户活跃度分析 • 后续可接入真实后端数据
+        <div class="glass-strong rounded-3xl p-6">
+          <h2 class="text-lg font-semibold text-white">业务说明</h2>
+          <ul class="mt-4 space-y-3 text-sm text-slate-400">
+            <li>• 用户数：邮箱验证码注册成功后的 sys_user 计数</li>
+            <li>• 下载量：product_download_log 累计写入</li>
+            <li>• 邮件：mail_log 中 SENT / FALLBACK 状态合计</li>
+            <li>• 后续可接入 ECharts 与按日聚合查询</li>
+          </ul>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+const loading = ref(true)
+const error = ref('')
+const stats = ref<any>({})
+
+const cards = computed(() => [
+  { label: '注册用户', value: stats.value.users ?? 0, hint: 'sys_user' },
+  { label: '产品数', value: stats.value.products ?? 0, hint: 'product' },
+  { label: '累计下载', value: stats.value.downloadsTotal ?? 0, hint: 'download_log' },
+  { label: '邮件发送', value: stats.value.mailSent ?? 0, hint: 'mail_log' }
+])
+
+const bars = computed(() => {
+  const base = Number(stats.value.downloadsTotal || 4)
+  return [30, 45, 38, 62, 55, 70, Math.min(95, 40 + base * 3)].map((n) => Math.max(18, n))
+})
+
+onMounted(async () => {
+  try {
+    const { api } = useApi()
+    stats.value = await api('/api/stats/public')
+  } catch (e: any) {
+    error.value = e.message || '加载失败'
+  } finally {
+    loading.value = false
+  }
+})
+</script>
