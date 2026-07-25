@@ -6,19 +6,49 @@
           <BrandLogo size="nav" :show-wordmark="true" />
         </NuxtLink>
 
+        <div class="nav-links" :class="{ open: menuOpen }">
+          <NuxtLink
+            v-for="p in PAGE_LINKS"
+            :key="p.key"
+            :to="p.to"
+            @click="menuOpen = false"
+          >{{ t(`nav.${p.key}`) }}</NuxtLink>
+
+          <span class="nav-sep" aria-hidden="true" />
+
+          <a
+            v-for="s in externalSites"
+            :key="s.key"
+            :href="s.href"
+            target="_blank"
+            rel="noopener"
+            class="nav-ext"
+            @click="menuOpen = false"
+          >{{ t(`site.${s.key}`) }} <span aria-hidden="true">↗</span></a>
+        </div>
+
         <div class="nav-actions">
+          <button
+            type="button"
+            class="btn-icon"
+            :title="t('nav.theme')"
+            :aria-label="t('nav.theme')"
+            @click="toggleTheme"
+          >
+            <component :is="theme === 'dark' ? Sun : Moon" :size="17" :stroke-width="2" />
+          </button>
           <button type="button" class="lang-switch" :title="t('nav.lang')" @click="toggleLocale">
             {{ t('nav.lang') }}
           </button>
-          <NuxtLink
-            v-if="auth.isLoggedIn"
-            to="/account"
-            class="btn btn-outline btn-sm"
-            style="height:36px"
-          >{{ auth.user?.email?.split('@')[0] }}</NuxtLink>
-          <NuxtLink v-else to="/account" class="btn btn-primary btn-sm" style="height:36px;padding:0 14px">
-            {{ t('nav.signIn') }}
-          </NuxtLink>
+          <button
+            type="button"
+            class="nav-toggle"
+            :aria-label="t('nav.menu')"
+            :aria-expanded="menuOpen"
+            @click="menuOpen = !menuOpen"
+          >
+            <component :is="menuOpen ? X : Menu" :size="20" :stroke-width="2" />
+          </button>
         </div>
       </div>
     </nav>
@@ -29,14 +59,31 @@
 
     <footer class="footer">
       <div class="container">
-        <div class="footer-slim">
-          <BrandLogo size="sm" />
-          <div class="footer-links">
-            <NuxtLink to="/products">{{ t('footer.products') }}</NuxtLink>
-            <NuxtLink to="/download">{{ t('footer.downloads') }}</NuxtLink>
-            <NuxtLink to="/about">{{ t('footer.about') }}</NuxtLink>
-            <NuxtLink to="/account">{{ t('footer.signIn') }}</NuxtLink>
-            <a href="https://magies.top" target="_blank" rel="noopener">{{ t('footer.blog') }}</a>
+        <div class="footer-grid">
+          <div>
+            <BrandLogo size="sm" />
+            <p style="margin-top:12px;max-width:34ch">{{ t('footer.blurb') }}</p>
+          </div>
+          <div>
+            <h4>{{ t('footer.site') }}</h4>
+            <NuxtLink v-for="p in PAGE_LINKS" :key="p.key" :to="p.to">{{ t(`nav.${p.key}`) }}</NuxtLink>
+          </div>
+          <div>
+            <h4>{{ t('footer.ecosystem') }}</h4>
+            <a
+              v-for="s in externalSites"
+              :key="s.key"
+              :href="s.href"
+              target="_blank"
+              rel="noopener"
+            >{{ t(`site.${s.key}`) }}</a>
+          </div>
+          <div>
+            <h4>{{ t('footer.resources') }}</h4>
+            <a href="https://shell.magies.top/#download" target="_blank" rel="noopener">
+              {{ t('footer.getTerminal') }}
+            </a>
+            <NuxtLink to="/products">{{ t('footer.allProducts') }}</NuxtLink>
           </div>
         </div>
         <div class="footer-bottom">
@@ -48,13 +95,45 @@
 </template>
 
 <script setup lang="ts">
-const auth = useAuthStore()
+import { Menu, Moon, Sun, X } from 'lucide-vue-next'
+import { PAGE_LINKS, SITE_LINKS } from '~/utils/siteLinks'
+
+const menuOpen = ref(false)
 const year = new Date().getFullYear()
 const { t, toggleLocale, initLocale } = useI18n()
+const { theme, toggleTheme, initTheme } = useTheme()
+
+const externalSites = SITE_LINKS.filter((s) => s.external)
 
 onMounted(() => {
-  document.documentElement.setAttribute('data-theme', 'dark')
-  localStorage.removeItem('magies-theme')
+  initTheme()
   initLocale()
 })
 </script>
+
+<style scoped>
+.nav-sep {
+  width: 1px;
+  height: 18px;
+  margin: 0 8px;
+  background: var(--border);
+}
+
+.nav-links :deep(a.nav-ext),
+.nav-ext {
+  opacity: 0.82;
+}
+
+.nav-ext span {
+  font-size: 0.72em;
+  opacity: 0.7;
+}
+
+@media (max-width: 900px) {
+  .nav-sep {
+    width: auto;
+    height: 1px;
+    margin: 8px 14px;
+  }
+}
+</style>

@@ -1,17 +1,22 @@
 <template>
   <div class="home">
     <!-- Hero -->
-    <section class="hero hero-home">
-      <div class="container hero-grid">
-        <div class="hero-copy">
-          <h1 class="hero-title">Build. Connect. Ship.</h1>
-          <p class="hero-lead">{{ t('home.lead') }}</p>
-          <div class="hero-actions" style="justify-content:flex-start">
-            <NuxtLink class="btn btn-primary" to="/products">{{ t('home.browse') }}</NuxtLink>
-          </div>
-        </div>
-        <div class="hero-visual">
+    <section class="hero">
+      <div class="container" style="text-align:center">
+        <span class="hero-badge">{{ t('home.badge') }}</span>
+        <div class="hero-avatar-wrap">
           <PlanetLogo />
+        </div>
+        <h1 class="hero-title">Build. Connect. Ship.</h1>
+        <p class="subtitle">{{ t('home.lead') }}</p>
+        <div class="hero-actions">
+          <NuxtLink class="btn btn-primary" to="/products">{{ t('home.browse') }}</NuxtLink>
+          <a class="btn btn-outline" href="https://shell.magies.top" target="_blank" rel="noopener">
+            {{ t('home.openTerminal') }}
+          </a>
+          <a class="btn btn-outline" href="https://nav.magies.top" target="_blank" rel="noopener">
+            {{ t('site.nav') }}
+          </a>
         </div>
       </div>
     </section>
@@ -60,7 +65,7 @@
             <div class="feature-mark">
               <BrandLogo size="lg" :show-wordmark="false" glow />
             </div>
-            <h3 class="feature-name">Magies Terminal</h3>
+            <h3 class="feature-name">MagiesTerminal</h3>
             <p class="muted">{{ t('home.terminalTag') }}</p>
           </div>
           <div class="feature-body">
@@ -83,6 +88,31 @@
       </div>
     </section>
 
+    <!-- All Magies sites in one place -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">{{ t('home.sitesLabel') }}</span>
+          <h2>{{ t('home.sitesTitle') }}</h2>
+          <p>{{ t('home.sitesDesc') }}</p>
+        </div>
+        <div class="site-row">
+          <NuxtLink
+            v-for="s in SITE_LINKS"
+            :key="s.key"
+            class="site-entry"
+            :to="s.href"
+            :target="s.external ? '_blank' : undefined"
+            :rel="s.external ? 'noopener' : undefined"
+          >
+            <span class="site-name">{{ t(`site.${s.key}`) }}</span>
+            <span class="site-host">{{ hostOf(s.href) }}</span>
+            <span class="site-desc">{{ t(`site.${s.key}Desc`) }}</span>
+          </NuxtLink>
+        </div>
+      </div>
+    </section>
+
     <!-- Philosophy -->
     <section class="section">
       <div class="container" style="max-width:640px;text-align:center">
@@ -98,6 +128,7 @@
 
 <script setup lang="ts">
 import { toolColor, toolIcon } from '~/utils/toolMeta'
+import { SITE_LINKS } from '~/utils/siteLinks'
 
 const { t } = useI18n()
 const products = useState<any[]>('hub-products', () => [])
@@ -123,6 +154,10 @@ const displayProducts = computed(() => {
   })
   return list.slice(0, 6)
 })
+
+function hostOf(href: string) {
+  return href.startsWith('http') ? new URL(href).host : 'dash.magies.top'
+}
 
 function displayName(p: { slug?: string; name?: string }) {
   return (p.slug && NAME_ALIAS[p.slug]) || p.name || 'Product'
@@ -156,3 +191,49 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.site-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+.site-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  text-decoration: none;
+  transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+}
+
+.site-entry:hover {
+  transform: translateY(-3px);
+  border-color: rgba(167, 139, 250, 0.42);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+}
+
+.site-name {
+  font-size: 0.98rem;
+  font-weight: 650;
+  color: var(--text-heading);
+}
+
+.site-host {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.74rem;
+  color: var(--accent-hover);
+  opacity: 0.85;
+}
+
+.site-desc {
+  margin-top: 4px;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+</style>

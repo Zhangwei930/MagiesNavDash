@@ -3,7 +3,7 @@
     <div class="planet-orbit planet-orbit-a" />
     <div class="planet-orbit planet-orbit-b" />
     <div class="planet-core">
-      <img src="/brand/logo-dark-256.png" width="256" height="256" alt="" decoding="async" fetchpriority="high" />
+      <img :src="src" width="256" height="256" alt="" decoding="async" fetchpriority="high" />
     </div>
     <span class="planet-spark s1" />
     <span class="planet-spark s2" />
@@ -11,6 +11,15 @@
     <span class="planet-spark s4" />
   </div>
 </template>
+
+<script setup lang="ts">
+const { theme } = useTheme()
+
+/** The mark is a raster render; the dark plate would read as a black disc on light. */
+const src = computed(() =>
+  theme.value === 'light' ? '/brand/logo-light-256.png' : '/brand/logo-dark-256.png'
+)
+</script>
 
 <style scoped>
 .planet {

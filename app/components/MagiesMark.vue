@@ -19,14 +19,14 @@
       </linearGradient>
 
       <radialGradient :id="`${uid}-star`" cx="0.5" cy="0.42" r="0.6">
-        <stop stop-color="#ffffff" />
-        <stop offset="0.35" stop-color="#ede9fe" />
-        <stop offset="1" stop-color="#a78bfa" />
+        <stop class="star-0" stop-color="#ffffff" />
+        <stop class="star-1" offset="0.35" stop-color="#ede9fe" />
+        <stop class="star-2" offset="1" stop-color="#a78bfa" />
       </radialGradient>
 
       <radialGradient :id="`${uid}-flare`" cx="0.5" cy="0.5" r="0.5">
-        <stop stop-color="#f5f3ff" stop-opacity="0.6" />
-        <stop offset="0.45" stop-color="#e9d5ff" stop-opacity="0.32" />
+        <stop class="flare-0" stop-color="#f5f3ff" stop-opacity="0.6" />
+        <stop class="flare-1" offset="0.45" stop-color="#e9d5ff" stop-opacity="0.32" />
         <stop offset="1" stop-color="#e9d5ff" stop-opacity="0" />
       </radialGradient>
 
@@ -42,7 +42,7 @@
     </defs>
 
     <!-- neon bloom: blurred copy under the crisp geometry -->
-    <g :filter="`url(#${uid}-bloom)`" opacity="0.85">
+    <g class="mark-bloom" :filter="`url(#${uid}-bloom)`" opacity="0.85">
       <circle cx="32" cy="32" r="21" :stroke="`url(#${uid}-ring)`" stroke-width="3.2" />
       <path :d="STAR" :fill="`url(#${uid}-star)`" />
     </g>
@@ -56,7 +56,7 @@
       :stroke="`url(#${uid}-ring)`"
       stroke-width="2.4"
     />
-    <circle cx="32" cy="32" r="21" stroke="#ffffff" stroke-width="0.7" opacity="0.42" />
+    <circle class="mark-sheen" cx="32" cy="32" r="21" stroke="#ffffff" stroke-width="0.7" opacity="0.42" />
 
     <!-- centre star + cross flare (flare fades out toward the ring) -->
     <path
@@ -97,5 +97,32 @@ const STAR =
   width: 100%;
   height: 100%;
   overflow: visible;
+}
+
+/* On a light background the white star centre disappears and the white sheen
+   washes the ring out, so darken the star and pull the glow way back. */
+:root[data-theme="light"] .mark-bloom {
+  opacity: 0.3;
+}
+
+:root[data-theme="light"] .mark-sheen {
+  opacity: 0.1;
+}
+
+:root[data-theme="light"] .star-0 {
+  stop-color: #7c3aed;
+}
+
+:root[data-theme="light"] .star-1 {
+  stop-color: #6d28d9;
+}
+
+:root[data-theme="light"] .star-2 {
+  stop-color: #4c1d95;
+}
+
+:root[data-theme="light"] .flare-0,
+:root[data-theme="light"] .flare-1 {
+  stop-color: #7c3aed;
 }
 </style>
