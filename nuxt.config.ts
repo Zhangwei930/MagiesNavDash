@@ -25,12 +25,17 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'Magies Hub — 统一产品门户',
+      title: 'Magies',
       meta: [
-        { name: 'description', content: 'Magies Hub Enterprise：产品中心、账号中心、下载中心、后台管理与邮件中心。' },
-        { name: 'theme-color', content: '#030712' }
+        { name: 'description', content: 'Magies — Build. Connect. Ship. 简洁的产品工具生态。' },
+        { name: 'theme-color', content: '#05060a' }
       ],
-      htmlAttrs: { lang: 'zh-CN' }
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'icon', type: 'image/png', href: '/favicon.png' },
+        { rel: 'apple-touch-icon', href: '/brand/logo-256.png' }
+      ],
+      htmlAttrs: { lang: 'zh-CN', 'data-theme': 'dark' }
     }
   }
 })

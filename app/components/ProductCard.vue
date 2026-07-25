@@ -1,44 +1,42 @@
 <template>
-  <NuxtLink
-    :to="`/products/${product.slug}`"
-    class="group glass-strong relative overflow-hidden rounded-3xl p-6 transition duration-300 hover:-translate-y-1 hover:border-cyan-400/30"
-  >
-    <div
-      class="absolute -right-8 -top-8 h-28 w-28 rounded-full opacity-30 blur-2xl transition group-hover:opacity-50"
-      :style="{ background: product.accentColor || '#22d3ee' }"
-    />
-    <div class="relative">
-      <div class="mb-5 flex items-start justify-between gap-3">
-        <div
-          class="flex h-14 w-14 items-center justify-center rounded-2xl text-2xl"
-          :style="{ background: `${product.accentColor || '#22d3ee'}22`, color: product.accentColor || '#22d3ee' }"
-        >
-          {{ product.icon || '✦' }}
-        </div>
-        <span class="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] uppercase tracking-wider text-slate-400">
-          Tool
-        </span>
+  <article class="card product-card-m">
+    <div class="card-top">
+      <div class="icon-circle" :style="{ color }">
+        <component :is="icon" :size="20" :stroke-width="2" />
       </div>
-      <h3 class="text-xl font-semibold text-white">{{ product.name }}</h3>
-      <p class="mt-1 text-sm text-cyan-200/80">{{ product.tagline }}</p>
-      <p class="mt-4 line-clamp-3 text-sm leading-relaxed text-slate-400">{{ product.description }}</p>
-      <div class="mt-6 flex items-center justify-between text-xs text-slate-500">
-        <span>查看详情</span>
-        <span class="text-cyan-300 transition group-hover:translate-x-1">→</span>
+      <div>
+        <h3>{{ product.name }}</h3>
+        <div class="tag">{{ product.tagline || product.description || product.slug }}</div>
       </div>
     </div>
-  </NuxtLink>
+    <div class="actions">
+      <a
+        v-if="product.homepageUrl"
+        class="btn btn-primary btn-sm"
+        :href="product.homepageUrl"
+        target="_blank"
+        rel="noopener"
+      >打开</a>
+      <NuxtLink class="btn btn-outline btn-sm" :to="`/products/${product.slug}`">详情</NuxtLink>
+    </div>
+  </article>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { toolColor, toolIcon } from '~/utils/toolMeta'
+
+const props = defineProps<{
   product: {
     name: string
     slug: string
     tagline?: string
     description?: string
-    icon?: string
+    homepageUrl?: string
     accentColor?: string
+    icon?: string
   }
 }>()
+
+const icon = computed(() => toolIcon(props.product))
+const color = computed(() => toolColor(props.product))
 </script>

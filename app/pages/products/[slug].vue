@@ -1,122 +1,113 @@
 <template>
-  <div class="page-shell py-12 md:py-16">
-    <div v-if="loading" class="glass-strong h-80 animate-pulse rounded-[2rem]" />
-    <div v-else-if="error" class="glass-strong rounded-[2rem] p-10 text-center text-rose-300">{{ error }}</div>
-    <div v-else-if="detail" class="space-y-8">
-      <div class="glass-strong relative overflow-hidden rounded-[2rem] p-8 md:p-10">
-        <div
-          class="absolute -right-16 -top-16 h-48 w-48 rounded-full opacity-30 blur-3xl"
-          :style="{ background: detail.product.accentColor }"
-        />
-        <div class="relative flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-          <div class="flex gap-5">
-            <div
-              class="flex h-16 w-16 items-center justify-center rounded-2xl text-3xl"
-              :style="{ background: `${detail.product.accentColor}22` }"
-            >
-              {{ detail.product.icon }}
-            </div>
-            <div>
-              <div class="section-kicker">Product</div>
-              <h1 class="mt-2 text-4xl font-bold text-white">{{ detail.product.name }}</h1>
-              <p class="mt-2 text-cyan-200/90">{{ detail.product.tagline }}</p>
-              <p class="mt-4 max-w-2xl text-sm leading-relaxed text-slate-400">{{ detail.product.description }}</p>
-            </div>
-          </div>
-          <div class="flex flex-wrap gap-3">
-            <a
-              v-if="detail.product.homepageUrl"
-              :href="detail.product.homepageUrl"
-              target="_blank"
-              rel="noopener"
-              class="btn-ghost"
-            >打开站点</a>
-            <button class="btn-primary" @click="download">签名下载</button>
-          </div>
-        </div>
-      </div>
+  <div class="page">
+    <div class="container">
+      <NuxtLink to="/products" class="back">← {{ t('products.title') }}</NuxtLink>
 
-      <div class="grid gap-6 lg:grid-cols-3">
-        <div class="glass-strong rounded-3xl p-6 lg:col-span-2">
-          <h2 class="text-lg font-semibold text-white">核心能力</h2>
-          <div class="mt-5 grid gap-4 sm:grid-cols-2">
-            <div
-              v-for="f in detail.features"
-              :key="f.id"
-              class="rounded-2xl border border-white/5 bg-white/[0.03] p-4"
-            >
-              <div class="font-medium text-white">{{ f.title }}</div>
-              <div class="mt-1 text-sm text-slate-400">{{ f.description }}</div>
+      <div v-if="loading" class="muted">{{ t('products.loading') }}</div>
+      <div v-else-if="error" class="err">{{ error }}</div>
+
+      <template v-else-if="detail">
+        <header class="d-head">
+          <div class="product-icon" :style="{ '--tint': color }">
+            <component :is="icon" :size="22" :stroke-width="2" />
+          </div>
+          <div class="d-id">
+            <h1>{{ detail.product.name }}</h1>
+            <p class="d-tag">{{ detail.product.tagline }}</p>
+          </div>
+          <a
+            v-if="detail.product.homepageUrl"
+            class="btn btn-primary"
+            :href="detail.product.homepageUrl"
+            target="_blank"
+            rel="noopener"
+          >{{ t('detail.open') }}</a>
+        </header>
+
+        <p v-if="detail.product.description" class="d-desc">{{ detail.product.description }}</p>
+
+        <section v-if="detail.features?.length" class="d-section">
+          <h2>{{ t('detail.features') }}</h2>
+          <div class="f-grid">
+            <div v-for="f in detail.features" :key="f.id" class="f-item">
+              <strong>{{ f.title }}</strong>
+              <span v-if="f.description">{{ f.description }}</span>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="glass-strong rounded-3xl p-6">
-          <h2 class="text-lg font-semibold text-white">最新版本</h2>
-          <div v-if="detail.latestRelease" class="mt-4 space-y-3 text-sm">
-            <div class="text-3xl font-semibold text-cyan-200">v{{ detail.latestRelease.version }}</div>
-            <div class="text-slate-400">{{ detail.latestRelease.changelog }}</div>
-            <div class="rounded-xl bg-slate-950/60 p-3 font-mono text-[11px] text-slate-400 break-all">
-              {{ detail.latestRelease.signature }}
+        <section v-if="latest" class="d-section">
+          <h2>{{ t('detail.release') }}</h2>
+          <div class="r-latest">
+            <div class="r-info">
+              <div class="r-line">
+                <code class="r-ver">v{{ latest.version }}</code>
+                <span class="r-meta">{{ releaseMeta(latest) }}</span>
+              </div>
+              <p v-if="latest.changelog" class="r-log">{{ latest.changelog }}</p>
             </div>
-            <div class="text-xs text-slate-500">
-              {{ formatSize(detail.latestRelease.fileSize) }} · {{ detail.latestRelease.platform }}
-            </div>
+            <button type="button" class="btn btn-primary" @click="download(latest.id)">
+              {{ t('detail.download') }}
+            </button>
           </div>
-          <div v-else class="mt-4 text-sm text-slate-500">暂无发布版本</div>
-        </div>
-      </div>
 
-      <div class="glass-strong rounded-3xl p-6">
-        <h2 class="mb-4 text-lg font-semibold text-white">版本历史</h2>
-        <div class="space-y-3">
-          <div
-            v-for="r in detail.releases"
-            :key="r.id"
-            class="flex flex-col gap-2 rounded-2xl border border-white/5 bg-white/[0.02] px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <div>
-              <div class="font-medium text-white">v{{ r.version }} <span class="text-xs text-slate-500">{{ r.channel }}</span></div>
-              <div class="text-sm text-slate-400">{{ r.changelog }}</div>
-            </div>
-            <button class="btn-ghost !py-2 text-xs" @click="download(r.id)">下载</button>
-          </div>
-        </div>
-      </div>
+          <ul v-if="older.length" class="r-older">
+            <li v-for="r in older" :key="r.id">
+              <code>v{{ r.version }}</code>
+              <span class="r-log">{{ r.changelog }}</span>
+              <button type="button" class="r-link" @click="download(r.id)">
+                {{ t('detail.download') }}
+              </button>
+            </li>
+          </ul>
 
-      <p v-if="downloadMsg" class="text-sm text-cyan-200">{{ downloadMsg }}</p>
+          <p v-if="msg" class="muted r-msg">{{ msg }}</p>
+        </section>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { toolColor, toolIcon } from '~/utils/toolMeta'
+
+const { t } = useI18n()
 const route = useRoute()
 const detail = ref<any>(null)
 const loading = ref(true)
 const error = ref('')
-const downloadMsg = ref('')
+const msg = ref('')
 
-function formatSize(bytes?: number) {
-  if (!bytes) return '—'
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+const icon = computed(() => toolIcon(detail.value?.product || {}))
+const color = computed(() => toolColor(detail.value?.product || {}))
+
+const releases = computed<any[]>(() => detail.value?.releases || [])
+const latest = computed(
+  () => detail.value?.latestRelease || releases.value.find((r) => r.isLatest) || releases.value[0] || null
+)
+const older = computed(() => releases.value.filter((r) => r.id !== latest.value?.id))
+
+function releaseMeta(r: { fileSize?: number; platform?: string; publishedAt?: string }) {
+  return [
+    r.fileSize ? `${(r.fileSize / 1024 / 1024).toFixed(1)} MB` : '',
+    r.platform,
+    r.publishedAt ? String(r.publishedAt).slice(0, 10) : ''
+  ]
+    .filter(Boolean)
+    .join(' · ')
 }
 
-async function download(releaseId?: number) {
-  if (!detail.value) return
-  downloadMsg.value = ''
+async function download(releaseId: number) {
+  msg.value = ''
   try {
     const { api } = useApi()
     const res = await api('/api/downloads', {
       method: 'POST',
-      body: JSON.stringify({
-        productId: detail.value.product.id,
-        releaseId: releaseId || detail.value.latestRelease?.id
-      })
+      body: JSON.stringify({ productId: detail.value.product.id, releaseId })
     })
-    downloadMsg.value = `${res.message} · 签名 ${res.signature || '—'}`
+    msg.value = res.message
   } catch (e: any) {
-    downloadMsg.value = e.message || '下载失败'
+    msg.value = e.message || '下载失败'
   }
 }
 
@@ -131,3 +122,187 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.back {
+  display: inline-block;
+  margin-bottom: 24px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.back:hover {
+  color: var(--accent-hover);
+}
+
+.d-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.d-id {
+  flex: 1;
+  min-width: 0;
+}
+
+.d-id h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  color: var(--text-heading);
+}
+
+.d-tag {
+  margin: 2px 0 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.d-desc {
+  margin: 18px 0 0;
+  max-width: 66ch;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+
+.d-section {
+  margin-top: 40px;
+}
+
+.d-section h2 {
+  margin: 0 0 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.f-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.f-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.f-item strong {
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: var(--text-heading);
+}
+
+.f-item span {
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.r-latest {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 18px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+}
+
+.r-info {
+  min-width: 0;
+}
+
+.r-line {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.r-ver {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 1rem;
+  font-weight: 650;
+  color: var(--text-heading);
+}
+
+.r-meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.r-log {
+  margin: 6px 0 0;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.r-older {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+.r-older li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.r-older li:last-child {
+  border-bottom: 0;
+}
+
+.r-older code {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.r-older .r-log {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.r-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--accent-hover);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.r-link:hover {
+  text-decoration: underline;
+}
+
+.r-msg {
+  margin-top: 12px;
+  font-size: 0.85rem;
+}
+</style>

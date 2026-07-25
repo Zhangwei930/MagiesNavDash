@@ -1,29 +1,61 @@
 <template>
-  <div class="page-shell py-12 md:py-16">
-    <div class="mb-10 max-w-2xl">
-      <div class="section-kicker">Tool Station</div>
-      <h1 class="mt-3 text-4xl font-bold text-white">工具站</h1>
-      <p class="mt-3 text-slate-400">
-        Magies 产品生态的统一陈列：导航门户、人事平台、游戏中台与 Hub 本体。数据来自 Spring Boot `/api/products`。
-      </p>
-    </div>
+  <div class="page">
+    <div class="container">
+      <h1 class="page-title">{{ t('products.title') }}</h1>
 
-    <div v-if="loading" class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-      <div v-for="i in 6" :key="i" class="glass h-56 animate-pulse rounded-3xl" />
-    </div>
-    <div v-else-if="error" class="glass-strong rounded-3xl p-10 text-center text-rose-300">{{ error }}</div>
-    <div v-else class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-      <ProductCard v-for="p in products" :key="p.id" :product="p" />
+      <div v-if="loading" class="muted">{{ t('products.loading') }}</div>
+      <div v-else-if="error" class="err">{{ error }}</div>
+      <div v-else-if="!list.length" class="empty">{{ t('products.empty') }}</div>
+      <div v-else class="grid grid-3 p-grid">
+        <NuxtLink v-for="p in list" :key="p.id" class="card p-card" :to="`/products/${p.slug}`">
+          <div class="p-head">
+            <div class="icon-circle" :style="{ '--tint': toolColor(p) }">
+              <component :is="toolIcon(p)" :size="20" :stroke-width="2" />
+            </div>
+            <div class="p-id">
+              <h3>{{ p.name }}</h3>
+              <span class="p-tag">{{ p.tagline || categoryLabel(p.categoryId) }}</span>
+            </div>
+          </div>
+
+          <p v-if="p.description" class="p-desc">{{ p.description }}</p>
+
+          <div class="p-foot">
+            <span class="p-more">{{ t('products.detail') }} →</span>
+            <button
+              v-if="p.homepageUrl"
+              type="button"
+              class="p-open"
+              @click.stop.prevent="open(p.homepageUrl)"
+            >{{ t('products.open') }} ↗</button>
+          </div>
+        </NuxtLink>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const products = ref<any[]>([])
+import { categoryLabel, toolColor, toolIcon } from '~/utils/toolMeta'
+
+const { t } = useI18n()
+const products = useState<any[]>('hub-products', () => [])
 const loading = ref(true)
 const error = ref('')
 
+const list = computed(() =>
+  [...products.value].sort((a, b) => (a.sortOrder ?? 99) - (b.sortOrder ?? 99))
+)
+
+function open(url: string) {
+  window.open(url, '_blank', 'noopener')
+}
+
 onMounted(async () => {
+  if (products.value.length) {
+    loading.value = false
+    return
+  }
   try {
     const { api } = useApi()
     products.value = await api('/api/products')
@@ -34,3 +66,86 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.p-grid {
+  margin-top: 24px;
+}
+
+.p-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.p-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(167, 139, 250, 0.4);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(167, 139, 250, 0.12);
+}
+
+.p-head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.p-id h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-heading);
+}
+
+.p-tag {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.p-desc {
+  margin: 0;
+  flex: 1;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+.p-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 4px;
+  font-size: 0.82rem;
+}
+
+.p-more {
+  color: var(--accent-hover);
+  opacity: 0.75;
+  transition: opacity 0.18s;
+}
+
+.p-card:hover .p-more {
+  opacity: 1;
+}
+
+.p-open {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+
+.p-open:hover {
+  background: var(--surface-hover);
+  border-color: rgba(167, 139, 250, 0.45);
+  color: var(--accent-hover);
+}
+</style>
