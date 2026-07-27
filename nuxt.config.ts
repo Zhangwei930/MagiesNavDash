@@ -30,13 +30,13 @@ export default defineNuxtConfig({
         {
           name: 'description',
           content:
-            'Magies 是独立软件产品品牌：开发工具、数据自动化、在线服务与企业应用。让复杂的软件，变得简单。'
+            'Magies 打造开发工具、数据自动化、在线服务与企业应用。让复杂的软件变得简单，让工作与生活更从容。'
         },
         { name: 'theme-color', content: '#05060a' },
         { property: 'og:title', content: 'Magies — Build. Connect. Ship.' },
         {
           property: 'og:description',
-          content: '开发工具 · 数据自动化 · 在线服务 · 企业应用。让复杂的软件，变得简单。'
+          content: '开发工具 · 数据自动化 · 在线服务 · 企业应用。让复杂的软件变得简单，让工作与生活更从容。'
         }
       ],
       link: [
