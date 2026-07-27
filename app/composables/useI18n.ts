@@ -129,7 +129,7 @@ const messages = {
     'account.login': '登录 / 注册',
     'account.codePh': '6 位',
     'about.title': '关于 Magies',
-    'about.desc': '让复杂的软件，变得简单。',
+    'about.desc': '让复杂的软件变得简单，让工作与生活更从容。',
     'about.whatTitle': 'Magies 是什么',
     'about.whatBody':
       'Magies 是一个独立软件产品品牌，专注于开发工具、数据自动化、在线服务和企业应用。产品彼此独立可用，又能共享统一的品牌、账号与发布体系。',
@@ -335,7 +335,7 @@ const messages = {
     'account.login': 'Sign in / Register',
     'account.codePh': '6 digits',
     'about.title': 'About Magies',
-    'about.desc': 'Make complex software simple.',
+    'about.desc': 'Simpler software. Lighter work. Better life.',
     'about.whatTitle': 'What Magies is',
     'about.whatBody':
       'Magies is an independent software brand focused on developer tools, data automation, online services, and enterprise apps. Products stand alone, yet share brand, account, and release infrastructure.',

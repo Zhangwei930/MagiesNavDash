@@ -45,7 +45,7 @@ html {
   --hero-overlay: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(88, 28, 135, 0.35) 0%, transparent 55%),
     radial-gradient(ellipse 50% 40% at 30% 50%, rgba(37, 99, 235, 0.18) 0%, transparent 50%),
     radial-gradient(ellipse 50% 40% at 70% 55%, rgba(234, 88, 12, 0.12) 0%, transparent 50%),
-    linear-gradient(180deg, rgba(5, 6, 10, 0.2) 0%, rgba(5, 6, 10, 0.92) 100%);
+    linear-gradient(180deg, rgba(5, 6, 10, 0.18) 0%, rgba(5, 6, 10, 0.5) 62%, rgba(5, 6, 10, 0.6) 100%);
   --hero-title-base: #f8fafc;
   --hero-title-shine: #e9d5ff;
   --hero-title-glow: #c4b5fd;
@@ -458,6 +458,10 @@ textarea {
   position: absolute;
   inset: 0;
   background: var(--hero-overlay);
+  /* The hero clips its overlay, so without this fade the near-black bottom of the
+     wash ends on a hard horizontal seam against the page background. */
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
   z-index: 0;
 }
 
@@ -607,10 +611,16 @@ textarea {
   position: relative;
 }
 
+/* Tint fades in and out inside the section rather than starting at full strength
+   against a 1px border — the hard edges were what made the bands read as stripes. */
 .section-alt {
-  background: linear-gradient(180deg, rgba(88, 28, 135, 0.08) 0%, rgba(5, 6, 10, 0.2) 100%);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(88, 28, 135, 0.11) 26%,
+    rgba(88, 28, 135, 0.11) 74%,
+    transparent 100%
+  );
 }
 
 
@@ -976,9 +986,21 @@ textarea {
 
 /* ========== FOOTER ========== */
 .footer {
+  position: relative;
   padding: 48px 0 28px;
-  background: var(--footer-bg);
-  border-top: 1px solid var(--border);
+  background: linear-gradient(180deg, transparent 0%, var(--footer-bg) 14%, var(--footer-bg) 100%);
+}
+
+/* Hairline that fades out at both ends, so the footer reads as separated without
+   a rule cutting the full width of the page. */
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--border) 22%, var(--border) 78%, transparent 100%);
 }
 
 .footer-grid {
