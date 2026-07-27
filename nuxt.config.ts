@@ -25,7 +25,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'Magies — Build. Connect. Ship.',
+      title: 'Magies — Build. Automate. Ship.',
       meta: [
         {
           name: 'description',
@@ -33,7 +33,7 @@ export default defineNuxtConfig({
             'Magies 打造开发工具、数据自动化、在线服务与企业应用。让复杂的软件变得简单，让工作与生活更从容。'
         },
         { name: 'theme-color', content: '#05060a' },
-        { property: 'og:title', content: 'Magies — Build. Connect. Ship.' },
+        { property: 'og:title', content: 'Magies — Build. Automate. Ship.' },
         {
           property: 'og:description',
           content: '开发工具 · 数据自动化 · 在线服务 · 企业应用。让复杂的软件变得简单，让工作与生活更从容。'

@@ -6,7 +6,7 @@
         <div class="hero-avatar-wrap">
           <PlanetLogo />
         </div>
-        <h1 class="hero-title">Build. Connect. Ship.</h1>
+        <h1 class="hero-title">Build. Automate. Ship.</h1>
         <p class="hero-claim">{{ t('home.claim') }}</p>
         <p class="subtitle">{{ t('home.lead') }}</p>
         <div class="hero-actions">
