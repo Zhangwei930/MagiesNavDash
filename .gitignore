@@ -22,3 +22,6 @@ logs
 .env
 .env.*
 !.env.example
+
+# Brand concept art — working reference, not site assets
+public/brand/logo-concept-*.jpg
