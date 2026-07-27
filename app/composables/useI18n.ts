@@ -29,9 +29,9 @@ const messages = {
     'footer.contact': '联系与反馈',
     'footer.copy': '版权所有',
     'footer.created': "Created by Magies's Dad",
-    'home.claim': '让复杂的软件，变得简单。',
+    'home.claim': '让复杂的软件变得简单，让工作与生活更从容。',
     'home.lead':
-      'Magies 构建面向开发者、数据工作者与企业用户的开发工具、数据自动化产品和在线服务。',
+      'Magies 打造开发工具、数据自动化与在线服务 —— 把重复和琐碎交给软件，把时间留给真正重要的事。',
     'home.explore': '探索全部产品',
     'home.learn': '了解 Magies',
     'home.linesLabel': '产品线',
@@ -235,9 +235,9 @@ const messages = {
     'footer.contact': 'Contact',
     'footer.copy': 'All rights reserved',
     'footer.created': "Created by Magies's Dad",
-    'home.claim': 'Make complex software simple.',
+    'home.claim': 'Simpler software. Lighter work. Better life.',
     'home.lead':
-      'Magies builds developer tools, data automation products, and online services for developers, data workers, and teams.',
+      'Magies builds developer tools, data automation, and online services — let software take the repetitive work, so your time goes where it matters.',
     'home.explore': 'Explore products',
     'home.learn': 'About Magies',
     'home.linesLabel': 'Product lines',
