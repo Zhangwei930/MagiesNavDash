@@ -35,8 +35,12 @@ const CN_TIMEZONES = ['Asia/Shanghai', 'Asia/Urumqi', 'Asia/Chongqing', 'Asia/Ha
 /** GitHub repo holding the Magies PDF builds. */
 const PDF_GITHUB_REPO = 'Zhangwei930/MagiesPdf'
 
-/** Cloudflare mirror prefix. 404s until the mirror is populated; we fall back. */
-const PDF_MIRROR = 'https://dl.magies.top/pdf'
+/**
+ * Cloudflare mirror prefix — the magiespdf-mirror Worker proxies GitHub
+ * Releases in real time, so it tracks the same latest release the direct
+ * source does. Product-scoped so it coexists with Terminal's /stable route.
+ */
+const PDF_MIRROR = 'https://dl.magies.top/magiespdf/stable'
 
 export function isCN(language?: string, timeZone?: string): boolean {
   if (language && /^zh-CN/i.test(language)) return true
@@ -201,14 +205,19 @@ async function fromMirror(base: string): Promise<LatestRelease> {
   }
 }
 
+/** Closest source first; the other one stays as the fallback. */
+export function sourceOrder(cn: boolean): ('mirror' | 'github')[] {
+  return cn ? ['mirror', 'github'] : ['github', 'mirror']
+}
+
 /**
  * Fetch the latest Magies PDF release, preferring whichever source is closer to
  * the visitor. Throws only when both sources fail.
  */
 export async function fetchLatestPdfRelease(): Promise<LatestRelease> {
-  const sources = isCNHere()
-    ? [() => fromMirror(PDF_MIRROR), () => fromGithub(PDF_GITHUB_REPO)]
-    : [() => fromGithub(PDF_GITHUB_REPO), () => fromMirror(PDF_MIRROR)]
+  const sources = sourceOrder(isCNHere()).map((name) =>
+    name === 'mirror' ? () => fromMirror(PDF_MIRROR) : () => fromGithub(PDF_GITHUB_REPO)
+  )
 
   let lastError: unknown
   for (const source of sources) {

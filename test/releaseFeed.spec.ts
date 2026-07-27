@@ -4,7 +4,8 @@ import {
   detectPlatform,
   groupByOs,
   isCN,
-  pickDownloads
+  pickDownloads,
+  sourceOrder
 } from '../app/utils/releaseFeed'
 
 describe('isCN', () => {
@@ -28,6 +29,21 @@ describe('isCN', () => {
 
   it('falls back to overseas when the environment reports nothing', () => {
     expect(isCN(undefined, undefined)).toBe(false)
+  })
+})
+
+describe('sourceOrder', () => {
+  it('sends domestic visitors to the Cloudflare mirror first', () => {
+    expect(sourceOrder(true)).toEqual(['mirror', 'github'])
+  })
+
+  it('sends everyone else straight to GitHub', () => {
+    expect(sourceOrder(false)).toEqual(['github', 'mirror'])
+  })
+
+  it('always keeps the other source as a fallback', () => {
+    expect(sourceOrder(true)).toHaveLength(2)
+    expect(sourceOrder(false)).toHaveLength(2)
   })
 })
 
