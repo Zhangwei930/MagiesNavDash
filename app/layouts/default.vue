@@ -16,15 +16,6 @@
         </div>
 
         <div class="nav-actions">
-          <button
-            type="button"
-            class="btn-icon"
-            :title="t('nav.theme')"
-            :aria-label="t('nav.theme')"
-            @click="toggleTheme"
-          >
-            <component :is="theme === 'dark' ? Sun : Moon" :size="17" :stroke-width="2" />
-          </button>
           <button type="button" class="lang-switch" :title="t('nav.lang')" @click="toggleLocale">
             {{ t('nav.lang') }}
           </button>
@@ -93,14 +84,13 @@
 </template>
 
 <script setup lang="ts">
-import { Menu, Moon, Sun, X } from 'lucide-vue-next'
+import { Menu, X } from 'lucide-vue-next'
 import { PAGE_LINKS, RESOURCE_LINKS } from '~/utils/siteLinks'
 import type { MsgKey } from '~/composables/useI18n'
 
 const menuOpen = ref(false)
 const year = new Date().getFullYear()
 const { t, toggleLocale, initLocale } = useI18n()
-const { theme, toggleTheme, initTheme } = useTheme()
 const auth = useAuthStore()
 
 function resourceLabel(key: string): MsgKey {
@@ -112,7 +102,6 @@ function resourceLabel(key: string): MsgKey {
 }
 
 onMounted(() => {
-  initTheme()
   initLocale()
 })
 </script>

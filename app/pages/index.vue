@@ -3,7 +3,6 @@
     <!-- 1. Brand Hero -->
     <section class="hero">
       <div class="container" style="text-align:center">
-        <span class="hero-badge">{{ t('home.badge') }}</span>
         <div class="hero-avatar-wrap">
           <PlanetLogo />
         </div>

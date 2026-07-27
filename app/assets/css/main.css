@@ -16,8 +16,7 @@ html {
 }
 
 /* Dark (logo-first) */
-:root,
-:root[data-theme="dark"] {
+:root {
   --bg: #05060a;
   --bg-alt: #0c0e16;
   --surface: rgba(255, 255, 255, 0.04);
@@ -60,46 +59,6 @@ html {
   --ring-gradient: linear-gradient(135deg, #60a5fa, #a78bfa 45%, #f472b6 70%, #fb923c);
 }
 
-:root[data-theme="light"] {
-  --bg: #f4f2ff;
-  --bg-alt: #ffffff;
-  --surface: rgba(88, 28, 135, 0.04);
-  --surface-hover: rgba(88, 28, 135, 0.07);
-  --border: rgba(109, 40, 217, 0.12);
-  --text: #1e1b2e;
-  --text-muted: #64748b;
-  --text-heading: #0f0a1a;
-  --accent: #7c3aed;
-  --accent-2: #2563eb;
-  --accent-3: #ea580c;
-  --accent-hover: #6d28d9;
-  --accent-glow: rgba(124, 58, 237, 0.18);
-  --accent-glow-blue: rgba(37, 99, 235, 0.12);
-  --accent-glow-orange: rgba(234, 88, 12, 0.1);
-  --gradient-start: #ede9fe;
-  --gradient-mid: #e0e7ff;
-  --gradient-end: #f4f2ff;
-  --card-bg: rgba(255, 255, 255, 0.88);
-  --card-border: rgba(109, 40, 217, 0.12);
-  --card-shadow: 0 8px 28px rgba(76, 29, 149, 0.08);
-  --nav-bg: rgba(244, 242, 255, 0.82);
-  --footer-bg: rgba(109, 40, 217, 0.04);
-  --badge-bg: linear-gradient(90deg, rgba(37, 99, 235, 0.1), rgba(124, 58, 237, 0.12), rgba(234, 88, 12, 0.08));
-  --badge-text: #6d28d9;
-  --hero-overlay: radial-gradient(ellipse 70% 50% at 50% 20%, rgba(167, 139, 250, 0.28) 0%, transparent 60%),
-    linear-gradient(180deg, rgba(244, 242, 255, 0.4) 0%, rgba(244, 242, 255, 0.95) 100%);
-  --hero-title-base: #0f0a1a;
-  --hero-title-shine: #7c3aed;
-  --hero-title-glow: #a78bfa;
-  --timeline-line: rgba(124, 58, 237, 0.22);
-  --timeline-dot: #7c3aed;
-  --field-bg: #fff;
-  --panel-bg: #fff;
-  --danger: #dc2626;
-  --ok: #7c3aed;
-  --btn-primary-fg: #ffffff;
-  --ring-gradient: linear-gradient(135deg, #3b82f6, #7c3aed 45%, #db2777 70%, #ea580c);
-}
 
 body {
   font-family: "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
@@ -146,9 +105,6 @@ body::after {
   background-size: 100% 100%;
 }
 
-:root[data-theme="light"] body::after {
-  opacity: 0.25;
-}
 
 a {
   color: inherit;
@@ -265,27 +221,6 @@ textarea {
   flex-shrink: 0;
 }
 
-.btn-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-muted);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-icon:hover {
-  background: var(--surface-hover);
-  color: var(--text-heading);
-  border-color: var(--accent);
-  box-shadow: 0 0 16px var(--accent-glow);
-}
-
 .nav-toggle {
   display: none;
   width: 36px;
@@ -396,12 +331,6 @@ textarea {
   -webkit-text-fill-color: transparent;
 }
 
-:root[data-theme="light"] .hero-title {
-  background: linear-gradient(105deg, #2563eb 0%, #7c3aed 40%, #0f0a1a 55%, #ea580c 90%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
 
 .hero-lead {
   margin: 0 0 28px;
@@ -567,19 +496,6 @@ textarea {
   z-index: 1;
 }
 
-.hero-badge {
-  display: inline-block;
-  padding: 6px 16px;
-  border-radius: 999px;
-  background: var(--badge-bg);
-  color: var(--badge-text);
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-bottom: 22px;
-  letter-spacing: 0.05em;
-  border: 1px solid rgba(167, 139, 250, 0.22);
-  box-shadow: 0 0 24px rgba(167, 139, 250, 0.12);
-}
 
 .hero-avatar-wrap {
   display: flex;
@@ -697,9 +613,6 @@ textarea {
   border-bottom: 1px solid var(--border);
 }
 
-:root[data-theme="light"] .section-alt {
-  background: linear-gradient(180deg, rgba(124, 58, 237, 0.05) 0%, rgba(255, 255, 255, 0.4) 100%);
-}
 
 .section-header {
   text-align: center;
@@ -950,25 +863,9 @@ textarea {
   border-color: var(--border);
 }
 
-:root[data-theme="light"] .status-badge[data-tone="ok"] {
-  color: #047857;
-  background: rgba(16, 185, 129, 0.1);
-}
 
-:root[data-theme="light"] .status-badge[data-tone="beta"] {
-  color: #6d28d9;
-  background: rgba(124, 58, 237, 0.1);
-}
 
-:root[data-theme="light"] .status-badge[data-tone="dev"] {
-  color: #1d4ed8;
-  background: rgba(37, 99, 235, 0.1);
-}
 
-:root[data-theme="light"] .status-badge[data-tone="enterprise"] {
-  color: #4338ca;
-  background: rgba(99, 102, 241, 0.1);
-}
 
 @media (prefers-reduced-motion: reduce) {
   .hero::after {

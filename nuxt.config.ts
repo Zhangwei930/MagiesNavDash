@@ -40,18 +40,9 @@ export default defineNuxtConfig({
         }
       ],
       link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
         { rel: 'icon', type: 'image/png', href: '/favicon.png' },
-        { rel: 'apple-touch-icon', href: '/brand/logo-256.png' }
-      ],
-      // data-theme is set by the inline script below, not here: unhead re-applies
-      // htmlAttrs on hydration and would stomp the restored preference.
-      script: [
-        {
-          innerHTML:
-            "(function(){try{var t=localStorage.getItem('magies-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark')}catch(e){document.documentElement.setAttribute('data-theme','dark')}})()",
-          tagPosition: 'head'
-        }
+        { rel: 'apple-touch-icon', href: '/brand/apple-touch-icon.png' }
       ],
       htmlAttrs: { lang: 'zh-CN' }
     }

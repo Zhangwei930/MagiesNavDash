@@ -3,7 +3,6 @@ export type Locale = 'zh' | 'en'
 const messages = {
   zh: {
     'nav.lang': 'EN',
-    'nav.theme': '切换主题',
     'nav.menu': '菜单',
     'nav.home': '首页',
     'nav.products': '产品',
@@ -30,7 +29,6 @@ const messages = {
     'footer.contact': '联系与反馈',
     'footer.copy': '版权所有',
     'footer.created': "Created by Magies's Dad",
-    'home.badge': '软件产品品牌',
     'home.claim': '让复杂的软件，变得简单。',
     'home.lead':
       'Magies 构建面向开发者、数据工作者与企业用户的开发工具、数据自动化产品和在线服务。',
@@ -211,7 +209,6 @@ const messages = {
   },
   en: {
     'nav.lang': '中文',
-    'nav.theme': 'Toggle theme',
     'nav.menu': 'Menu',
     'nav.home': 'Home',
     'nav.products': 'Products',
@@ -238,7 +235,6 @@ const messages = {
     'footer.contact': 'Contact',
     'footer.copy': 'All rights reserved',
     'footer.created': "Created by Magies's Dad",
-    'home.badge': 'Software product brand',
     'home.claim': 'Make complex software simple.',
     'home.lead':
       'Magies builds developer tools, data automation products, and online services for developers, data workers, and teams.',

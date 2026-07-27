@@ -1,7 +1,7 @@
 <template>
   <span
     class="brand-logo"
-    :class="[`size-${size}`, { stacked, glow }]"
+    :class="[`size-${size}`, { stacked }]"
     :aria-label="showWordmark ? 'Magies' : 'Magies logo'"
   >
     <span class="brand-logo-mark-wrap">
@@ -21,14 +21,12 @@ const props = withDefaults(
     showWordmark?: boolean
     tagline?: string
     stacked?: boolean
-    glow?: boolean
   }>(),
   {
     size: 'md',
     showWordmark: true,
     tagline: '',
-    stacked: false,
-    glow: false
+    stacked: false
   }
 )
 
@@ -56,28 +54,6 @@ const detail = computed(() => props.size === 'lg' || props.size === 'xl')
   display: grid;
   place-items: center;
   flex-shrink: 0;
-}
-
-/* Ambient halo — only on the hero/feature mark, never on nav or footer chrome
-   (stacking a CSS glow behind the SVG's own bloom is what made it look foggy). */
-.brand-logo.glow .brand-logo-mark-wrap::before {
-  content: "";
-  position: absolute;
-  inset: -30%;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, rgba(168, 85, 247, 0.28) 0%, transparent 62%),
-    radial-gradient(circle at 30% 40%, rgba(59, 130, 246, 0.2) 0%, transparent 55%),
-    radial-gradient(circle at 70% 55%, rgba(249, 115, 22, 0.16) 0%, transparent 55%);
-  filter: blur(14px);
-  z-index: 0;
-  pointer-events: none;
-  animation: logoAura 6s ease-in-out infinite;
-}
-
-.brand-logo-mark-wrap :deep(.mark) {
-  position: relative;
-  z-index: 1;
 }
 
 .size-sm .brand-logo-mark-wrap {
@@ -172,21 +148,8 @@ const detail = computed(() => props.size === 'lg' || props.size === 'xl')
   }
 }
 
-@keyframes logoAura {
-  0%,
-  100% {
-    opacity: 0.75;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.06);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .stacked .brand-logo-name,
-  .brand-logo.glow .brand-logo-mark-wrap::before {
+  .stacked .brand-logo-name {
     animation: none;
   }
 }
