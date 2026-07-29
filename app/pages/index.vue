@@ -36,7 +36,11 @@
 
           <div class="hero-trust" data-hero-in>
             <div class="trust-avatars" aria-hidden="true">
-              <span v-for="avatar in trustAvatars" :key="avatar" :style="{ '--avatar': avatar }" />
+              <span
+                v-for="position in trustAvatarPositions"
+                :key="position"
+                :style="{ '--avatar-position': position }"
+              />
             </div>
             <p>{{ t('home.trust') }}</p>
           </div>
@@ -44,7 +48,9 @@
 
         <div class="hero-art-wrap" data-hero-visual>
           <div class="hero-art-glow" aria-hidden="true" />
+          <div class="hero-galaxy-orbit" aria-hidden="true" />
           <img class="hero-logo-art" src="/brand/magies-logo-hero.png" alt="Magies">
+          <span class="hero-core-star" aria-hidden="true" />
         </div>
       </div>
     </section>
@@ -123,7 +129,6 @@
           </div>
 
           <div class="galaxy-panel" data-reveal aria-hidden="true">
-            <span class="galaxy-disk" />
             <div class="galaxy-pills">
               <span><Infinity :size="13" /> {{ t('home.pillPossibilities') }}</span>
               <span><MonitorUp :size="13" /> {{ t('home.pillUniverse') }}</span>
@@ -186,7 +191,7 @@ const root = ref<HTMLElement | null>(null)
 useReveal(root)
 const { t, locale } = useI18n()
 
-const trustAvatars = ['#f6c69f', '#d6a077', '#efc0ad', '#d8ae92', '#e8b995']
+const trustAvatarPositions = ['0%', '25%', '50%', '75%', '100%']
 
 const stats = computed<{ value: string; label: string; color: string; icon: LucideIcon }[]>(
   () => [
@@ -329,7 +334,7 @@ const whyItems = computed<{
 .hero-v2 {
   position: relative;
   z-index: 1;
-  height: 390px;
+  height: 440px;
   overflow: hidden;
 }
 
@@ -386,10 +391,10 @@ const whyItems = computed<{
 .hero-reference-grid {
   height: 100%;
   display: grid;
-  grid-template-columns: 0.88fr 1.12fr;
+  grid-template-columns: 0.9fr 1.1fr;
   align-items: center;
-  gap: 20px;
-  padding-bottom: 20px;
+  gap: 32px;
+  padding-bottom: 24px;
 }
 
 .hero-copy {
@@ -400,10 +405,10 @@ const whyItems = computed<{
 .hero-badges {
   display: flex;
   align-items: center;
-  gap: 9px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 16px;
   color: #a9b5d3;
-  font-size: 0.61rem;
+  font-size: 0.67rem;
   line-height: 1;
 }
 
@@ -424,8 +429,8 @@ const whyItems = computed<{
 }
 
 .hero-v2-title {
-  margin: 0 0 13px;
-  font-size: clamp(2.25rem, 4.3vw, 2.75rem);
+  margin: 0 0 18px;
+  font-size: clamp(2.45rem, 4.3vw, 3rem);
   font-weight: 800;
   line-height: 0.98;
   letter-spacing: -0.045em;
@@ -448,34 +453,34 @@ const whyItems = computed<{
 }
 
 .hero-v2-lead {
-  max-width: 34ch;
-  margin: 0 0 18px;
+  max-width: 40ch;
+  margin: 0 0 24px;
   color: #a4aec4;
-  font-size: 0.73rem;
-  line-height: 1.65;
+  font-size: 0.8rem;
+  line-height: 1.72;
 }
 
 .hero-actions,
 .cta-actions {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 14px;
 }
 
 .hero-actions {
-  margin-bottom: 22px;
+  margin-bottom: 26px;
 }
 
 .reference-button {
-  min-height: 36px;
-  padding: 0 18px;
+  min-height: 40px;
+  padding: 0 22px;
   border: 1px solid transparent;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 9px;
-  font-size: 0.66rem;
+  font-size: 0.72rem;
   font-weight: 650;
   color: #fff;
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
@@ -505,39 +510,40 @@ const whyItems = computed<{
 .hero-trust {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
 }
 
 .trust-avatars {
   display: flex;
-  padding-left: 5px;
+  padding-left: 0;
 }
 
 .trust-avatars span {
-  width: 23px;
-  height: 23px;
-  margin-left: -5px;
-  border: 1px solid #dbe5ff;
+  width: 31px;
+  height: 31px;
+  margin-left: -4px;
+  border: 2px solid #dbe5ff;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 33%, var(--avatar) 0 23%, transparent 25%),
-    radial-gradient(ellipse at 50% 95%, var(--avatar) 0 42%, transparent 44%),
-    linear-gradient(145deg, #303754, #121729);
+  background: url('/brand/trust-avatar-strip.jpg') var(--avatar-position) center / 500% auto no-repeat;
   box-shadow: 0 0 0 1px #02040d;
+}
+
+.trust-avatars span:first-child {
+  margin-left: 0;
 }
 
 .hero-trust p {
   margin: 0;
   color: #aab2c5;
-  font-size: 0.58rem;
-  line-height: 1.45;
+  font-size: 0.64rem;
+  line-height: 1.5;
 }
 
 .hero-art-wrap {
   position: relative;
   z-index: 1;
   min-width: 0;
-  height: 360px;
+  height: 404px;
   display: grid;
   place-items: center;
 }
@@ -557,9 +563,9 @@ const whyItems = computed<{
   left: 50%;
   top: 50%;
   z-index: 1;
-  width: 450px;
+  width: 480px;
   max-width: none;
-  height: 450px;
+  height: 480px;
   object-fit: contain;
   mix-blend-mode: screen;
   transform: translate(-50%, -50%);
@@ -572,17 +578,89 @@ const whyItems = computed<{
     drop-shadow(0 0 26px rgba(217, 70, 239, 0.14));
 }
 
+.hero-galaxy-orbit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 0;
+  width: 430px;
+  height: 430px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 1%, #fff 0 1.5px, #9ff3ff 2px, transparent 4px),
+    radial-gradient(circle at 88% 22%, #fff 0 1px, #ffb469 2px, transparent 4px),
+    radial-gradient(circle at 97% 58%, #fff 0 1.5px, #ff7ccf 2px, transparent 4px),
+    radial-gradient(circle at 74% 92%, #fff 0 1px, #c084fc 2px, transparent 4px),
+    radial-gradient(circle at 24% 91%, #fff 0 1px, #60dfff 2px, transparent 4px),
+    radial-gradient(circle at 1% 55%, #fff 0 1.5px, #42dfff 2px, transparent 4px),
+    radial-gradient(circle at 16% 18%, #fff 0 1px, #75e7ff 2px, transparent 4px),
+    conic-gradient(
+      from 15deg,
+      rgba(34, 211, 238, 0.02),
+      rgba(34, 211, 238, 0.58),
+      rgba(99, 102, 241, 0.12),
+      rgba(217, 70, 239, 0.52),
+      rgba(251, 146, 60, 0.62),
+      rgba(217, 70, 239, 0.18),
+      rgba(34, 211, 238, 0.02)
+    );
+  -webkit-mask: radial-gradient(circle, transparent 0 65%, #000 67% 71%, rgba(0, 0, 0, 0.72) 73%, transparent 76%);
+  mask: radial-gradient(circle, transparent 0 65%, #000 67% 71%, rgba(0, 0, 0, 0.72) 73%, transparent 76%);
+  filter:
+    drop-shadow(0 0 12px rgba(34, 211, 238, 0.45))
+    drop-shadow(0 0 18px rgba(217, 70, 239, 0.32));
+  transform: translate(-50%, -50%);
+  animation: galaxyClockwise 22s linear infinite;
+}
+
+.hero-core-star {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  width: 116px;
+  height: 116px;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 4%, #f5d0fe 8%, rgba(217, 70, 239, 0.24) 24%, transparent 58%);
+  mix-blend-mode: screen;
+  transform: translate(-50%, -50%);
+  animation: coreStarPulse 2.8s ease-in-out infinite;
+}
+
+.hero-core-star::before,
+.hero-core-star::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: linear-gradient(90deg, transparent, rgba(216, 180, 254, 0.8), #fff, rgba(244, 114, 182, 0.74), transparent);
+  transform: translate(-50%, -50%);
+  filter: blur(0.2px);
+}
+
+.hero-core-star::before {
+  width: 100%;
+  height: 1px;
+}
+
+.hero-core-star::after {
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, rgba(216, 180, 254, 0.78), #fff, rgba(96, 165, 250, 0.7), transparent);
+}
+
 .stats-wrap {
   position: relative;
   z-index: 4;
   width: min(100% - 48px, 820px);
   max-width: none;
   padding: 0;
-  margin: -15px auto 0;
+  margin: -18px auto 0;
 }
 
 .stats-bar {
-  min-height: 68px;
+  min-height: 80px;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   list-style: none;
@@ -601,7 +679,7 @@ const whyItems = computed<{
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   min-width: 0;
 }
 
@@ -616,8 +694,8 @@ const whyItems = computed<{
 }
 
 .stat-icon {
-  width: 31px;
-  height: 31px;
+  width: 36px;
+  height: 36px;
   display: grid;
   place-items: center;
   border-radius: 50%;
@@ -630,7 +708,7 @@ const whyItems = computed<{
 .stat-value {
   display: block;
   color: #f6f7fb;
-  font-size: 1.18rem;
+  font-size: 1.25rem;
   line-height: 1.1;
   font-weight: 760;
 }
@@ -639,7 +717,7 @@ const whyItems = computed<{
   display: block;
   margin-top: 3px;
   color: #8490aa;
-  font-size: 0.55rem;
+  font-size: 0.62rem;
   line-height: 1;
 }
 
@@ -649,50 +727,50 @@ const whyItems = computed<{
 }
 
 .products-section {
-  padding: 21px 0 16px;
+  padding: 34px 0 28px;
 }
 
 .reference-section-heading {
-  margin: 0 auto 11px;
+  margin: 0 auto 16px;
   text-align: center;
 }
 
 .reference-section-heading h2 {
   margin: 0;
   color: #f3f5fb;
-  font-size: 1.15rem;
+  font-size: 1.3rem;
   line-height: 1.2;
   font-weight: 730;
   letter-spacing: -0.025em;
 }
 
 .reference-section-heading p {
-  margin: 4px 0 0;
+  margin: 6px 0 0;
   color: #8e98ae;
-  font-size: 0.55rem;
-  line-height: 1.4;
+  font-size: 0.64rem;
+  line-height: 1.5;
 }
 
 .reference-section-heading.align-left {
   text-align: left;
-  margin-bottom: 13px;
+  margin-bottom: 18px;
 }
 
 .reference-products-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 7px;
+  gap: 12px;
 }
 
 .reference-product-card {
   position: relative;
-  min-height: 149px;
-  padding: 18px 10px 13px;
+  min-height: 168px;
+  padding: 22px 12px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid color-mix(in srgb, var(--product-color) 32%, rgba(96, 109, 158, 0.25));
   background: linear-gradient(150deg, rgba(12, 18, 41, 0.92), rgba(6, 9, 23, 0.94));
   box-shadow:
@@ -720,9 +798,9 @@ const whyItems = computed<{
 .reference-product-icon {
   position: relative;
   z-index: 1;
-  width: 40px;
-  height: 40px;
-  margin-bottom: 10px;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 12px;
   display: grid;
   place-items: center;
   border-radius: 8px;
@@ -737,9 +815,9 @@ const whyItems = computed<{
 .reference-product-card h3 {
   position: relative;
   z-index: 1;
-  margin: 0 0 5px;
+  margin: 0 0 7px;
   color: #f0f3f9;
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   line-height: 1.2;
   font-weight: 650;
 }
@@ -750,28 +828,28 @@ const whyItems = computed<{
   flex: 1;
   margin: 0;
   color: #8f99ad;
-  font-size: 0.48rem;
-  line-height: 1.45;
+  font-size: 0.55rem;
+  line-height: 1.55;
 }
 
 .product-learn {
   position: relative;
   z-index: 1;
-  margin-top: 7px;
+  margin-top: 10px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
   color: color-mix(in srgb, var(--product-color) 72%, #fff);
-  font-size: 0.49rem;
+  font-size: 0.56rem;
   font-weight: 620;
 }
 
 .showcase-section {
-  padding: 0 0 4px;
+  padding: 0 0 28px;
 }
 
 .showcase-shell {
-  padding: 7px 22px 6px;
+  padding: 18px 24px 16px;
   border: 1px solid rgba(91, 104, 159, 0.2);
   border-radius: 17px;
   background:
@@ -781,7 +859,7 @@ const whyItems = computed<{
 }
 
 .showcase-shell > .reference-section-heading {
-  margin-bottom: 4px;
+  margin-bottom: 12px;
 }
 
 .showcase-shell :deep(.showcase) {
@@ -790,96 +868,96 @@ const whyItems = computed<{
 }
 
 .showcase-shell :deep(.showcase-chrome) {
-  min-height: 287px;
-  grid-template-columns: 117px 1fr;
+  min-height: 326px;
+  grid-template-columns: 128px 1fr;
   border-radius: 10px;
 }
 
 .showcase-shell :deep(.showcase-sidebar) {
-  padding: 11px 9px;
+  padding: 14px 11px;
 }
 
 .showcase-shell :deep(.sb-brand) {
-  margin-bottom: 10px;
-  font-size: 0.5rem;
+  margin-bottom: 13px;
+  font-size: 0.56rem;
 }
 
 .showcase-shell :deep(.sb-item) {
-  padding: 4px 7px;
-  font-size: 0.5rem;
+  padding: 5px 8px;
+  font-size: 0.54rem;
   border-radius: 5px;
 }
 
 .showcase-shell :deep(.showcase-main) {
-  gap: 7px;
-  padding: 8px 10px 7px;
+  gap: 9px;
+  padding: 11px 13px 10px;
 }
 
 .showcase-shell :deep(.showcase-top h3) {
-  font-size: 0.64rem;
+  font-size: 0.7rem;
 }
 
 .showcase-shell :deep(.pill) {
-  padding: 2px 6px;
-  font-size: 0.45rem;
+  padding: 3px 7px;
+  font-size: 0.49rem;
 }
 
 .showcase-shell :deep(.avatar) {
-  width: 17px;
-  height: 17px;
+  width: 20px;
+  height: 20px;
 }
 
 .showcase-shell :deep(.kpi-row),
 .showcase-shell :deep(.panel-row) {
-  gap: 6px;
+  gap: 8px;
 }
 
 .showcase-shell :deep(.kpi) {
-  gap: 2px;
-  padding: 7px;
+  gap: 3px;
+  padding: 9px;
   border-radius: 7px;
 }
 
 .showcase-shell :deep(.kpi-label),
 .showcase-shell :deep(.panel-head) {
-  font-size: 0.46rem;
+  font-size: 0.5rem;
 }
 
 .showcase-shell :deep(.kpi-value) {
-  font-size: 0.78rem;
+  font-size: 0.87rem;
 }
 
 .showcase-shell :deep(.kpi-delta),
 .showcase-shell :deep(.chip) {
-  font-size: 0.4rem;
+  font-size: 0.44rem;
 }
 
 .showcase-shell :deep(.panel-row) {
-  min-height: 123px;
+  min-height: 140px;
   grid-template-columns: 1.3fr 1fr 0.85fr;
 }
 
 .showcase-shell :deep(.panel) {
-  padding: 7px;
+  padding: 9px;
   border-radius: 7px;
 }
 
 .showcase-shell :deep(.panel-head) {
-  margin-bottom: 5px;
+  margin-bottom: 7px;
 }
 
 .showcase-shell :deep(.chart) {
-  height: 68px;
+  height: 80px;
 }
 
 .showcase-shell :deep(.chart-axis),
 .showcase-shell :deep(.task-meta span),
 .showcase-shell :deep(.workflow-cap) {
-  font-size: 0.38rem;
+  font-size: 0.41rem;
 }
 
 .showcase-shell :deep(.task-list) {
-  gap: 5px;
+  gap: 6px;
 }
 
 .showcase-shell :deep(.task-list li) {
@@ -888,53 +966,53 @@ const whyItems = computed<{
 }
 
 .showcase-shell :deep(.task-meta strong) {
-  font-size: 0.42rem;
+  font-size: 0.46rem;
 }
 
 .showcase-shell :deep(.task-list em) {
-  font-size: 0.39rem;
+  font-size: 0.42rem;
 }
 
 .showcase-shell :deep(.workflow) {
-  height: 74px;
+  height: 86px;
 }
 
 .showcase-shell :deep(.feature-strip) {
-  gap: 5px;
+  gap: 7px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .showcase-shell :deep(.feat) {
-  gap: 5px;
-  padding: 6px;
+  gap: 7px;
+  padding: 8px;
   border-radius: 6px;
 }
 
 .showcase-shell :deep(.feat strong) {
-  font-size: 0.43rem;
+  font-size: 0.48rem;
 }
 
 .showcase-shell :deep(.feat span) {
-  font-size: 0.37rem;
+  font-size: 0.41rem;
 }
 
 .why-eco-section {
-  padding: 0 0 12px;
+  padding: 0 0 30px;
 }
 
 .why-eco-grid {
   display: grid;
   grid-template-columns: 1.62fr 0.92fr;
-  gap: 15px;
+  gap: 22px;
   align-items: start;
 }
 
 .why-block {
-  min-height: 248px;
+  min-height: 330px;
   display: grid;
   grid-template-columns: 0.92fr 1.08fr;
-  gap: 10px;
-  padding: 12px;
+  gap: 18px;
+  padding: 18px;
   border: 1px solid rgba(84, 98, 153, 0.17);
   border-radius: 14px;
   background: rgba(3, 6, 17, 0.5);
@@ -947,21 +1025,21 @@ const whyItems = computed<{
 .why-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 7px;
+  gap: 12px;
 }
 
 .why-card {
-  min-height: 86px;
-  padding: 10px 9px 8px;
+  min-height: 104px;
+  padding: 13px 12px 11px;
   border: 1px solid rgba(80, 95, 151, 0.2);
-  border-radius: 7px;
+  border-radius: 9px;
   background: linear-gradient(145deg, rgba(10, 15, 36, 0.88), rgba(5, 8, 21, 0.9));
 }
 
 .why-icon {
-  width: 24px;
-  height: 24px;
-  margin-bottom: 6px;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 8px;
   display: grid;
   place-items: center;
   border-radius: 7px;
@@ -972,76 +1050,53 @@ const whyItems = computed<{
 }
 
 .why-card h3 {
-  margin: 0 0 3px;
+  margin: 0 0 5px;
   color: #edf1f8;
-  font-size: 0.5rem;
+  font-size: 0.58rem;
   line-height: 1.25;
 }
 
 .why-card p {
   margin: 0;
   color: #8a95aa;
-  font-size: 0.4rem;
-  line-height: 1.45;
+  font-size: 0.46rem;
+  line-height: 1.5;
 }
 
 .galaxy-panel {
   position: relative;
-  min-height: 222px;
+  min-height: 258px;
   overflow: hidden;
-  border-radius: 9px;
+  border-radius: 11px;
   background:
-    radial-gradient(ellipse 46% 25% at 50% 44%, rgba(255, 255, 255, 0.8), transparent 7%),
-    radial-gradient(ellipse 52% 29% at 50% 44%, rgba(244, 114, 182, 0.66), transparent 20%),
-    radial-gradient(ellipse 78% 42% at 50% 44%, rgba(139, 92, 246, 0.65), transparent 45%),
-    radial-gradient(ellipse 100% 55% at 50% 44%, rgba(37, 99, 235, 0.34), transparent 58%),
-    #03050d;
+    linear-gradient(180deg, rgba(2, 4, 12, 0.04) 55%, rgba(2, 4, 12, 0.88) 100%),
+    url('/brand/magies-galaxy-realistic.jpg') center / cover no-repeat;
 }
 
 .galaxy-panel::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-image:
-    radial-gradient(1px 1px at 12% 15%, #fff, transparent),
-    radial-gradient(1px 1px at 82% 20%, #c4b5fd, transparent),
-    radial-gradient(1px 1px at 75% 68%, #93c5fd, transparent),
-    radial-gradient(1px 1px at 21% 75%, #fff, transparent),
-    radial-gradient(1px 1px at 92% 84%, #f9a8d4, transparent);
-}
-
-.galaxy-disk {
-  position: absolute;
-  left: 12%;
-  top: 15%;
-  width: 76%;
-  aspect-ratio: 1.8;
-  border-radius: 50%;
-  border-top: 1px solid rgba(196, 181, 253, 0.55);
-  border-bottom: 1px solid rgba(96, 165, 250, 0.28);
-  transform: rotate(-12deg);
-  box-shadow:
-    0 -8px 24px rgba(244, 114, 182, 0.22),
-    0 10px 34px rgba(59, 130, 246, 0.18);
+  box-shadow: inset 0 0 38px rgba(2, 4, 12, 0.72);
 }
 
 .galaxy-pills {
   position: absolute;
   z-index: 1;
-  left: 9px;
-  right: 9px;
-  bottom: 10px;
+  left: 12px;
+  right: 12px;
+  bottom: 13px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
+  gap: 8px;
 }
 
 .galaxy-pills span {
   display: grid;
   justify-items: center;
-  gap: 3px;
-  color: #9ca6bc;
-  font-size: 0.37rem;
+  gap: 4px;
+  color: #b5bfd2;
+  font-size: 0.43rem;
   text-align: center;
 }
 
@@ -1050,9 +1105,9 @@ const whyItems = computed<{
 }
 
 .eco-block {
-  height: 259px;
+  height: 330px;
   min-height: 0;
-  padding: 12px 8px 4px;
+  padding: 18px 10px 8px;
   overflow: hidden;
   border: 1px solid rgba(84, 98, 153, 0.17);
   border-radius: 14px;
@@ -1060,44 +1115,49 @@ const whyItems = computed<{
 }
 
 .eco-block :deep(.eco) {
-  width: 235px;
+  width: 270px;
   max-width: 100%;
-  margin-top: -8px;
+  margin-top: -4px;
 }
 
 .eco-block :deep(.eco-node) {
-  min-width: 91px;
-  gap: 5px;
-  padding: 5px 7px 5px 5px;
+  min-width: 104px;
+  gap: 6px;
+  padding: 6px 8px 6px 6px;
   border-radius: 9px;
 }
 
 .eco-block :deep(.node-icon) {
-  width: 22px;
-  height: 22px;
+  width: 25px;
+  height: 25px;
   border-radius: 6px;
 }
 
 .eco-block :deep(.node-text strong) {
-  font-size: 0.43rem;
+  font-size: 0.48rem;
 }
 
 .eco-block :deep(.node-text span) {
-  font-size: 0.35rem;
+  font-size: 0.39rem;
 }
 
 .eco-block :deep(.eco-core) {
-  width: 44px;
-  height: 44px;
+  width: 72px;
+  height: 72px;
+}
+
+.eco-block :deep(.eco-logo) {
+  width: 90px;
+  height: 90px;
 }
 
 .cta-section {
-  padding: 0 0 4px;
+  padding: 0 0 18px;
 }
 
 .cta-panel {
-  min-height: 84px;
-  padding: 8px 20px 7px;
+  min-height: 110px;
+  padding: 16px 22px 14px;
   display: grid;
   justify-items: center;
   align-content: center;
@@ -1113,21 +1173,44 @@ const whyItems = computed<{
 .cta-panel h2 {
   margin: 0;
   color: #f3f5fb;
-  font-size: 1rem;
+  font-size: 1.14rem;
   line-height: 1.2;
 }
 
 .cta-panel p {
-  margin: 4px 0 8px;
+  margin: 6px 0 12px;
   color: #929caf;
-  font-size: 0.48rem;
-  line-height: 1.3;
+  font-size: 0.56rem;
+  line-height: 1.4;
 }
 
 .reference-button.compact {
-  min-height: 25px;
-  padding: 0 19px;
-  font-size: 0.49rem;
+  min-height: 31px;
+  padding: 0 21px;
+  font-size: 0.57rem;
+}
+
+@keyframes galaxyClockwise {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes coreStarPulse {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: translate(-50%, -50%) scale(0.92);
+    filter: brightness(0.95) drop-shadow(0 0 5px rgba(217, 70, 239, 0.45));
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.07);
+    filter: brightness(1.22) drop-shadow(0 0 15px rgba(217, 70, 239, 0.8));
+  }
 }
 
 @media (min-width: 1200px) {
@@ -1152,12 +1235,17 @@ const whyItems = computed<{
     height: 410px;
   }
 
+  .hero-galaxy-orbit {
+    width: 392px;
+    height: 392px;
+  }
+
   .reference-products-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .reference-product-card {
-    min-height: 142px;
+    min-height: 160px;
   }
 
   .why-eco-grid {
@@ -1173,13 +1261,13 @@ const whyItems = computed<{
 @media (max-width: 680px) {
   .hero-v2 {
     height: auto;
-    min-height: 680px;
+    min-height: 730px;
   }
 
   .hero-reference-grid {
     grid-template-columns: 1fr;
-    gap: 0;
-    padding: 52px 0 22px;
+    gap: 10px;
+    padding: 58px 0 28px;
     text-align: center;
   }
 
@@ -1205,13 +1293,23 @@ const whyItems = computed<{
 
   .hero-art-wrap {
     order: 2;
-    height: 330px;
-    margin-top: -2px;
+    height: 342px;
+    margin-top: 4px;
   }
 
   .hero-logo-art {
     width: 350px;
     height: 350px;
+  }
+
+  .hero-galaxy-orbit {
+    width: 332px;
+    height: 332px;
+  }
+
+  .hero-core-star {
+    width: 100px;
+    height: 100px;
   }
 
   .hero-horizon {
@@ -1237,11 +1335,11 @@ const whyItems = computed<{
 
   .reference-products-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 9px;
+    gap: 12px;
   }
 
   .showcase-shell {
-    padding: 12px 10px 10px;
+    padding: 18px 12px 14px;
   }
 
   .showcase-shell :deep(.showcase-chrome) {
@@ -1271,10 +1369,21 @@ const whyItems = computed<{
 
   .why-block {
     grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .eco-block {
+    height: 350px;
+  }
+
+  .eco-block :deep(.eco-node) {
+    min-width: 0;
+    gap: 0;
+    padding: 6px;
   }
 
   .galaxy-panel {
-    min-height: 210px;
+    min-height: 250px;
   }
 }
 
@@ -1285,11 +1394,11 @@ const whyItems = computed<{
   }
 
   .hero-v2 {
-    min-height: 635px;
+    min-height: 690px;
   }
 
   .hero-reference-grid {
-    padding-top: 42px;
+    padding-top: 48px;
   }
 
   .hero-v2-title {
@@ -1302,12 +1411,22 @@ const whyItems = computed<{
   }
 
   .hero-art-wrap {
-    height: 296px;
+    height: 310px;
   }
 
   .hero-logo-art {
     width: 310px;
     height: 310px;
+  }
+
+  .hero-galaxy-orbit {
+    width: 292px;
+    height: 292px;
+  }
+
+  .hero-core-star {
+    width: 88px;
+    height: 88px;
   }
 
   .hero-trust {
@@ -1325,7 +1444,7 @@ const whyItems = computed<{
   }
 
   .reference-products-grid {
-    gap: 7px;
+    gap: 10px;
   }
 
   .why-grid {
@@ -1338,6 +1457,11 @@ const whyItems = computed<{
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hero-galaxy-orbit,
+  .hero-core-star {
+    animation: none;
+  }
+
   .reference-button,
   .reference-product-card {
     transition: none;

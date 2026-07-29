@@ -8,12 +8,20 @@ const layoutPath = fileURLToPath(new URL('../app/layouts/default.vue', import.me
 const layout = readFileSync(layoutPath, 'utf8')
 const i18nPath = fileURLToPath(new URL('../app/composables/useI18n.ts', import.meta.url))
 const i18n = readFileSync(i18nPath, 'utf8')
+const ecosystemPath = fileURLToPath(new URL('../app/components/HomeEcosystem.vue', import.meta.url))
+const ecosystem = readFileSync(ecosystemPath, 'utf8')
 const heroSigilPath = fileURLToPath(new URL('../app/components/HeroSigil.vue', import.meta.url))
 const heroSigil = readFileSync(heroSigilPath, 'utf8')
 const starfieldPath = fileURLToPath(new URL('../app/components/Starfield.vue', import.meta.url))
 const starfield = readFileSync(starfieldPath, 'utf8')
 const suppliedLogoPath = fileURLToPath(
   new URL('../public/brand/magies-logo-hero.png', import.meta.url)
+)
+const generatedAvatarPath = fileURLToPath(
+  new URL('../public/brand/trust-avatar-strip.jpg', import.meta.url)
+)
+const generatedGalaxyPath = fileURLToPath(
+  new URL('../public/brand/magies-galaxy-realistic.jpg', import.meta.url)
 )
 
 describe('homepage UI landmarks', () => {
@@ -89,6 +97,28 @@ describe('homepage UI landmarks', () => {
     expect(i18n).toContain("'home.stat.activeUsers': 'Active Users'")
     expect(i18n).toContain("'home.product.terminalDesc':")
   })
+
+  it('uses generated photographic avatars and a realistic galaxy asset', () => {
+    expect(homepage).toContain("url('/brand/trust-avatar-strip.jpg')")
+    expect(homepage).toContain("url('/brand/magies-galaxy-realistic.jpg')")
+    expect(existsSync(generatedAvatarPath)).toBe(true)
+    expect(existsSync(generatedGalaxyPath)).toBe(true)
+    expect(statSync(generatedAvatarPath).size).toBeGreaterThan(50_000)
+    expect(statSync(generatedGalaxyPath).size).toBeGreaterThan(100_000)
+  })
+
+  it('animates a clockwise galaxy around the hero logo and pulses its core star', () => {
+    expect(homepage).toContain('class="hero-galaxy-orbit"')
+    expect(homepage).toContain('class="hero-core-star"')
+    expect(homepage).toContain('@keyframes galaxyClockwise')
+    expect(homepage).toContain('@keyframes coreStarPulse')
+  })
+
+  it('adds breathing room to cards and major homepage sections', () => {
+    expect(homepage).toContain('padding: 34px 0 28px;')
+    expect(homepage).toContain('min-height: 168px;')
+    expect(homepage).toContain('gap: 12px;')
+  })
 })
 
 describe('homepage chrome', () => {
@@ -96,7 +126,8 @@ describe('homepage chrome', () => {
     expect(layout).toContain(
       '<nav v-if="isHome" class="reference-navbar" data-testid="home-nav">'
     )
-    expect(layout).toContain('class="reference-nav-score"')
+    expect(layout).not.toContain('class="reference-nav-score"')
+    expect(layout).not.toContain('36.2K')
     expect(layout).toContain(
       '<footer v-if="isHome" class="reference-footer" data-testid="home-footer">'
     )
@@ -113,6 +144,14 @@ describe('homepage chrome', () => {
   it('widens homepage navigation and footer with the desktop content', () => {
     expect(layout).toContain('@media (min-width: 1200px)')
     expect(layout).toContain('width: min(100% - 96px, 1180px);')
+  })
+})
+
+describe('homepage ecosystem', () => {
+  it('reuses the supplied Magies logo at the center of the ecosystem', () => {
+    expect(ecosystem).toContain(
+      '<img class="eco-logo" src="/brand/magies-logo-hero.png" alt="">'
+    )
   })
 })
 

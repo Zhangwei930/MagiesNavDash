@@ -32,10 +32,6 @@
           >
             {{ t('nav.lang') }}
           </button>
-          <span class="reference-nav-score" aria-label="36.2 thousand community stars">
-            <Star :size="11" fill="currentColor" />
-            36.2K
-          </span>
           <NuxtLink to="/account" class="reference-sign-in">
             {{ auth.isLoggedIn ? t('nav.account') : t('nav.login') }}
           </NuxtLink>
@@ -181,7 +177,7 @@
 </template>
 
 <script setup lang="ts">
-import { Github, Instagram, Linkedin, Menu, Star, Twitter, X, Youtube } from 'lucide-vue-next'
+import { Github, Instagram, Linkedin, Menu, Twitter, X, Youtube } from 'lucide-vue-next'
 import { PAGE_LINKS, RESOURCE_LINKS } from '~/utils/siteLinks'
 import type { MsgKey } from '~/composables/useI18n'
 
@@ -228,7 +224,7 @@ onMounted(() => {
   position: sticky;
   z-index: 1000;
   top: 0;
-  height: 69px;
+  height: 74px;
   border-bottom: 1px solid rgba(78, 91, 142, 0.08);
   background: linear-gradient(180deg, rgba(1, 3, 10, 0.93), rgba(1, 3, 10, 0.7));
   backdrop-filter: blur(17px) saturate(1.2);
@@ -239,7 +235,7 @@ onMounted(() => {
   height: 100%;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 176px 1fr 280px;
+  grid-template-columns: 176px 1fr 224px;
   align-items: center;
   gap: 14px;
 }
@@ -255,7 +251,7 @@ onMounted(() => {
 .reference-nav-brand {
   gap: 8px;
   width: max-content;
-  font-size: 0.78rem;
+  font-size: 0.84rem;
 }
 
 .reference-nav-brand img {
@@ -276,7 +272,7 @@ onMounted(() => {
   position: relative;
   padding: 7px 0;
   color: #d8ddeb;
-  font-size: 0.54rem;
+  font-size: 0.6rem;
   font-weight: 520;
 }
 
@@ -304,22 +300,21 @@ onMounted(() => {
   gap: 9px;
 }
 
-.reference-nav-score,
 .reference-sign-in,
 .reference-get-started,
 .reference-lang-switch {
-  min-height: 29px;
+  min-height: 32px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-  font-size: 0.51rem;
+  font-size: 0.57rem;
   font-weight: 620;
 }
 
 .reference-lang-switch {
-  min-width: 38px;
+  min-width: 41px;
   padding: 0 9px;
   color: #c9cfdf;
   border: 1px solid rgba(105, 117, 166, 0.22);
@@ -332,27 +327,15 @@ onMounted(() => {
   border-color: rgba(167, 139, 250, 0.55);
 }
 
-.reference-nav-score {
-  gap: 6px;
-  min-width: 59px;
-  color: #c9cfdf;
-  border: 1px solid rgba(105, 117, 166, 0.18);
-  background: rgba(10, 13, 28, 0.58);
-}
-
-.reference-nav-score svg {
-  color: #fbbf24;
-}
-
 .reference-sign-in {
-  min-width: 65px;
+  min-width: 70px;
   color: #eef1f8;
   border: 1px solid rgba(105, 117, 166, 0.22);
   background: rgba(4, 7, 16, 0.4);
 }
 
 .reference-get-started {
-  min-width: 98px;
+  min-width: 104px;
   color: #fff;
   background: linear-gradient(100deg, #5b65ff, #8248f2 38%, #ec4899 68%, #fb923c);
   box-shadow:
@@ -374,8 +357,8 @@ onMounted(() => {
 .reference-footer {
   position: relative;
   z-index: 3;
-  min-height: 61px;
-  padding: 12px 0 8px;
+  min-height: 70px;
+  padding: 15px 0 10px;
   border-top: 1px solid rgba(75, 119, 194, 0.36);
   background: rgba(1, 3, 10, 0.84);
 }
@@ -392,7 +375,7 @@ onMounted(() => {
 .reference-footer-brand {
   width: max-content;
   gap: 7px;
-  font-size: 0.63rem;
+  font-size: 0.69rem;
 }
 
 .reference-footer-brand img {
@@ -411,7 +394,7 @@ onMounted(() => {
 
 .reference-footer-links a {
   color: #9aa4b8;
-  font-size: 0.42rem;
+  font-size: 0.48rem;
 }
 
 .reference-footer-links a:hover {
@@ -437,7 +420,7 @@ onMounted(() => {
   width: min(100% - 48px, 920px);
   margin: 4px auto 0;
   color: #657087;
-  font-size: 0.39rem;
+  font-size: 0.44rem;
   text-align: right;
 }
 
@@ -504,14 +487,14 @@ onMounted(() => {
   }
 
   .reference-nav-inner {
-    grid-template-columns: 190px 1fr 280px;
+    grid-template-columns: 190px 1fr 224px;
   }
 }
 
 @media (max-width: 960px) {
   .reference-nav-inner {
     width: min(100% - 32px, 820px);
-    grid-template-columns: 138px 1fr 270px;
+    grid-template-columns: 138px 1fr 220px;
   }
 
   .reference-nav-links {
@@ -549,7 +532,7 @@ onMounted(() => {
     position: fixed;
     left: 12px;
     right: 12px;
-    top: 62px;
+    top: 72px;
     display: grid;
     gap: 0;
     padding: 10px;
@@ -570,7 +553,6 @@ onMounted(() => {
     font-size: 0.72rem;
   }
 
-  .reference-nav-score,
   .reference-sign-in {
     display: none;
   }
@@ -595,11 +577,15 @@ onMounted(() => {
 
 @media (max-width: 560px) {
   .reference-navbar {
-    height: 62px;
+    height: 66px;
   }
 
   .reference-nav-inner {
     width: calc(100% - 24px);
+  }
+
+  .reference-nav-links {
+    top: 64px;
   }
 
   .reference-footer {

@@ -4,9 +4,7 @@
     <div class="eco-ring ring-a" />
     <div class="eco-ring ring-b" />
     <div class="eco-core">
-      <span class="core-cross h" />
-      <span class="core-cross v" />
-      <span class="core-dot" />
+      <img class="eco-logo" src="/brand/magies-logo-hero.png" alt="">
     </div>
 
     <div
@@ -109,57 +107,27 @@ function nodeStyle(i: number) {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 64px;
-  height: 64px;
+  width: 96px;
+  height: 96px;
   transform: translate(-50%, -50%);
   display: grid;
   place-items: center;
   z-index: 2;
 }
 
-.core-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff, #c4b5fd 50%, #a78bfa);
-  box-shadow:
-    0 0 20px rgba(255, 255, 255, 0.8),
-    0 0 40px rgba(167, 139, 250, 0.7);
+.eco-logo {
+  width: 124px;
+  max-width: none;
+  height: 124px;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(circle, #000 0 49%, rgba(0, 0, 0, 0.88) 52%, transparent 57%);
+  mask-image: radial-gradient(circle, #000 0 49%, rgba(0, 0, 0, 0.88) 52%, transparent 57%);
+  filter:
+    saturate(1.08)
+    drop-shadow(0 0 16px rgba(96, 165, 250, 0.3))
+    drop-shadow(0 0 20px rgba(217, 70, 239, 0.22));
   animation: corePulse 2.6s ease-in-out infinite;
-}
-
-.core-cross {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(196, 181, 253, 0.85),
-    rgba(255, 255, 255, 0.95),
-    rgba(251, 146, 60, 0.7),
-    transparent
-  );
-}
-
-.core-cross.h {
-  width: 90px;
-  height: 2px;
-  transform: translate(-50%, -50%);
-}
-
-.core-cross.v {
-  width: 2px;
-  height: 90px;
-  transform: translate(-50%, -50%);
-  background: linear-gradient(
-    180deg,
-    transparent,
-    rgba(96, 165, 250, 0.7),
-    rgba(255, 255, 255, 0.95),
-    rgba(244, 114, 182, 0.6),
-    transparent
-  );
 }
 
 .eco-node {
@@ -282,7 +250,7 @@ function nodeStyle(i: number) {
 @media (prefers-reduced-motion: reduce) {
   .eco-glow,
   .eco-ring,
-  .core-dot,
+  .eco-logo,
   .eco-node {
     animation: none !important;
   }
