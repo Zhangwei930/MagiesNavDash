@@ -25,18 +25,18 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'Magies — Build. Automate. Ship.',
+      title: 'Magies — Build. Automate. Transform.',
       meta: [
         {
           name: 'description',
           content:
-            'Magies 打造开发工具、数据自动化、在线服务与企业应用。让复杂的软件变得简单，让工作与生活更从容。'
+            'Magies 是一套强大的工具套件，为创作者、开发者与企业打造 AI 时代的生产力体验。开发工具 · 数据自动化 · 在线服务 · 企业应用。'
         },
         { name: 'theme-color', content: '#05060a' },
-        { property: 'og:title', content: 'Magies — Build. Automate. Ship.' },
+        { property: 'og:title', content: 'Magies — Build. Automate. Transform.' },
         {
           property: 'og:description',
-          content: '开发工具 · 数据自动化 · 在线服务 · 企业应用。让复杂的软件变得简单，让工作与生活更从容。'
+          content: 'AI Native 产品生态：开发工具 · 数据自动化 · 在线服务 · 企业应用。'
         }
       ],
       link: [

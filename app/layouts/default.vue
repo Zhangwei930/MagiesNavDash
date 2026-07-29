@@ -1,5 +1,8 @@
 <template>
   <div class="hub">
+    <ClientOnly>
+      <Starfield />
+    </ClientOnly>
     <nav class="navbar">
       <div class="container navbar-inner">
         <NuxtLink to="/" class="nav-brand" @click="menuOpen = false">
@@ -24,6 +27,11 @@
             class="btn btn-outline btn-sm nav-login"
             @click="menuOpen = false"
           >{{ auth.isLoggedIn ? t('nav.account') : t('nav.login') }}</NuxtLink>
+          <NuxtLink
+            to="/products"
+            class="btn btn-primary btn-sm nav-cta"
+            @click="menuOpen = false"
+          >{{ t('nav.getStarted') }}</NuxtLink>
           <button
             type="button"
             class="nav-toggle"
@@ -44,9 +52,9 @@
     <footer class="footer">
       <div class="container">
         <div class="footer-grid footer-grid-5">
-          <div>
+          <div class="footer-brand">
             <BrandLogo size="sm" />
-            <p style="margin-top:12px;max-width:34ch">{{ t('footer.blurb') }}</p>
+            <p class="footer-blurb">{{ t('footer.blurb') }}</p>
             <p class="footer-created">{{ t('footer.created') }}</p>
           </div>
           <div>
@@ -77,6 +85,11 @@
         </div>
         <div class="footer-bottom">
           <p>© {{ year }} MAGIES. {{ t('footer.copy') }}.</p>
+          <div class="footer-social" aria-label="links">
+            <a href="https://shell.magies.top" target="_blank" rel="noopener" title="Terminal">T</a>
+            <a href="https://nav.magies.top" target="_blank" rel="noopener" title="Nav">N</a>
+            <a href="mailto:hello@magies.top" title="Email">@</a>
+          </div>
         </div>
       </div>
     </footer>
@@ -112,6 +125,20 @@ onMounted(() => {
   padding: 0 12px;
 }
 
+.nav-cta {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  box-shadow: 0 4px 18px rgba(167, 139, 250, 0.35);
+}
+
+.footer-blurb {
+  margin-top: 12px;
+  max-width: 34ch;
+  line-height: 1.7;
+}
+
 .footer-created {
   margin-top: 10px;
   font-size: 0.8rem;
@@ -123,12 +150,41 @@ onMounted(() => {
   grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr));
 }
 
+.footer-social {
+  display: flex;
+  gap: 8px;
+}
+
+.footer-social a {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid rgba(167, 139, 250, 0.18);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.footer-social a:hover {
+  color: var(--accent-hover);
+  border-color: rgba(167, 139, 250, 0.4);
+  box-shadow: 0 0 16px rgba(167, 139, 250, 0.15);
+}
+
 @media (max-width: 960px) {
   .footer-grid-5 {
     grid-template-columns: 1fr 1fr;
   }
 
   .nav-login {
+    display: none;
+  }
+
+  .nav-cta {
     display: none;
   }
 }

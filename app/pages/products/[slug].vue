@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="page detail-page">
     <div class="container">
       <NuxtLink to="/products" class="back">← {{ t('detail.back') }}</NuxtLink>
 
@@ -7,7 +7,8 @@
       <div v-else-if="error" class="err">{{ error }}</div>
 
       <template v-else-if="detail">
-        <header class="d-head">
+        <header class="d-head" :style="{ '--tint': color }">
+          <div class="d-glow" aria-hidden="true" />
           <div class="product-icon" :style="{ '--tint': color }">
             <component :is="icon" :size="22" :stroke-width="2" />
           </div>
@@ -202,7 +203,7 @@ onMounted(async () => {
 <style scoped>
 .back {
   display: inline-block;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   font-size: 0.88rem;
   color: var(--text-muted);
   text-decoration: none;
@@ -213,27 +214,62 @@ onMounted(async () => {
 }
 
 .d-head {
+  position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 14px;
+  gap: 16px;
   flex-wrap: wrap;
+  padding: 28px 24px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: rgba(12, 14, 24, 0.72);
+  border: 1px solid color-mix(in srgb, var(--tint, #a78bfa) 28%, transparent);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.35),
+    0 0 40px color-mix(in srgb, var(--tint, #a78bfa) 12%, transparent);
+}
+
+.d-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      80% 100% at 0% 0%,
+      color-mix(in srgb, var(--tint, #a78bfa) 22%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      50% 80% at 100% 0%,
+      color-mix(in srgb, var(--tint, #a78bfa) 10%, transparent),
+      transparent 50%
+    );
 }
 
 .product-icon {
   --tint: var(--accent);
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
+  position: relative;
+  z-index: 1;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
   display: grid;
   place-items: center;
   flex-shrink: 0;
   color: var(--tint);
   background: radial-gradient(
     circle at 30% 25%,
-    color-mix(in srgb, var(--tint) 28%, transparent),
-    color-mix(in srgb, var(--tint) 9%, transparent)
+    color-mix(in srgb, var(--tint) 32%, transparent),
+    color-mix(in srgb, var(--tint) 10%, transparent)
   );
-  border: 1px solid color-mix(in srgb, var(--tint) 38%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tint) 42%, transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--tint) 25%, transparent);
+}
+
+.d-id,
+.d-actions {
+  position: relative;
+  z-index: 1;
 }
 
 .d-id {
@@ -250,9 +286,9 @@ onMounted(async () => {
 
 .d-id h1 {
   margin: 0;
-  font-size: 1.6rem;
-  font-weight: 750;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.45rem, 3vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
   color: var(--text-heading);
 }
 
@@ -327,9 +363,16 @@ onMounted(async () => {
   flex-direction: column;
   gap: 5px;
   padding: 16px 18px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border-radius: 14px;
+  border: 1px solid rgba(167, 139, 250, 0.14);
+  background: rgba(12, 14, 24, 0.65);
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.f-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(167, 139, 250, 0.35);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
 }
 
 .f-item strong {
@@ -351,9 +394,10 @@ onMounted(async () => {
   gap: 20px;
   flex-wrap: wrap;
   padding: 18px 20px;
-  border-radius: 12px;
-  border: 1px solid var(--card-border);
-  background: var(--card-bg);
+  border-radius: 14px;
+  border: 1px solid rgba(167, 139, 250, 0.18);
+  background: rgba(12, 14, 24, 0.72);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.3);
 }
 
 .r-info {

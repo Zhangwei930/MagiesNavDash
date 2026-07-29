@@ -2,6 +2,7 @@ import {
   Boxes,
   Compass,
   Database,
+  FileText,
   Gamepad2,
   LayoutGrid,
   Terminal,
@@ -23,6 +24,7 @@ export const ICON_OPTIONS: { key: string; label: string; icon: LucideIcon }[] = 
   { key: 'wrench', label: '工具', icon: Wrench },
   { key: 'server', label: '服务', icon: Server },
   { key: 'database', label: '数据', icon: Database },
+  { key: 'file-text', label: '文档', icon: FileText },
   { key: 'layout-grid', label: '默认', icon: LayoutGrid }
 ]
 
@@ -32,7 +34,7 @@ const SLUG_ICON: Record<string, LucideIcon> = {
   'magies-shell': Terminal,
   'magies-terminal': Terminal,
   'magies-data-studio': Database,
-  'magies-hrp': Users,
+  'magies-pdf': FileText,
   'magies-game': Gamepad2
 }
 
@@ -54,7 +56,7 @@ export function toolColor(product: { slug?: string; accentColor?: string }): str
     'magies-shell': '#2ad4c8',
     'magies-terminal': '#2ad4c8',
     'magies-data-studio': '#22d3ee',
-    'magies-hrp': '#6366f1',
+    'magies-pdf': '#6366f1',
     'magies-game': '#94a3b8'
   }
   if (product.slug && map[product.slug]) return map[product.slug]

@@ -1,39 +1,89 @@
 <template>
-  <div class="page">
+  <div class="page download-page">
     <div class="container">
-      <h1 class="page-title">{{ t('download.title') }}</h1>
-      <p class="page-desc">{{ t('download.desc') }}</p>
+      <PageHero
+        :eyebrow="t('nav.download')"
+        :title="t('download.title')"
+        :desc="t('download.desc')"
+      />
 
-      <div v-if="loading" class="muted">{{ t('download.loading') }}</div>
-      <div v-else-if="error" class="err">{{ error }}</div>
+      <div v-if="loading" class="muted text-center">{{ t('download.loading') }}</div>
+      <div v-else-if="error" class="err text-center">{{ error }}</div>
       <div v-else-if="!items.length" class="empty">{{ t('download.empty') }}</div>
 
       <div v-else class="dl-list">
-        <div v-for="item in items" :key="item.release.id" class="dl-row">
-          <div class="dl-icon" :style="{ '--tint': toolColor(item.product || {}) }">
-            <component :is="toolIcon(item.product || {})" :size="20" :stroke-width="2" />
-          </div>
-
-          <div class="dl-info">
-            <div class="dl-line">
-              <NuxtLink v-if="item.product" class="dl-name" :to="`/products/${item.product.slug}`">
-                {{ item.product.name }}
-              </NuxtLink>
-              <span v-else class="dl-name">—</span>
-              <code class="dl-ver">v{{ item.release.version }}</code>
-              <span
-                v-if="item.product?.status"
-                class="status-badge"
-                :data-tone="statusMeta(item.product.status).tone"
-              >{{ statusLabel(item.product.status, locale) }}</span>
-              <span class="dl-meta">{{ releaseMeta(item.release) }}</span>
+        <div v-for="item in items" :key="item.release.id" class="dl-card">
+          <div class="dl-row">
+            <div class="dl-icon" :style="{ '--tint': toolColor(item.product || {}) }">
+              <component :is="toolIcon(item.product || {})" :size="20" :stroke-width="2" />
             </div>
-            <p v-if="item.release.changelog" class="dl-log">{{ item.release.changelog }}</p>
+
+            <div class="dl-info">
+              <div class="dl-line">
+                <NuxtLink v-if="item.product" class="dl-name" :to="`/products/${item.product.slug}`">
+                  {{ item.product.name }}
+                </NuxtLink>
+                <span v-else class="dl-name">—</span>
+                <code class="dl-ver">v{{ feedFor(item)?.version || item.release.version }}</code>
+                <span
+                  v-if="item.product?.status"
+                  class="status-badge"
+                  :data-tone="statusMeta(item.product.status).tone"
+                >{{ statusLabel(item.product.status, locale) }}</span>
+                <span class="dl-meta">{{ releaseMeta(item) }}</span>
+              </div>
+              <p v-if="item.release.changelog" class="dl-log">{{ item.release.changelog }}</p>
+            </div>
+
+            <div class="dl-actions">
+              <a
+                v-if="leadFile(item)"
+                class="btn btn-primary"
+                :href="leadFile(item)!.url"
+                @click="track(item)"
+              >{{ t('download.btn') }} {{ osName(current.os) }}</a>
+              <button v-else type="button" class="btn btn-primary" @click="download(item)">
+                {{ t('download.btn') }}
+              </button>
+              <span v-if="feedFor(item)" class="dl-source">{{ sourceNote(feedFor(item)!) }}</span>
+            </div>
           </div>
 
-          <button type="button" class="btn btn-primary" @click="download(item)">
-            {{ t('download.btn') }}
-          </button>
+          <div v-if="feedFor(item)" class="dl-platforms">
+            <div
+              v-for="column in groupByOs(feedFor(item)!.downloads)"
+              :key="column.os"
+              class="dl-plat"
+              :data-current="column.os === current.os || null"
+            >
+              <div class="dl-plat-head">
+                <span class="dl-plat-name">{{ osName(column.os) }}</span>
+                <span v-if="column.os === current.os" class="dl-chip">
+                  {{ t('download.yourSystem') }}
+                </span>
+              </div>
+
+              <div v-for="variant in column.variants" :key="variant.arch" class="dl-variant">
+                <span class="dl-plat-arch" :data-current="isCurrent(variant) || null">
+                  {{ archName(variant.os, variant.arch) }}
+                </span>
+                <a
+                  v-for="file in variant.files"
+                  :key="file.url"
+                  class="dl-file"
+                  :href="file.url"
+                  @click="track(item)"
+                >
+                  <span class="dl-file-kind">{{ fileKind(file.name) }}</span>
+                  <span class="dl-file-size">{{ mb(file.size) }}</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <p v-else-if="feedError && item.product?.slug === PDF_SLUG" class="dl-feed-err">
+            {{ t('download.feedError') }}
+          </p>
         </div>
       </div>
 
@@ -46,21 +96,95 @@
 <script setup lang="ts">
 import { toolColor, toolIcon } from '~/utils/toolMeta'
 import { statusLabel, statusMeta } from '~/utils/productStatus'
+import {
+  detectPlatformHere,
+  fetchLatestPdfRelease,
+  groupByOs,
+  type Arch,
+  type LatestRelease,
+  type Os,
+  type PlatformDownload
+} from '~/utils/releaseFeed'
+
+/** The one product whose per-platform files come from a live release feed. */
+const PDF_SLUG = 'magies-pdf'
 
 const { t, locale } = useI18n()
 const loading = ref(true)
 const error = ref('')
 const toast = ref('')
 const items = ref<any[]>([])
+const pdfFeed = ref<LatestRelease | null>(null)
+const feedError = ref(false)
+const current = ref<{ os: Os; arch: Arch }>({ os: 'unknown', arch: 'x64' })
 
-function releaseMeta(r: { fileSize?: number; platform?: string; publishedAt?: string }) {
+function feedFor(item: any): LatestRelease | null {
+  return item.product?.slug === PDF_SLUG ? pdfFeed.value : null
+}
+
+/** The build matching the visitor's own machine, if this release ships one. */
+function leadFile(item: any) {
+  const feed = feedFor(item)
+  if (!feed || current.value.os === 'unknown') return null
+  const group =
+    feed.downloads.find((d) => d.os === current.value.os && d.arch === current.value.arch) ||
+    feed.downloads.find((d) => d.os === current.value.os)
+  return group?.files[0] || null
+}
+
+function isCurrent(group: PlatformDownload): boolean {
+  return group.os === current.value.os && group.arch === current.value.arch
+}
+
+function osName(os: Os): string {
+  if (os === 'mac') return 'macOS'
+  if (os === 'win') return 'Windows'
+  if (os === 'linux') return 'Linux'
+  return ''
+}
+
+function archName(os: Os, arch: Arch): string {
+  if (os === 'mac') return arch === 'arm64' ? 'Apple Silicon' : 'Intel'
+  return arch === 'arm64' ? 'ARM64' : 'x64'
+}
+
+function fileKind(name: string): string {
+  const n = name.toLowerCase()
+  if (n.endsWith('.dmg')) return 'DMG'
+  if (n.endsWith('.appimage')) return 'AppImage'
+  if (n.endsWith('.deb')) return 'DEB'
+  if (n.endsWith('.zip')) return 'ZIP'
+  if (n.endsWith('.exe')) return n.includes('portable') ? t('download.portable') : 'EXE'
+  return name
+}
+
+function mb(size: number): string {
+  return size ? `${(size / 1024 / 1024).toFixed(1)} MB` : ''
+}
+
+function sourceNote(feed: LatestRelease): string {
+  return feed.source === 'mirror' ? t('download.sourceMirror') : t('download.sourceGithub')
+}
+
+function releaseMeta(item: any) {
+  const feed = feedFor(item)
+  const r = item.release
   return [
-    r.fileSize ? `${(r.fileSize / 1024 / 1024).toFixed(1)} MB` : '',
-    r.platform,
-    r.publishedAt ? String(r.publishedAt).slice(0, 10) : ''
+    feed ? '' : r.fileSize ? mb(r.fileSize) : '',
+    feed ? 'macOS · Windows · Linux' : r.platform,
+    String(feed?.publishedAt || r.publishedAt || '').slice(0, 10)
   ]
     .filter(Boolean)
     .join(' · ')
+}
+
+/** Best-effort download logging; the anchor navigates regardless. */
+function track(item: any) {
+  const { api } = useApi()
+  api('/api/downloads', {
+    method: 'POST',
+    body: JSON.stringify({ productId: item.product.id, releaseId: item.release.id })
+  }).catch((e) => console.warn('Failed to record download', e))
 }
 
 async function download(item: any) {
@@ -79,6 +203,7 @@ async function download(item: any) {
 }
 
 onMounted(async () => {
+  current.value = await detectPlatformHere()
   try {
     const { api } = useApi()
     const [products, releases] = await Promise.all([
@@ -89,17 +214,55 @@ onMounted(async () => {
     items.value = releases.map((r) => ({ release: r, product: map[r.productId] }))
   } catch (e: any) {
     error.value = e.message || '加载失败'
+    return
   } finally {
     loading.value = false
+  }
+
+  if (!items.value.some((i) => i.product?.slug === PDF_SLUG)) return
+  try {
+    pdfFeed.value = await fetchLatestPdfRelease()
+  } catch (e) {
+    feedError.value = true
+    console.warn('Magies PDF release feed unavailable', e)
   }
 })
 </script>
 
 <style scoped>
+.text-center {
+  text-align: center;
+}
+
+.empty {
+  margin: 32px 0;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.err {
+  color: var(--danger);
+}
+
 .dl-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.dl-card {
+  border-radius: 16px;
+  border: 1px solid rgba(167, 139, 250, 0.16);
+  background: rgba(12, 14, 24, 0.72);
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.32);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.dl-card:hover {
+  border-color: rgba(167, 139, 250, 0.32);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.38), 0 0 28px rgba(167, 139, 250, 0.08);
 }
 
 .dl-row {
@@ -108,9 +271,6 @@ onMounted(async () => {
   gap: 16px;
   flex-wrap: wrap;
   padding: 18px 20px;
-  border-radius: 14px;
-  border: 1px solid var(--card-border);
-  background: var(--card-bg);
 }
 
 .dl-icon {
@@ -168,6 +328,112 @@ onMounted(async () => {
   margin: 6px 0 0;
   font-size: 0.86rem;
   line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.dl-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.dl-source {
+  font-size: 0.72rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.dl-platforms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1px;
+  background: var(--card-border);
+  border-top: 1px solid var(--card-border);
+}
+
+.dl-plat {
+  padding: 14px 16px 16px;
+  background: var(--card-bg);
+}
+
+.dl-plat[data-current] {
+  background: color-mix(in srgb, var(--accent) 7%, var(--card-bg));
+}
+
+.dl-plat-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.dl-plat-name {
+  font-size: 0.9rem;
+  font-weight: 650;
+  color: var(--text-heading);
+}
+
+.dl-variant + .dl-variant {
+  margin-top: 12px;
+}
+
+.dl-plat-arch {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.dl-plat-arch[data-current] {
+  color: var(--accent);
+}
+
+.dl-chip {
+  font-size: 0.68rem;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.dl-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 10px;
+  margin-top: 4px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid transparent;
+}
+
+.dl-file:hover {
+  color: var(--accent-hover);
+  border-color: color-mix(in srgb, var(--accent) 32%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.dl-file-kind {
+  font-weight: 600;
+}
+
+.dl-file-size {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.dl-feed-err {
+  margin: 0;
+  padding: 0 20px 16px;
+  font-size: 0.82rem;
   color: var(--text-muted);
 }
 
