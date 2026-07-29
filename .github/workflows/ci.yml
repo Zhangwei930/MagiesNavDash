@@ -14,7 +14,7 @@ jobs:
   frontend:
     name: Frontend (test + build)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -24,13 +24,11 @@ jobs:
           node-version: 24
           cache: npm
 
-      # Lockfile is maintained with npm 11; npm 10's npm ci rejects nested
-      # optional deps (e.g. @emnapi/runtime) that 11 already resolved.
-      - name: Align npm
-        run: npm install -g npm@11
-
+      # package-lock was generated against a regional npm mirror and nested
+      # optional native deps; strict `npm ci` disagrees across npm major
+      # versions. `npm install` still honors the lock as a resolution guide.
       - name: Install
-        run: npm ci
+        run: npm install --no-fund --no-audit
 
       - name: Unit tests
         run: npm test
