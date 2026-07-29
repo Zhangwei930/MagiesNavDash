@@ -1,13 +1,16 @@
 <template>
-  <div class="page">
+  <div ref="root" class="page products-page">
     <div class="container">
-      <h1 class="page-title">{{ t('products.title') }}</h1>
-      <p class="page-desc">{{ t('products.desc') }}</p>
+      <PageHero
+        :eyebrow="t('home.productsTitle')"
+        :title="t('products.title')"
+        :desc="t('products.desc')"
+      />
 
-      <div v-if="loading" class="muted">{{ t('products.loading') }}</div>
-      <div v-else-if="error" class="err">{{ error }}</div>
+      <div v-if="loading" class="muted text-center">{{ t('products.loading') }}</div>
+      <div v-else-if="error" class="err text-center">{{ error }}</div>
       <template v-else>
-        <div class="filters">
+        <div class="filters" data-reveal>
           <div class="filter-block">
             <span class="filter-label">{{ t('products.filterLine') }}</span>
             <div class="cat-bar">
@@ -50,8 +53,14 @@
         </div>
 
         <div v-if="!list.length" class="empty">{{ t('products.empty') }}</div>
-        <div v-else class="grid grid-3 p-grid">
-          <NuxtLink v-for="p in list" :key="p.id" class="card p-card" :to="`/products/${p.slug}`">
+        <div v-else class="grid grid-3 p-grid" data-reveal-stagger>
+          <NuxtLink
+            v-for="p in list"
+            :key="p.id"
+            class="neon-tile p-card"
+            :to="`/products/${p.slug}`"
+            :style="{ '--neon': toolColor(p) }"
+          >
             <div class="p-head">
               <div class="icon-circle" :style="{ '--tint': toolColor(p) }">
                 <component :is="toolIcon(p)" :size="20" :stroke-width="2" />
@@ -77,6 +86,15 @@
             </div>
           </NuxtLink>
         </div>
+
+        <div class="page-cta" data-reveal>
+          <h2>{{ t('home.ctaTitle') }}</h2>
+          <p>{{ t('home.ctaLead') }}</p>
+          <div class="hero-actions">
+            <NuxtLink class="btn btn-primary" to="/download">{{ t('nav.download') }}</NuxtLink>
+            <NuxtLink class="btn btn-outline" to="/contact">{{ t('footer.contact') }}</NuxtLink>
+          </div>
+        </div>
       </template>
     </div>
   </div>
@@ -89,6 +107,9 @@ import { primaryAction, statusLabel, statusMeta, statusSortRank } from '~/utils/
 const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const root = ref<HTMLElement | null>(null)
+useReveal(root)
+
 const { categories, loadCategories, categoryLabel } = useCategories()
 const products = useState<any[]>('hub-products', () => [])
 const loading = ref(true)
@@ -173,8 +194,13 @@ onMounted(async () => {
 <style scoped>
 .filters {
   display: grid;
-  gap: 16px;
-  margin-top: 22px;
+  gap: 18px;
+  margin: 28px 0 8px;
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(12, 14, 24, 0.55);
+  border: 1px solid rgba(167, 139, 250, 0.12);
+  backdrop-filter: blur(12px);
 }
 
 .filter-label {
@@ -193,46 +219,12 @@ onMounted(async () => {
   gap: 8px;
 }
 
-.cat-chip {
-  padding: 7px 16px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-muted);
-  font: inherit;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: background 0.18s, border-color 0.18s, color 0.18s;
-  min-height: 36px;
-}
-
-.cat-chip:hover {
-  background: var(--surface-hover);
-  color: var(--text);
-}
-
-.cat-chip.active {
-  background: var(--badge-bg);
-  border-color: rgba(167, 139, 250, 0.45);
-  color: var(--badge-text);
-}
-
 .p-grid {
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
 .p-card {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  text-decoration: none;
-  color: inherit;
-}
-
-.p-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(167, 139, 250, 0.4);
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(167, 139, 250, 0.12);
+  min-height: 240px;
 }
 
 .p-head {
@@ -248,7 +240,7 @@ onMounted(async () => {
 
 .p-id h3 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.02rem;
   color: var(--text-heading);
 }
 
@@ -296,16 +288,26 @@ onMounted(async () => {
 }
 
 .p-more {
-  color: var(--accent-hover);
-  opacity: 0.75;
-}
-
-.p-card:hover .p-more {
-  opacity: 1;
+  color: color-mix(in srgb, var(--neon, #a78bfa) 85%, #fff);
+  font-weight: 600;
 }
 
 .p-action {
   color: var(--text-muted);
   font-weight: 550;
+}
+
+.empty {
+  margin: 40px 0;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.err {
+  color: var(--danger);
+}
+
+.text-center {
+  text-align: center;
 }
 </style>

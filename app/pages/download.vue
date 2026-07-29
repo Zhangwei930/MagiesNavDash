@@ -1,11 +1,14 @@
 <template>
-  <div class="page">
+  <div class="page download-page">
     <div class="container">
-      <h1 class="page-title">{{ t('download.title') }}</h1>
-      <p class="page-desc">{{ t('download.desc') }}</p>
+      <PageHero
+        :eyebrow="t('nav.download')"
+        :title="t('download.title')"
+        :desc="t('download.desc')"
+      />
 
-      <div v-if="loading" class="muted">{{ t('download.loading') }}</div>
-      <div v-else-if="error" class="err">{{ error }}</div>
+      <div v-if="loading" class="muted text-center">{{ t('download.loading') }}</div>
+      <div v-else-if="error" class="err text-center">{{ error }}</div>
       <div v-else-if="!items.length" class="empty">{{ t('download.empty') }}</div>
 
       <div v-else class="dl-list">
@@ -227,17 +230,39 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.text-center {
+  text-align: center;
+}
+
+.empty {
+  margin: 32px 0;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.err {
+  color: var(--danger);
+}
+
 .dl-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  margin-top: 12px;
 }
 
 .dl-card {
-  border-radius: 14px;
-  border: 1px solid var(--card-border);
-  background: var(--card-bg);
+  border-radius: 16px;
+  border: 1px solid rgba(167, 139, 250, 0.16);
+  background: rgba(12, 14, 24, 0.72);
   overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.32);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.dl-card:hover {
+  border-color: rgba(167, 139, 250, 0.32);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.38), 0 0 28px rgba(167, 139, 250, 0.08);
 }
 
 .dl-row {
