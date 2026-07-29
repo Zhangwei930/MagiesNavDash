@@ -92,8 +92,20 @@ onMounted(async () => {
   const glowGeo = new THREE.BufferGeometry()
   glowGeo.setAttribute('position', new THREE.BufferAttribute(glowPos, 3))
   glowGeo.setAttribute('color', new THREE.BufferAttribute(glowCol, 3))
+  const glowCanvas = document.createElement('canvas')
+  glowCanvas.width = 64
+  glowCanvas.height = 64
+  const glowContext = glowCanvas.getContext('2d')!
+  const glowGradient = glowContext.createRadialGradient(32, 32, 0, 32, 32, 32)
+  glowGradient.addColorStop(0, 'rgba(255,255,255,1)')
+  glowGradient.addColorStop(0.35, 'rgba(255,255,255,0.5)')
+  glowGradient.addColorStop(1, 'rgba(255,255,255,0)')
+  glowContext.fillStyle = glowGradient
+  glowContext.fillRect(0, 0, 64, 64)
+  const glowTexture = new THREE.CanvasTexture(glowCanvas)
   const glowMat = new THREE.PointsMaterial({
     size: 8,
+    map: glowTexture,
     vertexColors: true,
     transparent: true,
     opacity: 0.08,
@@ -156,6 +168,7 @@ onMounted(async () => {
     material.dispose()
     glowGeo.dispose()
     glowMat.dispose()
+    glowTexture.dispose()
     renderer.dispose()
   }
 })

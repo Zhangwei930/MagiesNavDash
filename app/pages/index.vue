@@ -1,7 +1,7 @@
 <template>
   <div ref="root" class="home-v2">
     <!-- HERO -->
-    <section class="hero-v2">
+    <section class="hero-v2" data-testid="home-hero" aria-labelledby="hero-title">
       <div class="hero-horizon" aria-hidden="true" />
       <div class="hero-stars" aria-hidden="true" />
       <div class="container hero-v2-grid">
@@ -11,7 +11,7 @@
             <span>Data Driven</span>
             <span>{{ t('home.badgeFuture') }}</span>
           </div>
-          <h1 class="hero-v2-title" data-hero-in>
+          <h1 id="hero-title" class="hero-v2-title" data-hero-in>
             <span class="line">Build. Automate.</span>
             <span class="line accent">{{ t('home.titleAccent') }}</span>
           </h1>
@@ -27,36 +27,44 @@
             </NuxtLink>
           </div>
           <div class="hero-trust" data-hero-in>
-            <div class="trust-avatars" aria-hidden="true">
-              <span v-for="i in 4" :key="i" class="trust-av" :style="{ '--i': i }" />
+            <div class="trust-galaxy" aria-hidden="true">
+              <span class="tg-halo" />
+              <span class="tg-disk" />
+              <span class="tg-arms" />
+              <span class="tg-core" />
+              <span class="tg-star s1" />
+              <span class="tg-star s2" />
+              <span class="tg-star s3" />
+              <span class="tg-star s4" />
+              <span class="tg-star s5" />
             </div>
             <p>{{ t('home.trust') }}</p>
           </div>
         </div>
         <div class="hero-visual" data-hero-visual>
-          <HeroOrbit />
+          <HeroSigil />
         </div>
       </div>
     </section>
 
     <!-- STATS (honest product metrics, not marketing vanity numbers) -->
-    <section class="stats-wrap container">
-      <div class="stats-bar" data-reveal>
-        <div v-for="s in stats" :key="s.key" class="stat-item">
+    <section class="stats-wrap container" data-testid="home-metrics" aria-label="Magies product metrics">
+      <ul class="stats-bar" data-reveal>
+        <li v-for="s in stats" :key="s.key" class="stat-item">
           <span class="stat-icon" :style="{ color: s.color }">{{ s.icon }}</span>
           <div>
             <strong class="stat-value">{{ s.value }}</strong>
             <span class="stat-label">{{ t(s.labelKey) }}</span>
           </div>
-        </div>
-      </div>
+        </li>
+      </ul>
     </section>
 
     <!-- PRODUCTS -->
-    <section class="section products-section">
+    <section class="section products-section" data-testid="home-products" aria-labelledby="products-title">
       <div class="container">
         <div class="section-header" data-reveal>
-          <h2>{{ t('home.productsTitle') }}</h2>
+          <h2 id="products-title">{{ t('home.productsTitle') }}</h2>
           <p>{{ t('home.productsDesc') }}</p>
         </div>
 
@@ -82,10 +90,10 @@
     </section>
 
     <!-- SHOWCASE -->
-    <section class="section section-alt showcase-section">
+    <section class="section section-alt showcase-section" data-testid="home-showcase" aria-labelledby="showcase-title">
       <div class="container">
         <div class="section-header" data-reveal>
-          <h2>{{ t('home.showcaseTitle') }}</h2>
+          <h2 id="showcase-title">{{ t('home.showcaseTitle') }}</h2>
           <p>{{ t('home.showcaseDesc') }}</p>
         </div>
         <HomeShowcase />
@@ -93,11 +101,11 @@
     </section>
 
     <!-- WHY + ECOSYSTEM -->
-    <section class="section why-eco-section">
+    <section class="section why-eco-section" data-testid="home-why" aria-labelledby="why-title">
       <div class="container why-eco-grid">
         <div class="why-block">
           <div class="section-header left" data-reveal>
-            <h2>{{ t('home.whyTitle') }}</h2>
+            <h2 id="why-title">{{ t('home.whyTitle') }}</h2>
           </div>
           <div class="why-grid" data-reveal-stagger>
             <div v-for="w in whyItems" :key="w.key" class="why-card">
@@ -126,10 +134,10 @@
     </section>
 
     <!-- CTA -->
-    <section class="section cta-section">
+    <section class="section cta-section" data-testid="home-cta" aria-labelledby="cta-title">
       <div class="container">
         <div class="cta-panel" data-reveal>
-          <h2>{{ t('home.ctaTitle') }}</h2>
+          <h2 id="cta-title">{{ t('home.ctaTitle') }}</h2>
           <p>{{ t('home.ctaLead') }}</p>
           <div class="hero-actions">
             <NuxtLink class="btn btn-primary btn-glow" to="/products">{{ t('home.ctaProducts') }}</NuxtLink>
@@ -280,14 +288,20 @@ onMounted(async () => {
 
 <style scoped>
 .home-v2 {
+  position: relative;
   overflow: hidden;
+  background:
+    radial-gradient(ellipse 52% 20% at 8% 29%, rgba(37, 99, 235, 0.11), transparent 70%),
+    radial-gradient(ellipse 48% 19% at 92% 47%, rgba(126, 34, 206, 0.12), transparent 72%),
+    radial-gradient(ellipse 48% 18% at 14% 73%, rgba(30, 64, 175, 0.1), transparent 72%),
+    radial-gradient(ellipse 44% 16% at 88% 88%, rgba(190, 24, 93, 0.08), transparent 72%);
 }
 
 /* —— HERO —— */
 .hero-v2 {
   position: relative;
-  padding: 48px 0 28px;
-  min-height: min(92vh, 860px);
+  padding: 40px 0 46px;
+  min-height: min(84vh, 780px);
   display: flex;
   align-items: center;
 }
@@ -346,8 +360,8 @@ onMounted(async () => {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 32px 40px;
+  grid-template-columns: 0.94fr 1.06fr;
+  gap: 32px 24px;
   align-items: center;
   width: 100%;
   max-width: 1180px;
@@ -367,26 +381,29 @@ onMounted(async () => {
 .hero-badges span {
   font-size: 0.72rem;
   font-weight: 650;
-  letter-spacing: 0.04em;
-  padding: 5px 12px;
+  letter-spacing: 0.05em;
+  padding: 6px 13px;
   border-radius: 999px;
-  color: #ddd6fe;
+  color: #e9d5ff;
   background: linear-gradient(
-    90deg,
-    rgba(96, 165, 250, 0.14),
-    rgba(167, 139, 250, 0.16),
-    rgba(251, 146, 60, 0.1)
+    105deg,
+    rgba(96, 165, 250, 0.16),
+    rgba(167, 139, 250, 0.18),
+    rgba(251, 146, 60, 0.12)
   );
-  border: 1px solid rgba(167, 139, 250, 0.22);
+  border: 1px solid rgba(196, 181, 253, 0.28);
+  box-shadow: 0 0 20px rgba(167, 139, 250, 0.08);
+  backdrop-filter: blur(8px);
 }
 
 .hero-v2-title {
   margin: 0 0 18px;
-  font-size: clamp(2.4rem, 5.6vw, 3.75rem);
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
+  font-size: clamp(2.55rem, 5.8vw, 3.9rem);
+  font-weight: 820;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
   color: #f8fafc;
+  text-shadow: 0 0 60px rgba(167, 139, 250, 0.15);
 }
 
 .hero-v2-title .line {
@@ -394,19 +411,19 @@ onMounted(async () => {
 }
 
 .hero-v2-title .accent {
-  background: linear-gradient(105deg, #c4b5fd 0%, #e879f9 35%, #fb923c 70%, #fbbf24 100%);
+  background: linear-gradient(105deg, #c4b5fd 0%, #e879f9 32%, #fb923c 68%, #fbbf24 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 24px rgba(232, 121, 249, 0.25));
+  filter: drop-shadow(0 0 28px rgba(232, 121, 249, 0.35));
 }
 
 .hero-v2-lead {
   margin: 0 0 28px;
-  font-size: clamp(0.98rem, 1.8vw, 1.12rem);
-  color: var(--text-muted);
-  line-height: 1.75;
-  max-width: 48ch;
+  font-size: clamp(1rem, 1.9vw, 1.14rem);
+  color: #a8b4cc;
+  line-height: 1.8;
+  max-width: 46ch;
 }
 
 .hero-actions {
@@ -447,47 +464,124 @@ onMounted(async () => {
 .hero-trust {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
-.trust-avatars {
-  display: flex;
-}
-
-.trust-av {
-  width: 28px;
-  height: 28px;
+/* Mini Milky Way mark next to trust copy */
+.trust-galaxy {
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  border: 2px solid rgba(5, 6, 10, 0.9);
-  margin-left: calc(var(--i, 1) * -6px + 6px);
+  overflow: hidden;
+  isolation: isolate;
   background:
-    linear-gradient(
-      135deg,
-      hsl(calc(210 + var(--i) * 28), 75%, 62%),
-      hsl(calc(280 + var(--i) * 20), 70%, 58%)
-    );
-  box-shadow: 0 0 0 1px rgba(167, 139, 250, 0.15);
+    radial-gradient(circle at 50% 50%, rgba(20, 18, 42, 0.2), rgba(5, 6, 12, 0.92) 72%);
+  box-shadow:
+    0 0 0 1px rgba(196, 181, 253, 0.22),
+    0 0 22px rgba(139, 92, 246, 0.28),
+    inset 0 0 16px rgba(96, 165, 250, 0.08);
 }
+
+.tg-halo {
+  position: absolute;
+  inset: -4%;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse 70% 42% at 50% 50%, rgba(167, 139, 250, 0.22), transparent 70%);
+  transform: rotate(-28deg);
+  pointer-events: none;
+}
+
+.tg-disk {
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse 88% 34% at 50% 50%, rgba(196, 181, 253, 0.35), transparent 72%),
+    radial-gradient(ellipse 72% 28% at 50% 50%, rgba(96, 165, 250, 0.22), transparent 70%);
+  transform: rotate(-32deg);
+  filter: blur(0.3px);
+}
+
+.tg-arms {
+  position: absolute;
+  inset: -12%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 20deg,
+    transparent 0deg,
+    rgba(96, 165, 250, 0.32) 22deg,
+    transparent 55deg,
+    rgba(167, 139, 250, 0.38) 95deg,
+    transparent 135deg,
+    rgba(251, 146, 60, 0.16) 175deg,
+    transparent 215deg,
+    rgba(244, 114, 182, 0.22) 255deg,
+    transparent 295deg,
+    rgba(125, 211, 252, 0.28) 330deg,
+    transparent 360deg
+  );
+  mask-image: radial-gradient(circle at 50% 50%, transparent 14%, #000 28%, #000 62%, transparent 78%);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 14%, #000 28%, #000 62%, transparent 78%);
+  animation: trustGalaxySpin 28s linear infinite;
+  opacity: 0.95;
+}
+
+.tg-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 38% 34%, #fff 0%, #e9d5ff 28%, #a78bfa 55%, transparent 78%);
+  box-shadow:
+    0 0 10px 3px rgba(196, 181, 253, 0.7),
+    0 0 18px 6px rgba(139, 92, 246, 0.35);
+  z-index: 2;
+}
+
+.tg-star {
+  position: absolute;
+  width: 1.5px;
+  height: 1.5px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 3px 0.5px rgba(255, 255, 255, 0.85);
+  z-index: 1;
+  opacity: 0.85;
+}
+
+.tg-star.s1 { left: 18%; top: 28%; width: 1px; height: 1px; opacity: 0.7; }
+.tg-star.s2 { left: 72%; top: 22%; width: 2px; height: 2px; }
+.tg-star.s3 { left: 78%; top: 62%; width: 1px; height: 1px; opacity: 0.6; }
+.tg-star.s4 { left: 24%; top: 70%; width: 1.5px; height: 1.5px; }
+.tg-star.s5 { left: 58%; top: 76%; width: 1px; height: 1px; opacity: 0.55; }
 
 .hero-trust p {
   margin: 0;
   font-size: 0.82rem;
+  line-height: 1.45;
   color: var(--text-muted);
+  letter-spacing: 0.01em;
 }
 
 .hero-visual {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 320px;
-  filter: drop-shadow(0 0 60px rgba(167, 139, 250, 0.2));
+  min-height: 440px;
 }
 
 /* —— STATS —— */
 .stats-wrap {
   position: relative;
   z-index: 2;
-  margin-top: -8px;
+  margin-top: -30px;
   margin-bottom: 24px;
   max-width: 1180px;
 }
@@ -496,14 +590,17 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
-  padding: 18px 10px;
-  border-radius: 18px;
-  background: rgba(10, 12, 22, 0.72);
-  border: 1px solid rgba(167, 139, 250, 0.16);
-  backdrop-filter: blur(16px);
+  padding: 20px 12px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(16, 18, 32, 0.88), rgba(8, 10, 18, 0.72));
+  border: 1px solid rgba(196, 181, 253, 0.2);
+  backdrop-filter: blur(20px) saturate(1.25);
   box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.35),
-    0 0 40px rgba(167, 139, 250, 0.06);
+    0 24px 60px rgba(0, 0, 0, 0.4),
+    0 0 50px rgba(167, 139, 250, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  list-style: none;
+  margin-bottom: 0;
 }
 
 .stat-item {
@@ -532,12 +629,15 @@ onMounted(async () => {
 
 .stat-value {
   display: block;
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: #f8fafc;
-  letter-spacing: -0.02em;
+  font-size: 1.45rem;
+  font-weight: 820;
+  letter-spacing: -0.03em;
   line-height: 1.15;
   font-variant-numeric: tabular-nums;
+  background: linear-gradient(180deg, #fff 20%, #c4b5fd 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .stat-label {
@@ -549,78 +649,125 @@ onMounted(async () => {
 
 /* —— PRODUCTS —— */
 .products-section .section-header {
-  margin-bottom: 36px;
+  margin-bottom: 30px;
 }
 
-.products-section h2 {
-  font-size: clamp(1.6rem, 3vw, 2.1rem);
+.products-section h2,
+.showcase-section h2,
+.why-eco-section h2 {
+  font-size: clamp(1.65rem, 3.1vw, 2.2rem);
+  letter-spacing: -0.03em;
+}
+
+.products-section :deep(.section-header p),
+.showcase-section :deep(.section-header p) {
+  color: #9aa8c2;
 }
 
 .product-neon-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .neon-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 24px 22px;
+  align-items: center;
+  gap: 9px;
+  padding: 22px 14px 20px;
   border-radius: 16px;
+  text-align: center;
   text-decoration: none;
   color: inherit;
-  background: rgba(12, 14, 24, 0.72);
-  border: 1px solid color-mix(in srgb, var(--neon, #a78bfa) 22%, transparent);
-  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(160deg, rgba(18, 20, 36, 0.92), rgba(8, 10, 18, 0.78));
+  border: 1px solid color-mix(in srgb, var(--neon, #a78bfa) 26%, transparent);
+  box-shadow:
+    0 14px 40px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
   overflow: hidden;
-  transition: transform 0.22s, border-color 0.22s, box-shadow 0.22s;
-  min-height: 196px;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.22s, box-shadow 0.22s;
+  min-height: 218px;
+  backdrop-filter: blur(12px);
 }
 
 .neon-card::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    120% 80% at 0% 0%,
-    color-mix(in srgb, var(--neon, #a78bfa) 16%, transparent),
-    transparent 55%
-  );
-  opacity: 0.85;
+  background:
+    radial-gradient(
+      120% 90% at 0% 0%,
+      color-mix(in srgb, var(--neon, #a78bfa) 22%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      80% 60% at 100% 100%,
+      color-mix(in srgb, var(--neon, #a78bfa) 8%, transparent),
+      transparent 50%
+    );
+  opacity: 0.9;
   pointer-events: none;
 }
 
+.neon-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--neon, #a78bfa) 45%, transparent),
+    transparent 40%,
+    transparent 70%,
+    color-mix(in srgb, var(--neon, #a78bfa) 25%, transparent)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.55;
+  pointer-events: none;
+  transition: opacity 0.22s;
+}
+
 .neon-card:hover {
-  transform: translateY(-5px);
-  border-color: color-mix(in srgb, var(--neon, #a78bfa) 55%, transparent);
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--neon, #a78bfa) 58%, transparent);
   box-shadow:
-    0 18px 44px rgba(0, 0, 0, 0.4),
-    0 0 32px color-mix(in srgb, var(--neon, #a78bfa) 22%, transparent);
+    0 22px 50px rgba(0, 0, 0, 0.45),
+    0 0 40px color-mix(in srgb, var(--neon, #a78bfa) 28%, transparent);
+}
+
+.neon-card:hover::after {
+  opacity: 1;
 }
 
 .neon-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  width: 50px;
+  height: 50px;
+  border-radius: 15px;
   display: grid;
   place-items: center;
   color: var(--neon, #a78bfa);
   background: radial-gradient(
     circle at 30% 25%,
-    color-mix(in srgb, var(--neon, #a78bfa) 28%, transparent),
+    color-mix(in srgb, var(--neon, #a78bfa) 34%, transparent),
     color-mix(in srgb, var(--neon, #a78bfa) 8%, transparent)
   );
-  border: 1px solid color-mix(in srgb, var(--neon, #a78bfa) 40%, transparent);
-  box-shadow: 0 0 22px color-mix(in srgb, var(--neon, #a78bfa) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--neon, #a78bfa) 48%, transparent);
+  box-shadow:
+    0 0 26px color-mix(in srgb, var(--neon, #a78bfa) 28%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
   position: relative;
   z-index: 1;
 }
 
 .neon-card h3 {
   margin: 4px 0 0;
-  font-size: 1.05rem;
+  font-size: 0.98rem;
   font-weight: 720;
   color: var(--text-heading);
   position: relative;
@@ -629,7 +776,7 @@ onMounted(async () => {
 
 .neon-card p {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
   line-height: 1.55;
   flex: 1;
@@ -638,7 +785,7 @@ onMounted(async () => {
 }
 
 .neon-link {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   font-weight: 650;
   color: color-mix(in srgb, var(--neon, #a78bfa) 85%, #fff);
   position: relative;
@@ -648,6 +795,16 @@ onMounted(async () => {
 /* —— SHOWCASE —— */
 .showcase-section .container {
   max-width: 1180px;
+}
+
+.products-section {
+  padding-top: 50px;
+}
+
+.showcase-section,
+.why-eco-section {
+  padding-top: 62px;
+  padding-bottom: 62px;
 }
 
 /* —— WHY + ECO —— */
@@ -680,29 +837,33 @@ onMounted(async () => {
 }
 
 .why-card {
-  padding: 18px 16px;
-  border-radius: 14px;
-  background: rgba(12, 14, 24, 0.65);
-  border: 1px solid rgba(167, 139, 250, 0.14);
+  padding: 20px 18px;
+  border-radius: 16px;
+  background: linear-gradient(160deg, rgba(16, 18, 32, 0.88), rgba(8, 10, 18, 0.7));
+  border: 1px solid rgba(167, 139, 250, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
   transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
 .why-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(167, 139, 250, 0.35);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  transform: translateY(-4px);
+  border-color: rgba(196, 181, 253, 0.4);
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.32),
+    0 0 24px rgba(167, 139, 250, 0.12);
 }
 
 .why-icon {
   display: inline-grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(167, 139, 250, 0.16);
-  font-size: 0.9rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  margin-bottom: 12px;
+  background: radial-gradient(circle at 30% 25%, rgba(167, 139, 250, 0.22), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(167, 139, 250, 0.22);
+  font-size: 0.95rem;
+  box-shadow: 0 0 16px rgba(167, 139, 250, 0.12);
 }
 
 .why-card h3 {
@@ -720,33 +881,39 @@ onMounted(async () => {
 
 .galaxy-panel {
   position: relative;
-  border-radius: 16px;
+  border-radius: 18px;
   overflow: hidden;
-  min-height: 160px;
-  border: 1px solid rgba(167, 139, 250, 0.14);
-  background: radial-gradient(ellipse at 50% 45%, rgba(88, 28, 135, 0.35), rgba(5, 6, 12, 0.9));
+  min-height: 168px;
+  border: 1px solid rgba(196, 181, 253, 0.18);
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(109, 40, 217, 0.38), transparent 55%),
+    radial-gradient(ellipse at 70% 70%, rgba(37, 99, 235, 0.18), transparent 50%),
+    linear-gradient(180deg, rgba(10, 12, 24, 0.4), rgba(5, 6, 12, 0.95));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 16px 40px rgba(0, 0, 0, 0.3);
 }
 
 .galaxy-spiral {
   position: absolute;
-  inset: -20%;
+  inset: -18%;
   background:
-    radial-gradient(ellipse 18% 10% at 50% 50%, rgba(255, 255, 255, 0.55), transparent 55%),
+    radial-gradient(ellipse 16% 9% at 50% 50%, rgba(255, 255, 255, 0.65), transparent 55%),
     conic-gradient(
       from 40deg,
       transparent 0deg,
-      rgba(96, 165, 250, 0.12) 30deg,
+      rgba(96, 165, 250, 0.16) 30deg,
       transparent 70deg,
-      rgba(167, 139, 250, 0.18) 120deg,
+      rgba(167, 139, 250, 0.22) 120deg,
       transparent 180deg,
-      rgba(251, 146, 60, 0.1) 230deg,
+      rgba(251, 146, 60, 0.12) 230deg,
       transparent 300deg,
-      rgba(244, 114, 182, 0.12) 330deg,
+      rgba(244, 114, 182, 0.14) 330deg,
       transparent 360deg
     );
-  filter: blur(0.5px);
-  animation: galaxySpin 48s linear infinite;
-  opacity: 0.85;
+  filter: blur(0.4px);
+  animation: galaxySpin 56s linear infinite;
+  opacity: 0.9;
 }
 
 .galaxy-pills {
@@ -764,34 +931,43 @@ onMounted(async () => {
 
 .galaxy-pills span {
   font-size: 0.7rem;
-  font-weight: 600;
-  color: #cbd5e1;
-  padding: 5px 12px;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  color: #e2e8f0;
+  padding: 6px 14px;
   border-radius: 999px;
-  background: rgba(8, 10, 18, 0.7);
-  border: 1px solid rgba(167, 139, 250, 0.2);
-  backdrop-filter: blur(8px);
+  background: rgba(8, 10, 18, 0.78);
+  border: 1px solid rgba(196, 181, 253, 0.28);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 /* —— CTA —— */
 .cta-panel {
   text-align: center;
-  max-width: 720px;
+  max-width: none;
   margin: 0 auto;
-  padding: 48px 28px;
-  border-radius: 24px;
+  padding: 44px 32px;
+  border-radius: 26px;
   background:
-    radial-gradient(ellipse 80% 80% at 50% 0%, rgba(167, 139, 250, 0.18), transparent 55%),
-    rgba(12, 14, 24, 0.65);
-  border: 1px solid rgba(167, 139, 250, 0.18);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    radial-gradient(ellipse 90% 80% at 50% 0%, rgba(167, 139, 250, 0.28), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 80% 100%, rgba(251, 146, 60, 0.1), transparent 50%),
+    linear-gradient(180deg, rgba(16, 18, 34, 0.9), rgba(8, 10, 18, 0.75));
+  border: 1px solid rgba(196, 181, 253, 0.24);
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.42),
+    0 0 50px rgba(167, 139, 250, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .cta-panel h2 {
   margin: 0 0 12px;
-  font-size: clamp(1.45rem, 3vw, 1.9rem);
-  color: var(--text-heading);
-  letter-spacing: -0.02em;
+  font-size: clamp(1.5rem, 3.1vw, 2rem);
+  letter-spacing: -0.03em;
+  background: linear-gradient(105deg, #f8fafc 10%, #c4b5fd 55%, #fdba74 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .cta-panel p {
@@ -824,7 +1000,30 @@ onMounted(async () => {
   }
 }
 
+@keyframes trustGalaxySpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1100px) {
+  .product-neon-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .neon-card {
+    min-height: 196px;
+    padding-inline: 20px;
+  }
+}
+
 @media (max-width: 960px) {
+  .hero-v2 {
+    min-height: auto;
+    padding-top: 44px;
+  }
+
   .hero-v2-grid {
     grid-template-columns: 1fr;
     text-align: center;
@@ -846,8 +1045,7 @@ onMounted(async () => {
   }
 
   .hero-visual {
-    order: -1;
-    min-height: 260px;
+    min-height: 360px;
   }
 
   .stats-bar {
@@ -873,7 +1071,14 @@ onMounted(async () => {
   }
 
   .stats-bar {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 12px 6px;
+  }
+
+  .stat-item {
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 10px 8px;
   }
 
   .stat-item::after {
@@ -887,12 +1092,22 @@ onMounted(async () => {
   .hero-v2 {
     min-height: auto;
     padding-top: 28px;
+    padding-bottom: 38px;
+  }
+
+  .hero-visual {
+    min-height: 270px;
+  }
+
+  .cta-panel {
+    padding: 38px 20px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-stars,
-  .galaxy-spiral {
+  .galaxy-spiral,
+  .tg-arms {
     animation: none;
   }
 
