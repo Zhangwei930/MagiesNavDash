@@ -4,7 +4,9 @@
     <div class="eco-ring ring-a" />
     <div class="eco-ring ring-b" />
     <div class="eco-core">
-      <img class="eco-logo" src="/brand/magies-logo-hero.png" alt="">
+      <span class="core-cross h" />
+      <span class="core-cross v" />
+      <span class="core-dot" />
     </div>
 
     <div
@@ -45,14 +47,21 @@ const nodes = [
   { key: 'nav', name: 'Magies Nav', desc: 'Unified Entry', color: '#818cf8', icon: Compass }
 ]
 
+const nodePositions = [
+  { x: 50, y: 12 },
+  { x: 22, y: 34 },
+  { x: 78, y: 34 },
+  { x: 22, y: 57 },
+  { x: 78, y: 57 },
+  { x: 22, y: 80 },
+  { x: 78, y: 80 }
+]
+
 function nodeStyle(i: number) {
-  const n = nodes.length
-  const angle = (i / n) * Math.PI * 2 - Math.PI / 2
-  const x = 50 + Math.cos(angle) * 38
-  const y = 50 + Math.sin(angle) * 38
+  const position = nodePositions[i]
   return {
-    left: `${x}%`,
-    top: `${y}%`,
+    left: `${position.x}%`,
+    top: `${position.y}%`,
     animationDelay: `${i * 0.12}s`
   }
 }
@@ -107,27 +116,57 @@ function nodeStyle(i: number) {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 96px;
-  height: 96px;
+  width: 112px;
+  height: 112px;
   transform: translate(-50%, -50%);
   display: grid;
   place-items: center;
   z-index: 2;
 }
 
-.eco-logo {
-  width: 124px;
-  max-width: none;
-  height: 124px;
-  object-fit: contain;
-  mix-blend-mode: screen;
-  -webkit-mask-image: radial-gradient(circle, #000 0 49%, rgba(0, 0, 0, 0.88) 52%, transparent 57%);
-  mask-image: radial-gradient(circle, #000 0 49%, rgba(0, 0, 0, 0.88) 52%, transparent 57%);
-  filter:
-    saturate(1.08)
-    drop-shadow(0 0 16px rgba(96, 165, 250, 0.3))
-    drop-shadow(0 0 20px rgba(217, 70, 239, 0.22));
+.core-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 22%, #e9d5ff 38%, #a78bfa 70%);
+  box-shadow:
+    0 0 24px rgba(255, 255, 255, 0.9),
+    0 0 48px rgba(167, 139, 250, 0.78);
   animation: corePulse 2.6s ease-in-out infinite;
+}
+
+.core-cross {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(96, 165, 250, 0.72),
+    rgba(255, 255, 255, 0.98),
+    rgba(244, 114, 182, 0.72),
+    transparent
+  );
+}
+
+.core-cross.h {
+  width: 132px;
+  height: 2px;
+  transform: translate(-50%, -50%);
+}
+
+.core-cross.v {
+  width: 2px;
+  height: 132px;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(96, 165, 250, 0.7),
+    rgba(255, 255, 255, 0.98),
+    rgba(244, 114, 182, 0.68),
+    transparent
+  );
 }
 
 .eco-node {
@@ -135,14 +174,16 @@ function nodeStyle(i: number) {
   transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 12px 8px 8px;
-  border-radius: 14px;
-  background: rgba(10, 12, 20, 0.78);
-  border: 1px solid rgba(167, 139, 250, 0.18);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
-  min-width: 148px;
+  gap: 12px;
+  padding: 11px 16px 11px 11px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(16, 18, 32, 0.92), rgba(8, 10, 18, 0.78));
+  border: 1px solid rgba(167, 139, 250, 0.22);
+  backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  min-width: 164px;
   z-index: 3;
   animation: nodeFloat 4.5s ease-in-out infinite;
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
@@ -157,8 +198,8 @@ function nodeStyle(i: number) {
 }
 
 .node-icon {
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   border-radius: 10px;
   display: grid;
   place-items: center;
@@ -175,14 +216,14 @@ function nodeStyle(i: number) {
 }
 
 .node-text strong {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   color: #f1f5f9;
   font-weight: 700;
   white-space: nowrap;
 }
 
 .node-text span {
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   color: #94a3b8;
   white-space: nowrap;
 }
@@ -250,7 +291,7 @@ function nodeStyle(i: number) {
 @media (prefers-reduced-motion: reduce) {
   .eco-glow,
   .eco-ring,
-  .eco-logo,
+  .core-dot,
   .eco-node {
     animation: none !important;
   }

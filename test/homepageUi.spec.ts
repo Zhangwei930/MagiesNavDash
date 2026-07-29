@@ -107,17 +107,18 @@ describe('homepage UI landmarks', () => {
     expect(statSync(generatedGalaxyPath).size).toBeGreaterThan(100_000)
   })
 
-  it('animates a clockwise galaxy around the hero logo and pulses its core star', () => {
-    expect(homepage).toContain('class="hero-galaxy-orbit"')
+  it('rotates only the logo inner ring and pulses its core star', () => {
+    expect(homepage).not.toContain('class="hero-galaxy-orbit"')
+    expect(homepage).toContain('class="hero-logo-ring"')
     expect(homepage).toContain('class="hero-core-star"')
-    expect(homepage).toContain('@keyframes galaxyClockwise')
+    expect(homepage).toContain('@keyframes logoRingClockwise')
     expect(homepage).toContain('@keyframes coreStarPulse')
   })
 
   it('adds breathing room to cards and major homepage sections', () => {
-    expect(homepage).toContain('padding: 34px 0 28px;')
-    expect(homepage).toContain('min-height: 168px;')
-    expect(homepage).toContain('gap: 12px;')
+    expect(homepage).toContain('padding: 46px 0 40px;')
+    expect(homepage).toContain('min-height: 190px;')
+    expect(homepage).toContain('gap: 16px;')
   })
 })
 
@@ -145,13 +146,29 @@ describe('homepage chrome', () => {
     expect(layout).toContain('@media (min-width: 1200px)')
     expect(layout).toContain('width: min(100% - 96px, 1180px);')
   })
+
+  it('uses larger typography in the first navigation row', () => {
+    expect(layout).toMatch(/\.reference-nav-brand \{[\s\S]*?font-size: 0\.92rem;/)
+    expect(layout).toMatch(/\.reference-nav-links a \{[\s\S]*?font-size: 0\.68rem;/)
+  })
 })
 
 describe('homepage ecosystem', () => {
-  it('reuses the supplied Magies logo at the center of the ecosystem', () => {
-    expect(ecosystem).toContain(
-      '<img class="eco-logo" src="/brand/magies-logo-hero.png" alt="">'
-    )
+  it('restores and enlarges the original cross-star ecosystem core', () => {
+    expect(ecosystem).not.toContain('class="eco-logo"')
+    expect(ecosystem).toContain('<span class="core-cross h" />')
+    expect(ecosystem).toContain('<span class="core-cross v" />')
+    expect(ecosystem).toContain('<span class="core-dot" />')
+    expect(ecosystem).toContain('width: 22px;')
+  })
+
+  it('keeps ecosystem nodes evenly distributed with readable labels', () => {
+    expect(ecosystem).toContain('const nodePositions = [')
+    expect(ecosystem).toContain('{ x: 50, y: 12 }')
+    expect(ecosystem).toContain('{ x: 22, y: 80 }')
+    expect(ecosystem).toContain('{ x: 78, y: 80 }')
+    expect(ecosystem).toContain('font-size: 0.8rem;')
+    expect(ecosystem).toContain('font-size: 0.68rem;')
   })
 })
 

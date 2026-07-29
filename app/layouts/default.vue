@@ -224,7 +224,7 @@ onMounted(() => {
   position: sticky;
   z-index: 1000;
   top: 0;
-  height: 74px;
+  height: 80px;
   border-bottom: 1px solid rgba(78, 91, 142, 0.08);
   background: linear-gradient(180deg, rgba(1, 3, 10, 0.93), rgba(1, 3, 10, 0.7));
   backdrop-filter: blur(17px) saturate(1.2);
@@ -235,7 +235,7 @@ onMounted(() => {
   height: 100%;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 176px 1fr 224px;
+  grid-template-columns: 182px 1fr 252px;
   align-items: center;
   gap: 14px;
 }
@@ -249,14 +249,14 @@ onMounted(() => {
 }
 
 .reference-nav-brand {
-  gap: 8px;
+  gap: 9px;
   width: max-content;
-  font-size: 0.84rem;
+  font-size: 0.92rem;
 }
 
 .reference-nav-brand img {
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   object-fit: contain;
   filter: saturate(1.08) drop-shadow(0 0 8px rgba(167, 139, 250, 0.38));
 }
@@ -265,14 +265,14 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
+  gap: 20px;
 }
 
 .reference-nav-links a {
   position: relative;
   padding: 7px 0;
   color: #d8ddeb;
-  font-size: 0.6rem;
+  font-size: 0.68rem;
   font-weight: 520;
 }
 
@@ -297,25 +297,25 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 9px;
+  gap: 10px;
 }
 
 .reference-sign-in,
 .reference-get-started,
 .reference-lang-switch {
-  min-height: 32px;
+  min-height: 36px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-  font-size: 0.57rem;
+  font-size: 0.63rem;
   font-weight: 620;
 }
 
 .reference-lang-switch {
-  min-width: 41px;
-  padding: 0 9px;
+  min-width: 45px;
+  padding: 0 10px;
   color: #c9cfdf;
   border: 1px solid rgba(105, 117, 166, 0.22);
   background: rgba(4, 7, 16, 0.4);
@@ -328,14 +328,14 @@ onMounted(() => {
 }
 
 .reference-sign-in {
-  min-width: 70px;
+  min-width: 76px;
   color: #eef1f8;
   border: 1px solid rgba(105, 117, 166, 0.22);
   background: rgba(4, 7, 16, 0.4);
 }
 
 .reference-get-started {
-  min-width: 104px;
+  min-width: 112px;
   color: #fff;
   background: linear-gradient(100deg, #5b65ff, #8248f2 38%, #ec4899 68%, #fb923c);
   box-shadow:
@@ -357,8 +357,8 @@ onMounted(() => {
 .reference-footer {
   position: relative;
   z-index: 3;
-  min-height: 70px;
-  padding: 15px 0 10px;
+  min-height: 80px;
+  padding: 18px 0 12px;
   border-top: 1px solid rgba(75, 119, 194, 0.36);
   background: rgba(1, 3, 10, 0.84);
 }
@@ -375,12 +375,12 @@ onMounted(() => {
 .reference-footer-brand {
   width: max-content;
   gap: 7px;
-  font-size: 0.69rem;
+  font-size: 0.76rem;
 }
 
 .reference-footer-brand img {
-  width: 24px;
-  height: 24px;
+  width: 27px;
+  height: 27px;
   object-fit: contain;
   filter: saturate(1.08);
 }
@@ -394,7 +394,7 @@ onMounted(() => {
 
 .reference-footer-links a {
   color: #9aa4b8;
-  font-size: 0.48rem;
+  font-size: 0.55rem;
 }
 
 .reference-footer-links a:hover {
@@ -420,7 +420,7 @@ onMounted(() => {
   width: min(100% - 48px, 920px);
   margin: 4px auto 0;
   color: #657087;
-  font-size: 0.44rem;
+  font-size: 0.5rem;
   text-align: right;
 }
 
@@ -487,18 +487,18 @@ onMounted(() => {
   }
 
   .reference-nav-inner {
-    grid-template-columns: 190px 1fr 224px;
+    grid-template-columns: 200px 1fr 252px;
   }
 }
 
 @media (max-width: 960px) {
   .reference-nav-inner {
     width: min(100% - 32px, 820px);
-    grid-template-columns: 138px 1fr 220px;
+    grid-template-columns: 142px 1fr 252px;
   }
 
   .reference-nav-links {
-    gap: 12px;
+    gap: 13px;
   }
 
   .reference-footer-inner,
@@ -532,7 +532,7 @@ onMounted(() => {
     position: fixed;
     left: 12px;
     right: 12px;
-    top: 72px;
+    top: 78px;
     display: grid;
     gap: 0;
     padding: 10px;
@@ -558,7 +558,7 @@ onMounted(() => {
   }
 
   .reference-get-started {
-    min-width: 92px;
+    min-width: 104px;
   }
 
   .reference-menu-toggle {
@@ -577,7 +577,7 @@ onMounted(() => {
 
 @media (max-width: 560px) {
   .reference-navbar {
-    height: 66px;
+    height: 70px;
   }
 
   .reference-nav-inner {
@@ -585,7 +585,7 @@ onMounted(() => {
   }
 
   .reference-nav-links {
-    top: 64px;
+    top: 68px;
   }
 
   .reference-footer {

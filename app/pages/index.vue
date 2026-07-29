@@ -48,8 +48,8 @@
 
         <div class="hero-art-wrap" data-hero-visual>
           <div class="hero-art-glow" aria-hidden="true" />
-          <div class="hero-galaxy-orbit" aria-hidden="true" />
           <img class="hero-logo-art" src="/brand/magies-logo-hero.png" alt="Magies">
+          <img class="hero-logo-ring" src="/brand/magies-logo-hero.png" alt="" aria-hidden="true">
           <span class="hero-core-star" aria-hidden="true" />
         </div>
       </div>
@@ -63,7 +63,7 @@
       <ul class="stats-bar" data-reveal>
         <li v-for="stat in stats" :key="stat.label" class="stat-item">
           <span class="stat-icon" :style="{ '--stat-color': stat.color }">
-            <component :is="stat.icon" :size="20" :stroke-width="1.7" />
+            <component :is="stat.icon" :size="22" :stroke-width="1.7" />
           </span>
           <div>
             <strong class="stat-value">{{ stat.value }}</strong>
@@ -90,11 +90,11 @@
           >
             <span class="product-card-glow" aria-hidden="true" />
             <span class="reference-product-icon">
-              <component :is="product.icon" :size="25" :stroke-width="1.7" />
+              <component :is="product.icon" :size="28" :stroke-width="1.7" />
             </span>
             <h3>{{ product.name }}</h3>
             <p>{{ product.description }}</p>
-            <span class="product-learn">{{ t('action.learn') }} <ArrowRight :size="10" /></span>
+            <span class="product-learn">{{ t('action.learn') }} <ArrowRight :size="11" /></span>
           </NuxtLink>
         </div>
       </div>
@@ -120,7 +120,7 @@
             <div class="why-grid" data-reveal-stagger>
               <article v-for="item in whyItems" :key="item.title" class="why-card">
                 <span class="why-icon" :style="{ '--why-color': item.color }">
-                  <component :is="item.icon" :size="17" :stroke-width="1.7" />
+                  <component :is="item.icon" :size="19" :stroke-width="1.7" />
                 </span>
                 <h3>{{ item.title }}</h3>
                 <p>{{ item.description }}</p>
@@ -130,9 +130,9 @@
 
           <div class="galaxy-panel" data-reveal aria-hidden="true">
             <div class="galaxy-pills">
-              <span><Infinity :size="13" /> {{ t('home.pillPossibilities') }}</span>
-              <span><MonitorUp :size="13" /> {{ t('home.pillUniverse') }}</span>
-              <span><Sparkles :size="13" /> {{ t('home.pillConnected') }}</span>
+              <span><Infinity :size="15" /> {{ t('home.pillPossibilities') }}</span>
+              <span><MonitorUp :size="15" /> {{ t('home.pillUniverse') }}</span>
+              <span><Sparkles :size="15" /> {{ t('home.pillConnected') }}</span>
             </div>
           </div>
         </div>
@@ -334,7 +334,7 @@ const whyItems = computed<{
 .hero-v2 {
   position: relative;
   z-index: 1;
-  height: 440px;
+  height: 490px;
   overflow: hidden;
 }
 
@@ -393,8 +393,8 @@ const whyItems = computed<{
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
   align-items: center;
-  gap: 32px;
-  padding-bottom: 24px;
+  gap: 40px;
+  padding-bottom: 30px;
 }
 
 .hero-copy {
@@ -406,9 +406,9 @@ const whyItems = computed<{
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 19px;
   color: #a9b5d3;
-  font-size: 0.67rem;
+  font-size: 0.74rem;
   line-height: 1;
 }
 
@@ -429,8 +429,8 @@ const whyItems = computed<{
 }
 
 .hero-v2-title {
-  margin: 0 0 18px;
-  font-size: clamp(2.45rem, 4.3vw, 3rem);
+  margin: 0 0 21px;
+  font-size: clamp(2.65rem, 4.5vw, 3.25rem);
   font-weight: 800;
   line-height: 0.98;
   letter-spacing: -0.045em;
@@ -453,11 +453,11 @@ const whyItems = computed<{
 }
 
 .hero-v2-lead {
-  max-width: 40ch;
-  margin: 0 0 24px;
+  max-width: 42ch;
+  margin: 0 0 28px;
   color: #a4aec4;
-  font-size: 0.8rem;
-  line-height: 1.72;
+  font-size: 0.88rem;
+  line-height: 1.76;
 }
 
 .hero-actions,
@@ -468,19 +468,19 @@ const whyItems = computed<{
 }
 
 .hero-actions {
-  margin-bottom: 26px;
+  margin-bottom: 30px;
 }
 
 .reference-button {
-  min-height: 40px;
-  padding: 0 22px;
+  min-height: 44px;
+  padding: 0 25px;
   border: 1px solid transparent;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 9px;
-  font-size: 0.72rem;
+  font-size: 0.79rem;
   font-weight: 650;
   color: #fff;
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
@@ -510,7 +510,7 @@ const whyItems = computed<{
 .hero-trust {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .trust-avatars {
@@ -519,8 +519,8 @@ const whyItems = computed<{
 }
 
 .trust-avatars span {
-  width: 31px;
-  height: 31px;
+  width: 34px;
+  height: 34px;
   margin-left: -4px;
   border: 2px solid #dbe5ff;
   border-radius: 50%;
@@ -535,7 +535,7 @@ const whyItems = computed<{
 .hero-trust p {
   margin: 0;
   color: #aab2c5;
-  font-size: 0.64rem;
+  font-size: 0.7rem;
   line-height: 1.5;
 }
 
@@ -543,7 +543,7 @@ const whyItems = computed<{
   position: relative;
   z-index: 1;
   min-width: 0;
-  height: 404px;
+  height: 450px;
   display: grid;
   place-items: center;
 }
@@ -558,17 +558,21 @@ const whyItems = computed<{
   filter: blur(24px);
 }
 
-.hero-logo-art {
+.hero-logo-art,
+.hero-logo-ring {
   position: absolute;
   left: 50%;
   top: 50%;
-  z-index: 1;
-  width: 480px;
+  width: 520px;
   max-width: none;
-  height: 480px;
+  height: 520px;
   object-fit: contain;
   mix-blend-mode: screen;
   transform: translate(-50%, -50%);
+}
+
+.hero-logo-art {
+  z-index: 1;
   -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0 45%, rgba(0, 0, 0, 0.96) 48%, transparent 52%);
   mask-image: radial-gradient(circle at 50% 50%, #000 0 45%, rgba(0, 0, 0, 0.96) 48%, transparent 52%);
   filter:
@@ -578,48 +582,26 @@ const whyItems = computed<{
     drop-shadow(0 0 26px rgba(217, 70, 239, 0.14));
 }
 
-.hero-galaxy-orbit {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: 0;
-  width: 430px;
-  height: 430px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 1%, #fff 0 1.5px, #9ff3ff 2px, transparent 4px),
-    radial-gradient(circle at 88% 22%, #fff 0 1px, #ffb469 2px, transparent 4px),
-    radial-gradient(circle at 97% 58%, #fff 0 1.5px, #ff7ccf 2px, transparent 4px),
-    radial-gradient(circle at 74% 92%, #fff 0 1px, #c084fc 2px, transparent 4px),
-    radial-gradient(circle at 24% 91%, #fff 0 1px, #60dfff 2px, transparent 4px),
-    radial-gradient(circle at 1% 55%, #fff 0 1.5px, #42dfff 2px, transparent 4px),
-    radial-gradient(circle at 16% 18%, #fff 0 1px, #75e7ff 2px, transparent 4px),
-    conic-gradient(
-      from 15deg,
-      rgba(34, 211, 238, 0.02),
-      rgba(34, 211, 238, 0.58),
-      rgba(99, 102, 241, 0.12),
-      rgba(217, 70, 239, 0.52),
-      rgba(251, 146, 60, 0.62),
-      rgba(217, 70, 239, 0.18),
-      rgba(34, 211, 238, 0.02)
-    );
-  -webkit-mask: radial-gradient(circle, transparent 0 65%, #000 67% 71%, rgba(0, 0, 0, 0.72) 73%, transparent 76%);
-  mask: radial-gradient(circle, transparent 0 65%, #000 67% 71%, rgba(0, 0, 0, 0.72) 73%, transparent 76%);
+.hero-logo-ring {
+  z-index: 2;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle, transparent 0 30%, #000 33% 49%, transparent 52%);
+  mask-image: radial-gradient(circle, transparent 0 30%, #000 33% 49%, transparent 52%);
   filter:
-    drop-shadow(0 0 12px rgba(34, 211, 238, 0.45))
-    drop-shadow(0 0 18px rgba(217, 70, 239, 0.32));
-  transform: translate(-50%, -50%);
-  animation: galaxyClockwise 22s linear infinite;
+    saturate(1.18)
+    contrast(1.1)
+    drop-shadow(0 0 12px rgba(34, 211, 238, 0.28))
+    drop-shadow(0 0 16px rgba(217, 70, 239, 0.22));
+  animation: logoRingClockwise 24s linear infinite;
 }
 
 .hero-core-star {
   position: absolute;
   left: 50%;
   top: 50%;
-  z-index: 2;
-  width: 116px;
-  height: 116px;
+  z-index: 3;
+  width: 124px;
+  height: 124px;
   pointer-events: none;
   border-radius: 50%;
   background: radial-gradient(circle, #fff 0 4%, #f5d0fe 8%, rgba(217, 70, 239, 0.24) 24%, transparent 58%);
@@ -656,11 +638,11 @@ const whyItems = computed<{
   width: min(100% - 48px, 820px);
   max-width: none;
   padding: 0;
-  margin: -18px auto 0;
+  margin: -20px auto 0;
 }
 
 .stats-bar {
-  min-height: 80px;
+  min-height: 92px;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   list-style: none;
@@ -679,7 +661,7 @@ const whyItems = computed<{
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 14px;
   min-width: 0;
 }
 
@@ -694,8 +676,8 @@ const whyItems = computed<{
 }
 
 .stat-icon {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
   border-radius: 50%;
@@ -708,7 +690,7 @@ const whyItems = computed<{
 .stat-value {
   display: block;
   color: #f6f7fb;
-  font-size: 1.25rem;
+  font-size: 1.38rem;
   line-height: 1.1;
   font-weight: 760;
 }
@@ -717,7 +699,7 @@ const whyItems = computed<{
   display: block;
   margin-top: 3px;
   color: #8490aa;
-  font-size: 0.62rem;
+  font-size: 0.69rem;
   line-height: 1;
 }
 
@@ -727,50 +709,50 @@ const whyItems = computed<{
 }
 
 .products-section {
-  padding: 34px 0 28px;
+  padding: 46px 0 40px;
 }
 
 .reference-section-heading {
-  margin: 0 auto 16px;
+  margin: 0 auto 22px;
   text-align: center;
 }
 
 .reference-section-heading h2 {
   margin: 0;
   color: #f3f5fb;
-  font-size: 1.3rem;
+  font-size: 1.48rem;
   line-height: 1.2;
   font-weight: 730;
   letter-spacing: -0.025em;
 }
 
 .reference-section-heading p {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   color: #8e98ae;
-  font-size: 0.64rem;
-  line-height: 1.5;
+  font-size: 0.72rem;
+  line-height: 1.55;
 }
 
 .reference-section-heading.align-left {
   text-align: left;
-  margin-bottom: 18px;
+  margin-bottom: 22px;
 }
 
 .reference-products-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 12px;
+  gap: 16px;
 }
 
 .reference-product-card {
   position: relative;
-  min-height: 168px;
-  padding: 22px 12px 16px;
+  min-height: 190px;
+  padding: 26px 16px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid color-mix(in srgb, var(--product-color) 32%, rgba(96, 109, 158, 0.25));
   background: linear-gradient(150deg, rgba(12, 18, 41, 0.92), rgba(6, 9, 23, 0.94));
   box-shadow:
@@ -798,9 +780,9 @@ const whyItems = computed<{
 .reference-product-icon {
   position: relative;
   z-index: 1;
-  width: 44px;
-  height: 44px;
-  margin-bottom: 12px;
+  width: 50px;
+  height: 50px;
+  margin-bottom: 15px;
   display: grid;
   place-items: center;
   border-radius: 8px;
@@ -815,9 +797,9 @@ const whyItems = computed<{
 .reference-product-card h3 {
   position: relative;
   z-index: 1;
-  margin: 0 0 7px;
+  margin: 0 0 9px;
   color: #f0f3f9;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   line-height: 1.2;
   font-weight: 650;
 }
@@ -828,28 +810,28 @@ const whyItems = computed<{
   flex: 1;
   margin: 0;
   color: #8f99ad;
-  font-size: 0.55rem;
-  line-height: 1.55;
+  font-size: 0.66rem;
+  line-height: 1.6;
 }
 
 .product-learn {
   position: relative;
   z-index: 1;
-  margin-top: 10px;
+  margin-top: 13px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
   color: color-mix(in srgb, var(--product-color) 72%, #fff);
-  font-size: 0.56rem;
+  font-size: 0.64rem;
   font-weight: 620;
 }
 
 .showcase-section {
-  padding: 0 0 28px;
+  padding: 12px 0 46px;
 }
 
 .showcase-shell {
-  padding: 18px 24px 16px;
+  padding: 24px 28px 22px;
   border: 1px solid rgba(91, 104, 159, 0.2);
   border-radius: 17px;
   background:
@@ -859,7 +841,7 @@ const whyItems = computed<{
 }
 
 .showcase-shell > .reference-section-heading {
-  margin-bottom: 12px;
+  margin-bottom: 18px;
 }
 
 .showcase-shell :deep(.showcase) {
@@ -868,96 +850,96 @@ const whyItems = computed<{
 }
 
 .showcase-shell :deep(.showcase-chrome) {
-  min-height: 326px;
-  grid-template-columns: 128px 1fr;
+  min-height: 366px;
+  grid-template-columns: 140px 1fr;
   border-radius: 10px;
 }
 
 .showcase-shell :deep(.showcase-sidebar) {
-  padding: 14px 11px;
+  padding: 17px 13px;
 }
 
 .showcase-shell :deep(.sb-brand) {
-  margin-bottom: 13px;
-  font-size: 0.56rem;
+  margin-bottom: 15px;
+  font-size: 0.63rem;
 }
 
 .showcase-shell :deep(.sb-item) {
-  padding: 5px 8px;
-  font-size: 0.54rem;
+  padding: 6px 9px;
+  font-size: 0.6rem;
   border-radius: 5px;
 }
 
 .showcase-shell :deep(.showcase-main) {
-  gap: 9px;
-  padding: 11px 13px 10px;
+  gap: 11px;
+  padding: 14px 16px 13px;
 }
 
 .showcase-shell :deep(.showcase-top h3) {
-  font-size: 0.7rem;
+  font-size: 0.78rem;
 }
 
 .showcase-shell :deep(.pill) {
-  padding: 3px 7px;
-  font-size: 0.49rem;
+  padding: 4px 8px;
+  font-size: 0.55rem;
 }
 
 .showcase-shell :deep(.avatar) {
-  width: 20px;
-  height: 20px;
+  width: 23px;
+  height: 23px;
 }
 
 .showcase-shell :deep(.kpi-row),
 .showcase-shell :deep(.panel-row) {
-  gap: 8px;
+  gap: 10px;
 }
 
 .showcase-shell :deep(.kpi) {
-  gap: 3px;
-  padding: 9px;
+  gap: 4px;
+  padding: 11px;
   border-radius: 7px;
 }
 
 .showcase-shell :deep(.kpi-label),
 .showcase-shell :deep(.panel-head) {
-  font-size: 0.5rem;
+  font-size: 0.57rem;
 }
 
 .showcase-shell :deep(.kpi-value) {
-  font-size: 0.87rem;
+  font-size: 0.98rem;
 }
 
 .showcase-shell :deep(.kpi-delta),
 .showcase-shell :deep(.chip) {
-  font-size: 0.44rem;
+  font-size: 0.49rem;
 }
 
 .showcase-shell :deep(.panel-row) {
-  min-height: 140px;
+  min-height: 158px;
   grid-template-columns: 1.3fr 1fr 0.85fr;
 }
 
 .showcase-shell :deep(.panel) {
-  padding: 9px;
+  padding: 11px;
   border-radius: 7px;
 }
 
 .showcase-shell :deep(.panel-head) {
-  margin-bottom: 7px;
+  margin-bottom: 9px;
 }
 
 .showcase-shell :deep(.chart) {
-  height: 80px;
+  height: 92px;
 }
 
 .showcase-shell :deep(.chart-axis),
 .showcase-shell :deep(.task-meta span),
 .showcase-shell :deep(.workflow-cap) {
-  font-size: 0.41rem;
+  font-size: 0.5rem;
 }
 
 .showcase-shell :deep(.task-list) {
-  gap: 6px;
+  gap: 7px;
 }
 
 .showcase-shell :deep(.task-list li) {
@@ -966,53 +948,53 @@ const whyItems = computed<{
 }
 
 .showcase-shell :deep(.task-meta strong) {
-  font-size: 0.46rem;
+  font-size: 0.56rem;
 }
 
 .showcase-shell :deep(.task-list em) {
-  font-size: 0.42rem;
+  font-size: 0.51rem;
 }
 
 .showcase-shell :deep(.workflow) {
-  height: 86px;
+  height: 98px;
 }
 
 .showcase-shell :deep(.feature-strip) {
-  gap: 7px;
+  gap: 9px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .showcase-shell :deep(.feat) {
-  gap: 7px;
-  padding: 8px;
+  gap: 8px;
+  padding: 10px;
   border-radius: 6px;
 }
 
 .showcase-shell :deep(.feat strong) {
-  font-size: 0.48rem;
+  font-size: 0.58rem;
 }
 
 .showcase-shell :deep(.feat span) {
-  font-size: 0.41rem;
+  font-size: 0.5rem;
 }
 
 .why-eco-section {
-  padding: 0 0 30px;
+  padding: 12px 0 48px;
 }
 
 .why-eco-grid {
   display: grid;
   grid-template-columns: 1.62fr 0.92fr;
-  gap: 22px;
+  gap: 28px;
   align-items: start;
 }
 
 .why-block {
-  min-height: 330px;
+  min-height: 470px;
   display: grid;
   grid-template-columns: 0.92fr 1.08fr;
-  gap: 18px;
-  padding: 18px;
+  gap: 24px;
+  padding: 24px;
   border: 1px solid rgba(84, 98, 153, 0.17);
   border-radius: 14px;
   background: rgba(3, 6, 17, 0.5);
@@ -1025,21 +1007,21 @@ const whyItems = computed<{
 .why-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 16px;
 }
 
 .why-card {
-  min-height: 104px;
-  padding: 13px 12px 11px;
+  min-height: 128px;
+  padding: 16px 15px 14px;
   border: 1px solid rgba(80, 95, 151, 0.2);
   border-radius: 9px;
   background: linear-gradient(145deg, rgba(10, 15, 36, 0.88), rgba(5, 8, 21, 0.9));
 }
 
 .why-icon {
-  width: 28px;
-  height: 28px;
-  margin-bottom: 8px;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 10px;
   display: grid;
   place-items: center;
   border-radius: 7px;
@@ -1050,22 +1032,22 @@ const whyItems = computed<{
 }
 
 .why-card h3 {
-  margin: 0 0 5px;
+  margin: 0 0 7px;
   color: #edf1f8;
-  font-size: 0.58rem;
+  font-size: 0.67rem;
   line-height: 1.25;
 }
 
 .why-card p {
   margin: 0;
   color: #8a95aa;
-  font-size: 0.46rem;
-  line-height: 1.5;
+  font-size: 0.58rem;
+  line-height: 1.58;
 }
 
 .galaxy-panel {
   position: relative;
-  min-height: 258px;
+  min-height: 370px;
   overflow: hidden;
   border-radius: 11px;
   background:
@@ -1083,20 +1065,20 @@ const whyItems = computed<{
 .galaxy-pills {
   position: absolute;
   z-index: 1;
-  left: 12px;
-  right: 12px;
-  bottom: 13px;
+  left: 16px;
+  right: 16px;
+  bottom: 17px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 10px;
 }
 
 .galaxy-pills span {
   display: grid;
   justify-items: center;
-  gap: 4px;
+  gap: 6px;
   color: #b5bfd2;
-  font-size: 0.43rem;
+  font-size: 0.56rem;
   text-align: center;
 }
 
@@ -1105,9 +1087,9 @@ const whyItems = computed<{
 }
 
 .eco-block {
-  height: 330px;
+  height: 470px;
   min-height: 0;
-  padding: 18px 10px 8px;
+  padding: 24px 14px 16px;
   overflow: hidden;
   border: 1px solid rgba(84, 98, 153, 0.17);
   border-radius: 14px;
@@ -1115,49 +1097,44 @@ const whyItems = computed<{
 }
 
 .eco-block :deep(.eco) {
-  width: 270px;
+  width: 346px;
   max-width: 100%;
-  margin-top: -4px;
+  margin-top: 0;
 }
 
 .eco-block :deep(.eco-node) {
-  min-width: 104px;
-  gap: 6px;
-  padding: 6px 8px 6px 6px;
-  border-radius: 9px;
+  min-width: 164px;
+  gap: 12px;
+  padding: 11px 16px 11px 11px;
+  border-radius: 14px;
 }
 
 .eco-block :deep(.node-icon) {
-  width: 25px;
-  height: 25px;
-  border-radius: 6px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
 }
 
 .eco-block :deep(.node-text strong) {
-  font-size: 0.48rem;
+  font-size: 0.8rem;
 }
 
 .eco-block :deep(.node-text span) {
-  font-size: 0.39rem;
+  font-size: 0.68rem;
 }
 
 .eco-block :deep(.eco-core) {
-  width: 72px;
-  height: 72px;
-}
-
-.eco-block :deep(.eco-logo) {
-  width: 90px;
-  height: 90px;
+  width: 112px;
+  height: 112px;
 }
 
 .cta-section {
-  padding: 0 0 18px;
+  padding: 12px 0 32px;
 }
 
 .cta-panel {
-  min-height: 110px;
-  padding: 16px 22px 14px;
+  min-height: 142px;
+  padding: 22px 26px 20px;
   display: grid;
   justify-items: center;
   align-content: center;
@@ -1173,24 +1150,24 @@ const whyItems = computed<{
 .cta-panel h2 {
   margin: 0;
   color: #f3f5fb;
-  font-size: 1.14rem;
+  font-size: 1.32rem;
   line-height: 1.2;
 }
 
 .cta-panel p {
-  margin: 6px 0 12px;
+  margin: 8px 0 16px;
   color: #929caf;
-  font-size: 0.56rem;
-  line-height: 1.4;
+  font-size: 0.66rem;
+  line-height: 1.5;
 }
 
 .reference-button.compact {
-  min-height: 31px;
-  padding: 0 21px;
-  font-size: 0.57rem;
+  min-height: 36px;
+  padding: 0 24px;
+  font-size: 0.65rem;
 }
 
-@keyframes galaxyClockwise {
+@keyframes logoRingClockwise {
   from {
     transform: translate(-50%, -50%) rotate(0deg);
   }
@@ -1220,32 +1197,9 @@ const whyItems = computed<{
   }
 }
 
-@media (max-width: 900px) {
-  .reference-container,
-  .stats-wrap {
-    width: min(100% - 32px, 760px);
-  }
-
-  .hero-reference-grid {
-    grid-template-columns: 0.95fr 1.05fr;
-  }
-
-  .hero-logo-art {
-    width: 410px;
-    height: 410px;
-  }
-
-  .hero-galaxy-orbit {
-    width: 392px;
-    height: 392px;
-  }
-
+@media (max-width: 1199px) {
   .reference-products-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .reference-product-card {
-    min-height: 160px;
   }
 
   .why-eco-grid {
@@ -1258,16 +1212,33 @@ const whyItems = computed<{
   }
 }
 
+@media (max-width: 900px) {
+  .reference-container,
+  .stats-wrap {
+    width: min(100% - 32px, 760px);
+  }
+
+  .hero-reference-grid {
+    grid-template-columns: 0.95fr 1.05fr;
+  }
+
+  .hero-logo-art,
+  .hero-logo-ring {
+    width: 440px;
+    height: 440px;
+  }
+}
+
 @media (max-width: 680px) {
   .hero-v2 {
     height: auto;
-    min-height: 730px;
+    min-height: 790px;
   }
 
   .hero-reference-grid {
     grid-template-columns: 1fr;
-    gap: 10px;
-    padding: 58px 0 28px;
+    gap: 18px;
+    padding: 64px 0 34px;
     text-align: center;
   }
 
@@ -1293,23 +1264,19 @@ const whyItems = computed<{
 
   .hero-art-wrap {
     order: 2;
-    height: 342px;
-    margin-top: 4px;
+    height: 380px;
+    margin-top: 8px;
   }
 
-  .hero-logo-art {
-    width: 350px;
-    height: 350px;
-  }
-
-  .hero-galaxy-orbit {
-    width: 332px;
-    height: 332px;
+  .hero-logo-art,
+  .hero-logo-ring {
+    width: 380px;
+    height: 380px;
   }
 
   .hero-core-star {
-    width: 100px;
-    height: 100px;
+    width: 108px;
+    height: 108px;
   }
 
   .hero-horizon {
@@ -1322,11 +1289,11 @@ const whyItems = computed<{
 
   .stats-bar {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 8px 0;
+    padding: 12px 0;
   }
 
   .stat-item {
-    min-height: 58px;
+    min-height: 68px;
   }
 
   .stat-item:nth-child(2)::after {
@@ -1335,11 +1302,11 @@ const whyItems = computed<{
 
   .reference-products-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 14px;
   }
 
   .showcase-shell {
-    padding: 18px 12px 14px;
+    padding: 22px 14px 18px;
   }
 
   .showcase-shell :deep(.showcase-chrome) {
@@ -1369,21 +1336,15 @@ const whyItems = computed<{
 
   .why-block {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 24px;
   }
 
   .eco-block {
-    height: 350px;
-  }
-
-  .eco-block :deep(.eco-node) {
-    min-width: 0;
-    gap: 0;
-    padding: 6px;
+    height: 440px;
   }
 
   .galaxy-panel {
-    min-height: 250px;
+    min-height: 300px;
   }
 }
 
@@ -1394,15 +1355,15 @@ const whyItems = computed<{
   }
 
   .hero-v2 {
-    min-height: 690px;
+    min-height: 740px;
   }
 
   .hero-reference-grid {
-    padding-top: 48px;
+    padding-top: 52px;
   }
 
   .hero-v2-title {
-    font-size: 2.28rem;
+    font-size: 2.5rem;
   }
 
   .hero-v2-lead {
@@ -1411,22 +1372,18 @@ const whyItems = computed<{
   }
 
   .hero-art-wrap {
-    height: 310px;
+    height: 330px;
   }
 
-  .hero-logo-art {
-    width: 310px;
-    height: 310px;
-  }
-
-  .hero-galaxy-orbit {
-    width: 292px;
-    height: 292px;
+  .hero-logo-art,
+  .hero-logo-ring {
+    width: 330px;
+    height: 330px;
   }
 
   .hero-core-star {
-    width: 88px;
-    height: 88px;
+    width: 94px;
+    height: 94px;
   }
 
   .hero-trust {
@@ -1444,11 +1401,17 @@ const whyItems = computed<{
   }
 
   .reference-products-grid {
-    gap: 10px;
+    gap: 12px;
   }
 
   .why-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .eco-block :deep(.eco-node) {
+    min-width: 0;
+    gap: 0;
+    padding: 7px;
   }
 
   .cta-panel {
@@ -1457,7 +1420,7 @@ const whyItems = computed<{
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-galaxy-orbit,
+  .hero-logo-ring,
   .hero-core-star {
     animation: none;
   }
