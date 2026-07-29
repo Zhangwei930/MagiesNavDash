@@ -20,8 +20,14 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          # Nuxt 4 / recent Babel deps expect ^22.18 or >=24
+          node-version: 24
           cache: npm
+
+      # Lockfile is maintained with npm 11; npm 10's npm ci rejects nested
+      # optional deps (e.g. @emnapi/runtime) that 11 already resolved.
+      - name: Align npm
+        run: npm install -g npm@11
 
       - name: Install
         run: npm ci
