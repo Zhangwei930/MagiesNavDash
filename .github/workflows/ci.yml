@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend (test + build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Nuxt 4 / recent Babel deps expect ^22.18 or >=24
+          node-version: 24
+          cache: npm
+
+      # package-lock was generated against a regional npm mirror and nested
+      # optional native deps; strict `npm ci` disagrees across npm major
+      # versions. `npm install` still honors the lock as a resolution guide.
+      - name: Install
+        run: npm install --no-fund --no-audit
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Production build
+        run: npm run build
+
+  backend:
+    name: Backend (test + jar)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Grant gradlew
+        run: chmod +x gradlew
+
+      - name: Unit tests
+        run: ./gradlew test --no-daemon
+
+      - name: Boot jar
+        run: ./gradlew bootJar --no-daemon
