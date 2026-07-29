@@ -6,6 +6,8 @@ const homepagePath = fileURLToPath(new URL('../app/pages/index.vue', import.meta
 const homepage = readFileSync(homepagePath, 'utf8')
 const layoutPath = fileURLToPath(new URL('../app/layouts/default.vue', import.meta.url))
 const layout = readFileSync(layoutPath, 'utf8')
+const i18nPath = fileURLToPath(new URL('../app/composables/useI18n.ts', import.meta.url))
+const i18n = readFileSync(i18nPath, 'utf8')
 const heroSigilPath = fileURLToPath(new URL('../app/components/HeroSigil.vue', import.meta.url))
 const heroSigil = readFileSync(heroSigilPath, 'utf8')
 const starfieldPath = fileURLToPath(new URL('../app/components/Starfield.vue', import.meta.url))
@@ -39,9 +41,9 @@ describe('homepage UI landmarks', () => {
   })
 
   it('exposes product metrics as a labelled list', () => {
-    expect(homepage).toContain(
-      '<section class="stats-wrap container" data-testid="home-metrics" aria-label="Magies product metrics">'
-    )
+    expect(homepage).toContain('class="stats-wrap container"')
+    expect(homepage).toContain('data-testid="home-metrics"')
+    expect(homepage).toContain(":aria-label=\"t('home.metricsLabel')\"")
     expect(homepage).toContain('<ul class="stats-bar"')
     expect(homepage).toContain(
       'v-for="stat in stats" :key="stat.label" class="stat-item"'
@@ -73,6 +75,20 @@ describe('homepage UI landmarks', () => {
     expect(existsSync(suppliedLogoPath)).toBe(true)
     expect(statSync(suppliedLogoPath).size).toBeGreaterThan(500_000)
   })
+
+  it('widens the homepage content only on large desktop screens', () => {
+    expect(homepage).toContain('@media (min-width: 1200px)')
+    expect(homepage).toContain('width: min(100% - 96px, 1180px);')
+  })
+
+  it('renders homepage copy from the shared Chinese and English locale state', () => {
+    expect(homepage).toContain('const { t, locale } = useI18n()')
+    expect(homepage).toContain("{{ t('home.productsTitle') }}")
+    expect(homepage).toContain("{{ t('home.ctaTitle') }}")
+    expect(i18n).toContain("'home.stat.activeUsers': '活跃用户'")
+    expect(i18n).toContain("'home.stat.activeUsers': 'Active Users'")
+    expect(i18n).toContain("'home.product.terminalDesc':")
+  })
 })
 
 describe('homepage chrome', () => {
@@ -84,6 +100,19 @@ describe('homepage chrome', () => {
     expect(layout).toContain(
       '<footer v-if="isHome" class="reference-footer" data-testid="home-footer">'
     )
+  })
+
+  it('provides a bilingual toggle in the homepage navigation', () => {
+    expect(layout).toContain('data-testid="home-language-toggle"')
+    expect(layout).toContain('@click="toggleLocale"')
+    expect(layout).toContain("{{ t('nav.lang') }}")
+    expect(layout).toContain("htmlAttrs: { lang: locale.value === 'zh' ? 'zh-CN' : 'en' }")
+    expect(layout).not.toContain(':key="link.label"')
+  })
+
+  it('widens homepage navigation and footer with the desktop content', () => {
+    expect(layout).toContain('@media (min-width: 1200px)')
+    expect(layout).toContain('width: min(100% - 96px, 1180px);')
   })
 })
 

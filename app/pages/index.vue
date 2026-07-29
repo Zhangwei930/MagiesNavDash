@@ -1,5 +1,5 @@
 <template>
-  <div ref="root" class="reference-home">
+  <div ref="root" class="reference-home" :lang="locale === 'zh' ? 'zh-CN' : 'en'">
     <section class="hero-v2" data-testid="home-hero" aria-labelledby="hero-title">
       <div class="hero-nebula" aria-hidden="true" />
       <div class="hero-planet planet-left" aria-hidden="true" />
@@ -9,30 +9,27 @@
       <div class="reference-container hero-reference-grid">
         <div class="hero-copy">
           <div class="hero-badges" data-hero-in>
-            <span>AI Native</span>
+            <span>{{ t('home.badgeAi') }}</span>
             <i aria-hidden="true" />
-            <span>Data Driven</span>
+            <span>{{ t('home.badgeData') }}</span>
             <i aria-hidden="true" />
-            <span>Built for the Future</span>
+            <span>{{ t('home.badgeFuture') }}</span>
           </div>
 
           <h1 id="hero-title" class="hero-v2-title" data-hero-in>
-            <span>Build. Automate.</span>
-            <span class="hero-title-accent">Transform.</span>
+            <span>{{ t('home.heroTitle') }}</span>
+            <span class="hero-title-accent">{{ t('home.titleAccent') }}</span>
           </h1>
 
-          <p class="hero-v2-lead" data-hero-in>
-            Magies is a suite of powerful tools designed to empower creators, developers and
-            businesses in the age of AI.
-          </p>
+          <p class="hero-v2-lead" data-hero-in>{{ t('home.lead') }}</p>
 
           <div class="hero-actions" data-hero-in>
             <NuxtLink class="reference-button primary" to="/products">
-              Explore Products
+              {{ t('home.explore') }}
               <ArrowRight :size="14" :stroke-width="1.8" />
             </NuxtLink>
             <NuxtLink class="reference-button secondary" to="/about">
-              Watch Video
+              {{ t('home.watch') }}
               <CirclePlay :size="14" :stroke-width="1.8" />
             </NuxtLink>
           </div>
@@ -41,7 +38,7 @@
             <div class="trust-avatars" aria-hidden="true">
               <span v-for="avatar in trustAvatars" :key="avatar" :style="{ '--avatar': avatar }" />
             </div>
-            <p>Trusted by 50,000+ creators<br>and developers worldwide</p>
+            <p>{{ t('home.trust') }}</p>
           </div>
         </div>
 
@@ -52,7 +49,11 @@
       </div>
     </section>
 
-    <section class="stats-wrap container" data-testid="home-metrics" aria-label="Magies product metrics">
+    <section
+      class="stats-wrap container"
+      data-testid="home-metrics"
+      :aria-label="t('home.metricsLabel')"
+    >
       <ul class="stats-bar" data-reveal>
         <li v-for="stat in stats" :key="stat.label" class="stat-item">
           <span class="stat-icon" :style="{ '--stat-color': stat.color }">
@@ -69,8 +70,8 @@
     <section class="section products-section" data-testid="home-products" aria-labelledby="products-title">
       <div class="reference-container">
         <div class="reference-section-heading" data-reveal>
-          <h2 id="products-title">Magies Products</h2>
-          <p>Powerful tools. Seamless experience. Infinite possibilities.</p>
+          <h2 id="products-title">{{ t('home.productsTitle') }}</h2>
+          <p>{{ t('home.productsDesc') }}</p>
         </div>
 
         <div class="reference-products-grid">
@@ -87,7 +88,7 @@
             </span>
             <h3>{{ product.name }}</h3>
             <p>{{ product.description }}</p>
-            <span class="product-learn">Learn more <ArrowRight :size="10" /></span>
+            <span class="product-learn">{{ t('action.learn') }} <ArrowRight :size="10" /></span>
           </NuxtLink>
         </div>
       </div>
@@ -96,8 +97,8 @@
     <section class="section section-alt showcase-section" data-testid="home-showcase" aria-labelledby="showcase-title">
       <div class="reference-container showcase-shell">
         <div class="reference-section-heading" data-reveal>
-          <h2 id="showcase-title">Product Showcase</h2>
-          <p>See how Magies Data Studio helps you turn data into value.</p>
+          <h2 id="showcase-title">{{ t('home.showcaseTitle') }}</h2>
+          <p>{{ t('home.showcaseDesc') }}</p>
         </div>
         <HomeShowcase />
       </div>
@@ -108,7 +109,7 @@
         <div class="why-block">
           <div class="why-copy">
             <div class="reference-section-heading align-left" data-reveal>
-              <h2 id="why-title">Why Magies?</h2>
+              <h2 id="why-title">{{ t('home.whyTitle') }}</h2>
             </div>
             <div class="why-grid" data-reveal-stagger>
               <article v-for="item in whyItems" :key="item.title" class="why-card">
@@ -124,16 +125,16 @@
           <div class="galaxy-panel" data-reveal aria-hidden="true">
             <span class="galaxy-disk" />
             <div class="galaxy-pills">
-              <span><Infinity :size="13" /> Possibilities</span>
-              <span><MonitorUp :size="13" /> One Universe</span>
-              <span><Sparkles :size="13" /> All Connected</span>
+              <span><Infinity :size="13" /> {{ t('home.pillPossibilities') }}</span>
+              <span><MonitorUp :size="13" /> {{ t('home.pillUniverse') }}</span>
+              <span><Sparkles :size="13" /> {{ t('home.pillConnected') }}</span>
             </div>
           </div>
         </div>
 
         <div class="eco-block">
           <div class="reference-section-heading" data-reveal>
-            <h2>Magies Ecosystem</h2>
+            <h2>{{ t('home.ecoTitle') }}</h2>
           </div>
           <HomeEcosystem />
         </div>
@@ -143,14 +144,14 @@
     <section class="section cta-section" data-testid="home-cta" aria-labelledby="cta-title">
       <div class="reference-container">
         <div class="cta-panel" data-reveal>
-          <h2 id="cta-title">Ready to build the future with Magies?</h2>
-          <p>Join thousands of creators and developers already using Magies.</p>
+          <h2 id="cta-title">{{ t('home.ctaTitle') }}</h2>
+          <p>{{ t('home.ctaLead') }}</p>
           <div class="cta-actions">
             <NuxtLink class="reference-button primary compact" to="/products">
-              Get Started for Free
+              {{ t('home.ctaProducts') }}
             </NuxtLink>
             <NuxtLink class="reference-button secondary compact" to="/roadmap">
-              View Pricing
+              {{ t('home.ctaUpdates') }}
             </NuxtLink>
           </div>
         </div>
@@ -183,98 +184,101 @@ import {
 
 const root = ref<HTMLElement | null>(null)
 useReveal(root)
+const { t, locale } = useI18n()
 
 const trustAvatars = ['#f6c69f', '#d6a077', '#efc0ad', '#d8ae92', '#e8b995']
 
-const stats: { value: string; label: string; color: string; icon: LucideIcon }[] = [
-  { value: '50K+', label: 'Active Users', color: '#60a5fa', icon: Users },
-  { value: '1M+', label: 'Tasks Automated', color: '#a78bfa', icon: Zap },
-  { value: '99.99%', label: 'System Uptime', color: '#818cf8', icon: ShieldCheck },
-  { value: '120+', label: 'Countries', color: '#d946ef', icon: Globe2 }
-]
+const stats = computed<{ value: string; label: string; color: string; icon: LucideIcon }[]>(
+  () => [
+    { value: '50K+', label: t('home.stat.activeUsers'), color: '#60a5fa', icon: Users },
+    { value: '1M+', label: t('home.stat.tasksAutomated'), color: '#a78bfa', icon: Zap },
+    { value: '99.99%', label: t('home.stat.uptime'), color: '#818cf8', icon: ShieldCheck },
+    { value: '120+', label: t('home.stat.countries'), color: '#d946ef', icon: Globe2 }
+  ]
+)
 
-const products: {
+const products = computed<{
   name: string
   description: string
   color: string
   icon: LucideIcon
   to: string
-}[] = [
+}[]>(() => [
   {
     name: 'Magies Terminal',
-    description: 'Beautiful terminal for developers and teams.',
+    description: t('home.product.terminalDesc'),
     color: '#22d3ee',
     icon: Terminal,
     to: '/products/magies-terminal'
   },
   {
     name: 'Magies PDF',
-    description: 'AI-powered PDF tools for productivity.',
+    description: t('home.product.pdfDesc'),
     color: '#f472b6',
     icon: FileText,
     to: '/products/magies-pdf'
   },
   {
     name: 'Magies Data Studio',
-    description: 'Collect, clean and visualize data with ease.',
+    description: t('home.product.studioDesc'),
     color: '#c084fc',
     icon: Database,
     to: '/products/magies-data-studio'
   },
   {
     name: 'Magies AI',
-    description: 'Your intelligent assistant for every task.',
+    description: t('home.product.aiDesc'),
     color: '#818cf8',
     icon: BrainCircuit,
     to: '/roadmap'
   },
   {
     name: 'Magies Cloud',
-    description: 'Secure cloud services built for performance.',
+    description: t('home.product.cloudDesc'),
     color: '#22d3ee',
     icon: Cloud,
     to: '/roadmap'
   },
   {
     name: 'Magies SDK',
-    description: 'Integrate Magies into your own products.',
+    description: t('home.product.sdkDesc'),
     color: '#fb923c',
     icon: Boxes,
     to: '/roadmap'
   }
-]
+])
 
-const whyItems: {
+const whyItems = computed<{
   title: string
   description: string
   color: string
   icon: LucideIcon
-}[] = [
+}[]>(() => [
   {
-    title: 'AI Native',
-    description: 'Built from the ground up for the AI era.',
+    title: t('home.why.ai'),
+    description: t('home.why.aiDesc'),
     color: '#e879f9',
     icon: Sparkles
   },
   {
-    title: 'Powerful & Simple',
-    description: 'Advanced features with a simple interface.',
+    title: t('home.why.simple'),
+    description: t('home.why.simpleDesc'),
     color: '#818cf8',
     icon: MonitorCog
   },
   {
-    title: 'Secure & Private',
-    description: 'Your data is always protected and private.',
+    title: t('home.why.secure'),
+    description: t('home.why.secureDesc'),
     color: '#f472b6',
     icon: ShieldCheck
   },
   {
-    title: 'Open & Connected',
-    description: 'Integrates with the tools you already love.',
+    title: t('home.why.open'),
+    description: t('home.why.openDesc'),
     color: '#818cf8',
     icon: PlugZap
   }
-]
+])
 </script>
 
 <style scoped>
@@ -1124,6 +1128,13 @@ const whyItems: {
   min-height: 25px;
   padding: 0 19px;
   font-size: 0.49rem;
+}
+
+@media (min-width: 1200px) {
+  .reference-container,
+  .stats-wrap {
+    width: min(100% - 96px, 1180px);
+  }
 }
 
 @media (max-width: 900px) {

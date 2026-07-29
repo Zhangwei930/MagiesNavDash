@@ -14,27 +14,36 @@
         <div class="reference-nav-links" :class="{ open: menuOpen }">
           <NuxtLink
             v-for="link in homeNavLinks"
-            :key="link.label"
+            :key="link.key"
             :to="link.to"
             @click="menuOpen = false"
           >
-            {{ link.label }}
+            {{ t(link.key) }}
           </NuxtLink>
         </div>
 
         <div class="reference-nav-actions">
+          <button
+            type="button"
+            class="reference-lang-switch"
+            data-testid="home-language-toggle"
+            :aria-label="t('nav.lang')"
+            @click="toggleLocale"
+          >
+            {{ t('nav.lang') }}
+          </button>
           <span class="reference-nav-score" aria-label="36.2 thousand community stars">
             <Star :size="11" fill="currentColor" />
             36.2K
           </span>
           <NuxtLink to="/account" class="reference-sign-in">
-            {{ auth.isLoggedIn ? 'Account' : 'Sign In' }}
+            {{ auth.isLoggedIn ? t('nav.account') : t('nav.login') }}
           </NuxtLink>
-          <NuxtLink to="/products" class="reference-get-started">Get Started</NuxtLink>
+          <NuxtLink to="/products" class="reference-get-started">{{ t('nav.getStarted') }}</NuxtLink>
           <button
             type="button"
             class="reference-menu-toggle"
-            aria-label="Menu"
+            :aria-label="t('nav.menu')"
             :aria-expanded="menuOpen"
             @click="menuOpen = !menuOpen"
           >
@@ -98,8 +107,8 @@
         </NuxtLink>
 
         <nav class="reference-footer-links" aria-label="Footer">
-          <NuxtLink v-for="link in homeFooterLinks" :key="link.label" :to="link.to">
-            {{ link.label }}
+          <NuxtLink v-for="link in homeFooterLinks" :key="link.key" :to="link.to">
+            {{ t(link.key) }}
           </NuxtLink>
         </nav>
 
@@ -121,7 +130,7 @@
           </a>
         </div>
       </div>
-      <p class="reference-footer-copy">© {{ year }} Magies. All rights reserved.</p>
+      <p class="reference-footer-copy">© {{ year }} Magies. {{ t('footer.copy') }}.</p>
     </footer>
 
     <footer v-else class="footer">
@@ -180,21 +189,25 @@ const menuOpen = ref(false)
 const year = new Date().getFullYear()
 const route = useRoute()
 const isHome = computed(() => route.path === '/')
-const { t, toggleLocale, initLocale } = useI18n()
+const { t, toggleLocale, initLocale, locale } = useI18n()
 const auth = useAuthStore()
 
-const homeNavLinks = [
-  { label: 'Products', to: '/products' },
-  { label: 'Solutions', to: '/solutions' },
-  { label: 'Resources', to: '/download' },
-  { label: 'Pricing', to: '/roadmap' },
-  { label: 'Blog', to: '/changelog' },
-  { label: 'About', to: '/about' }
+useHead(() => ({
+  htmlAttrs: { lang: locale.value === 'zh' ? 'zh-CN' : 'en' }
+}))
+
+const homeNavLinks: { key: MsgKey; to: string }[] = [
+  { key: 'nav.products', to: '/products' },
+  { key: 'nav.solutions', to: '/solutions' },
+  { key: 'footer.resources', to: '/download' },
+  { key: 'home.navPricing', to: '/roadmap' },
+  { key: 'changelog.title', to: '/changelog' },
+  { key: 'nav.about', to: '/about' }
 ]
 
 const homeFooterLinks = [
   ...homeNavLinks,
-  { label: 'Contact', to: '/contact' }
+  { key: 'footer.contact' as MsgKey, to: '/contact' }
 ]
 
 function resourceLabel(key: string): MsgKey {
@@ -226,7 +239,7 @@ onMounted(() => {
   height: 100%;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 176px 1fr 220px;
+  grid-template-columns: 176px 1fr 280px;
   align-items: center;
   gap: 14px;
 }
@@ -293,7 +306,8 @@ onMounted(() => {
 
 .reference-nav-score,
 .reference-sign-in,
-.reference-get-started {
+.reference-get-started,
+.reference-lang-switch {
   min-height: 29px;
   border-radius: 999px;
   display: inline-flex;
@@ -302,6 +316,20 @@ onMounted(() => {
   white-space: nowrap;
   font-size: 0.51rem;
   font-weight: 620;
+}
+
+.reference-lang-switch {
+  min-width: 38px;
+  padding: 0 9px;
+  color: #c9cfdf;
+  border: 1px solid rgba(105, 117, 166, 0.22);
+  background: rgba(4, 7, 16, 0.4);
+  cursor: pointer;
+}
+
+.reference-lang-switch:hover {
+  color: #fff;
+  border-color: rgba(167, 139, 250, 0.55);
 }
 
 .reference-nav-score {
@@ -468,10 +496,22 @@ onMounted(() => {
   box-shadow: 0 0 16px rgba(167, 139, 250, 0.15);
 }
 
+@media (min-width: 1200px) {
+  .reference-nav-inner,
+  .reference-footer-inner,
+  .reference-footer-copy {
+    width: min(100% - 96px, 1180px);
+  }
+
+  .reference-nav-inner {
+    grid-template-columns: 190px 1fr 280px;
+  }
+}
+
 @media (max-width: 960px) {
   .reference-nav-inner {
     width: min(100% - 32px, 820px);
-    grid-template-columns: 138px 1fr 220px;
+    grid-template-columns: 138px 1fr 270px;
   }
 
   .reference-nav-links {
