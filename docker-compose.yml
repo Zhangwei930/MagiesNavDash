@@ -4,7 +4,8 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8110:3000"
+      # 8110 is taken by agent-farm-intel-crawler on the production host.
+      - "127.0.0.1:8410:3000"
     environment:
       NODE_ENV: production
       NUXT_PUBLIC_API_BASE: ""
@@ -16,7 +17,7 @@ services:
     build: ./backend
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8111:8080"
+      - "127.0.0.1:8411:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/magies
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-admin}
@@ -49,7 +50,8 @@ services:
     build: ./mail-gateway
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8090:8090"
+      # 8090 is taken by AAO knowledge_api on the production host.
+      - "127.0.0.1:8412:8090"
     environment:
       PORT: 8090
       SMTP_HOST: ${SMTP_HOST:-}

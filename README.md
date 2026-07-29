@@ -58,13 +58,13 @@ cp .env.example .env
 docker compose up --build -d
 ```
 
-端口（仅本机）：
+端口（仅本机，生产机避开 8110/8090 占用）：
 
-- 前端 `127.0.0.1:8110`
-- API `127.0.0.1:8111`
-- Mail Gateway `127.0.0.1:8090`
+- 前端 `127.0.0.1:8410`
+- API `127.0.0.1:8411`
+- Mail Gateway `127.0.0.1:8412`
 
-主机 Nginx 配置见仓库根目录 `nginx.conf`，按现有 `nav.magies.top` 方式安装到 `sites-available`。
+主机 Nginx 配置见仓库根目录 `nginx.conf`，安装到 `/etc/nginx/conf.d/dash.magies.top.conf` 后 `nginx -t && systemctl reload nginx`。
 
 ## 页面
 
