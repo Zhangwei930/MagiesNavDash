@@ -1,9 +1,50 @@
 <template>
-  <div class="hub">
+  <div class="hub" :class="{ 'home-layout': isHome }">
     <ClientOnly>
       <Starfield />
     </ClientOnly>
-    <nav class="navbar">
+
+    <nav v-if="isHome" class="reference-navbar" data-testid="home-nav">
+      <div class="reference-nav-inner">
+        <NuxtLink to="/" class="reference-nav-brand" @click="menuOpen = false">
+          <img src="/favicon.png" alt="">
+          <span>Magies</span>
+        </NuxtLink>
+
+        <div class="reference-nav-links" :class="{ open: menuOpen }">
+          <NuxtLink
+            v-for="link in homeNavLinks"
+            :key="link.label"
+            :to="link.to"
+            @click="menuOpen = false"
+          >
+            {{ link.label }}
+          </NuxtLink>
+        </div>
+
+        <div class="reference-nav-actions">
+          <span class="reference-nav-score" aria-label="36.2 thousand community stars">
+            <Star :size="11" fill="currentColor" />
+            36.2K
+          </span>
+          <NuxtLink to="/account" class="reference-sign-in">
+            {{ auth.isLoggedIn ? 'Account' : 'Sign In' }}
+          </NuxtLink>
+          <NuxtLink to="/products" class="reference-get-started">Get Started</NuxtLink>
+          <button
+            type="button"
+            class="reference-menu-toggle"
+            aria-label="Menu"
+            :aria-expanded="menuOpen"
+            @click="menuOpen = !menuOpen"
+          >
+            <component :is="menuOpen ? X : Menu" :size="20" />
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <nav v-else class="navbar">
       <div class="container navbar-inner">
         <NuxtLink to="/" class="nav-brand" @click="menuOpen = false">
           <BrandLogo size="nav" :show-wordmark="true" />
@@ -49,7 +90,41 @@
       <slot />
     </main>
 
-    <footer class="footer">
+    <footer v-if="isHome" class="reference-footer" data-testid="home-footer">
+      <div class="reference-footer-inner">
+        <NuxtLink to="/" class="reference-footer-brand">
+          <img src="/favicon.png" alt="">
+          <span>Magies</span>
+        </NuxtLink>
+
+        <nav class="reference-footer-links" aria-label="Footer">
+          <NuxtLink v-for="link in homeFooterLinks" :key="link.label" :to="link.to">
+            {{ link.label }}
+          </NuxtLink>
+        </nav>
+
+        <div class="reference-footer-social" aria-label="Social links">
+          <a href="https://github.com" target="_blank" rel="noopener" title="GitHub">
+            <Github :size="13" />
+          </a>
+          <a href="https://x.com" target="_blank" rel="noopener" title="X">
+            <Twitter :size="13" />
+          </a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener" title="LinkedIn">
+            <Linkedin :size="13" />
+          </a>
+          <a href="https://youtube.com" target="_blank" rel="noopener" title="YouTube">
+            <Youtube :size="13" />
+          </a>
+          <a href="https://instagram.com" target="_blank" rel="noopener" title="Instagram">
+            <Instagram :size="13" />
+          </a>
+        </div>
+      </div>
+      <p class="reference-footer-copy">© {{ year }} Magies. All rights reserved.</p>
+    </footer>
+
+    <footer v-else class="footer">
       <div class="container">
         <div class="footer-grid footer-grid-5">
           <div class="footer-brand">
@@ -97,14 +172,30 @@
 </template>
 
 <script setup lang="ts">
-import { Menu, X } from 'lucide-vue-next'
+import { Github, Instagram, Linkedin, Menu, Star, Twitter, X, Youtube } from 'lucide-vue-next'
 import { PAGE_LINKS, RESOURCE_LINKS } from '~/utils/siteLinks'
 import type { MsgKey } from '~/composables/useI18n'
 
 const menuOpen = ref(false)
 const year = new Date().getFullYear()
+const route = useRoute()
+const isHome = computed(() => route.path === '/')
 const { t, toggleLocale, initLocale } = useI18n()
 const auth = useAuthStore()
+
+const homeNavLinks = [
+  { label: 'Products', to: '/products' },
+  { label: 'Solutions', to: '/solutions' },
+  { label: 'Resources', to: '/download' },
+  { label: 'Pricing', to: '/roadmap' },
+  { label: 'Blog', to: '/changelog' },
+  { label: 'About', to: '/about' }
+]
+
+const homeFooterLinks = [
+  ...homeNavLinks,
+  { label: 'Contact', to: '/contact' }
+]
 
 function resourceLabel(key: string): MsgKey {
   if (key === 'download') return 'nav.download'
@@ -120,6 +211,208 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.reference-navbar {
+  position: sticky;
+  z-index: 1000;
+  top: 0;
+  height: 69px;
+  border-bottom: 1px solid rgba(78, 91, 142, 0.08);
+  background: linear-gradient(180deg, rgba(1, 3, 10, 0.93), rgba(1, 3, 10, 0.7));
+  backdrop-filter: blur(17px) saturate(1.2);
+}
+
+.reference-nav-inner {
+  width: min(100% - 48px, 930px);
+  height: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 176px 1fr 220px;
+  align-items: center;
+  gap: 14px;
+}
+
+.reference-nav-brand,
+.reference-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  color: #f3f5fb;
+  font-weight: 650;
+}
+
+.reference-nav-brand {
+  gap: 8px;
+  width: max-content;
+  font-size: 0.78rem;
+}
+
+.reference-nav-brand img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  filter: saturate(1.08) drop-shadow(0 0 8px rgba(167, 139, 250, 0.38));
+}
+
+.reference-nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.reference-nav-links a {
+  position: relative;
+  padding: 7px 0;
+  color: #d8ddeb;
+  font-size: 0.54rem;
+  font-weight: 520;
+}
+
+.reference-nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  bottom: 2px;
+  height: 1px;
+  background: linear-gradient(90deg, #60a5fa, #c084fc, #fb923c);
+  transition: left 0.2s, right 0.2s;
+}
+
+.reference-nav-links a:hover::after,
+.reference-nav-links a.router-link-active::after {
+  left: 0;
+  right: 0;
+}
+
+.reference-nav-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+.reference-nav-score,
+.reference-sign-in,
+.reference-get-started {
+  min-height: 29px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  font-size: 0.51rem;
+  font-weight: 620;
+}
+
+.reference-nav-score {
+  gap: 6px;
+  min-width: 59px;
+  color: #c9cfdf;
+  border: 1px solid rgba(105, 117, 166, 0.18);
+  background: rgba(10, 13, 28, 0.58);
+}
+
+.reference-nav-score svg {
+  color: #fbbf24;
+}
+
+.reference-sign-in {
+  min-width: 65px;
+  color: #eef1f8;
+  border: 1px solid rgba(105, 117, 166, 0.22);
+  background: rgba(4, 7, 16, 0.4);
+}
+
+.reference-get-started {
+  min-width: 98px;
+  color: #fff;
+  background: linear-gradient(100deg, #5b65ff, #8248f2 38%, #ec4899 68%, #fb923c);
+  box-shadow:
+    0 6px 20px rgba(124, 58, 237, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.reference-menu-toggle {
+  display: none;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(105, 117, 166, 0.24);
+  border-radius: 9px;
+  background: rgba(7, 10, 23, 0.8);
+  color: #e7eaf2;
+  cursor: pointer;
+}
+
+.reference-footer {
+  position: relative;
+  z-index: 3;
+  min-height: 61px;
+  padding: 12px 0 8px;
+  border-top: 1px solid rgba(75, 119, 194, 0.36);
+  background: rgba(1, 3, 10, 0.84);
+}
+
+.reference-footer-inner {
+  width: min(100% - 48px, 920px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 180px 1fr 150px;
+  align-items: center;
+  gap: 12px;
+}
+
+.reference-footer-brand {
+  width: max-content;
+  gap: 7px;
+  font-size: 0.63rem;
+}
+
+.reference-footer-brand img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: saturate(1.08);
+}
+
+.reference-footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.reference-footer-links a {
+  color: #9aa4b8;
+  font-size: 0.42rem;
+}
+
+.reference-footer-links a:hover {
+  color: #e6e9f2;
+}
+
+.reference-footer-social {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.reference-footer-social a {
+  color: #9da7bb;
+}
+
+.reference-footer-social a:hover {
+  color: #e4e8f1;
+}
+
+.reference-footer-copy {
+  width: min(100% - 48px, 920px);
+  margin: 4px auto 0;
+  color: #657087;
+  font-size: 0.39rem;
+  text-align: right;
+}
+
 .nav-login {
   min-height: 36px;
   padding: 0 12px;
@@ -176,6 +469,24 @@ onMounted(() => {
 }
 
 @media (max-width: 960px) {
+  .reference-nav-inner {
+    width: min(100% - 32px, 820px);
+    grid-template-columns: 138px 1fr 220px;
+  }
+
+  .reference-nav-links {
+    gap: 12px;
+  }
+
+  .reference-footer-inner,
+  .reference-footer-copy {
+    width: min(100% - 32px, 820px);
+  }
+
+  .reference-footer-links {
+    gap: 11px;
+  }
+
   .footer-grid-5 {
     grid-template-columns: 1fr 1fr;
   }
@@ -189,7 +500,82 @@ onMounted(() => {
   }
 }
 
+@media (max-width: 760px) {
+  .reference-nav-inner {
+    grid-template-columns: 1fr auto;
+  }
+
+  .reference-nav-links {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    top: 62px;
+    display: grid;
+    gap: 0;
+    padding: 10px;
+    border: 1px solid rgba(105, 117, 166, 0.25);
+    border-radius: 12px;
+    background: rgba(4, 7, 18, 0.97);
+    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.42);
+    transform: translateY(-145%);
+    transition: transform 0.22s;
+  }
+
+  .reference-nav-links.open {
+    transform: translateY(0);
+  }
+
+  .reference-nav-links a {
+    padding: 10px 12px;
+    font-size: 0.72rem;
+  }
+
+  .reference-nav-score,
+  .reference-sign-in {
+    display: none;
+  }
+
+  .reference-get-started {
+    min-width: 92px;
+  }
+
+  .reference-menu-toggle {
+    display: inline-grid;
+    place-items: center;
+  }
+
+  .reference-footer-inner {
+    grid-template-columns: 1fr auto;
+  }
+
+  .reference-footer-links {
+    display: none;
+  }
+}
+
 @media (max-width: 560px) {
+  .reference-navbar {
+    height: 62px;
+  }
+
+  .reference-nav-inner {
+    width: calc(100% - 24px);
+  }
+
+  .reference-footer {
+    min-height: 70px;
+  }
+
+  .reference-footer-inner,
+  .reference-footer-copy {
+    width: calc(100% - 24px);
+  }
+
+  .reference-footer-copy {
+    margin-top: 8px;
+    text-align: center;
+  }
+
   .footer-grid-5 {
     grid-template-columns: 1fr;
   }
