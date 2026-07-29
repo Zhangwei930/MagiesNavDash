@@ -50,7 +50,7 @@ docker compose up --build -d
 ## Architecture notes
 
 - Frontend lives under `app/` (Nuxt 4 convention).
-- Browser calls same-origin `/api/*`; production nginx proxies to Spring Boot on `127.0.0.1:8411`.
+- Browser calls same-origin `/api/*`; production nginx proxies to Spring Boot on `127.0.0.1:8111`.
 - Dev: `nitro.devProxy` forwards `/api` to `http://127.0.0.1:8080/api`.
 - Auth: `POST /api/auth/send-code` → Redis/memory code (5 min) → Mail Gateway → `POST /api/auth/verify` → JWT.
 - Seed admin: `admin@magies.top`.
@@ -58,15 +58,13 @@ docker compose up --build -d
 
 ## Ports (compose, localhost only)
 
-- product-server: `127.0.0.1:8410`
-- api: `127.0.0.1:8411`
-- mail-gateway: `127.0.0.1:8412`
-
-(8110 / 8090 are already used by other services on the production host.)
+- product-server: `127.0.0.1:8110`
+- api: `127.0.0.1:8111`
+- mail-gateway: `127.0.0.1:8090`
 
 ## Production host
 
-- Server: `aao-server` (`root@129.146.112.178`)
-- App dir: `/opt/magies-hub`
+- Server: `ubuntu@150.230.47.207` (`qi`), key `~/Downloads/ssh-key-2026-03-27.key`
+- App dir: `/home/ubuntu/MagiesNavDash`
 - Public: `https://dash.magies.top`
-- Deploy: rsync/git pull + `docker compose up --build -d` + install `nginx.conf`
+- Deploy: rsync + `sudo docker compose up --build -d` + install `nginx.conf`
