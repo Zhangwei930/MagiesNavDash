@@ -441,16 +441,18 @@ picture {
   );
   /* Same 8-point construction as .universe-core so the scale pulse reads as a
      star, not a breathing circle. Waist is kept narrow to match the slender
-     arms painted into the hero art instead of thickening them. */
+     arms painted into the hero art instead of thickening them. Expressed in
+     percentages, not px, so the proportions hold when the breakpoints below
+     shrink this element to 126px / clamp(120px, 24vw, 160px). */
   clip-path: polygon(
     50% 0%,
-    calc(50% + 9px) calc(50% - 9px),
+    54.7% 45.3%,
     100% 50%,
-    calc(50% + 9px) calc(50% + 9px),
+    54.7% 54.7%,
     50% 100%,
-    calc(50% - 9px) calc(50% + 9px),
+    45.3% 54.7%,
     0% 50%,
-    calc(50% - 9px) calc(50% - 9px)
+    45.3% 45.3%
   );
   mix-blend-mode: screen;
   transform: translate(-50%, -50%);

@@ -181,8 +181,12 @@ describe('cross-star sparkle consistency', () => {
   it('shapes the hero sparkle as a star so its scaling reads like the universe core', () => {
     const spark = rule('.hero-core-spark')
     expect(spark).toContain('clip-path: polygon(')
-    // 8 vertices = 4 arms + 4 waist points, same construction as .universe-core
-    expect(spark.match(/calc\(50% [+-] \d+px\)/g)!.length).toBeGreaterThanOrEqual(8)
+    // 8 vertices = 4 arm tips + 4 waist points, same construction as .universe-core
+    expect(spark.match(/\d+(\.\d+)?%/g)!.length).toBeGreaterThanOrEqual(16)
+    // waist in percentages, not px, so proportions survive the breakpoints that
+    // shrink this element to 126px / clamp(120px, 24vw, 160px)
+    expect(spark).toMatch(/clip-path: polygon\((?:[^)]|\([^)]*\))*\)/)
+    expect(spark).not.toMatch(/clip-path:[\s\S]*?\d+px[\s\S]*?\);/)
     // position and blend deliberately unchanged
     expect(spark).toContain('left: 72.3%')
     expect(spark).toContain('top: 43.2%')
