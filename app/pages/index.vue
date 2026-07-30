@@ -590,8 +590,9 @@ picture {
 .hero-v2-title {
   margin: 0 0 24px;
   /* The 6rem cap landed at 1524px, so every screen above it got the same 96px
-     title on an ever larger canvas. 7rem keeps growing to 1778px. */
-  font-size: clamp(4rem, 6.3vw, 7rem);
+     title on an ever larger canvas. 8rem keeps it growing to 2032px, which is
+     also why the wide-shell blocks below do not restate it: no breakpoint jump. */
+  font-size: clamp(4rem, 6.3vw, 8rem);
   font-weight: 780;
   line-height: 0.92;
   letter-spacing: -0.055em;
@@ -1369,6 +1370,39 @@ picture {
     min-width: 172px;
     min-height: 52px;
     font-size: 0.9rem;
+  }
+}
+
+/* Past 1900px even the 1400px shell left ~260px of black on the left of a
+   full-bleed hero, with the copy reading as a strip in the middle of a much
+   larger picture. The art puts its galaxy at 72% of the width, so the left half
+   is where the copy belongs -- it just has to be big enough to own it. Centring
+   the copy instead was tried and is worse: it lands the title on the galaxy and
+   leaves dead black on both sides. */
+@media (min-width: 1900px) {
+  .reference-container {
+    width: min(100% - 96px, 1600px);
+  }
+
+  .hero-v2 {
+    --shell-inset: max(48px, calc((100% - 1600px) / 2));
+  }
+
+  .hero-copy {
+    width: 52%;
+    max-width: 840px;
+  }
+
+  .hero-kicker {
+    font-size: 1.45rem;
+  }
+
+  .hero-claim {
+    font-size: 1.7rem;
+  }
+
+  .hero-description {
+    font-size: 1.05rem;
   }
 }
 

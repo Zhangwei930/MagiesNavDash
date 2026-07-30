@@ -623,13 +623,21 @@ onMounted(() => {
 }
 
 /* Must stay in step with .reference-container in app/pages/index.vue: the page
-   shell widens here, and chrome that kept a 1180px shell would no longer line
-   up with the content under it. */
+   shell widens on these two breakpoints, and chrome that kept a 1180px shell
+   would no longer line up with the content under it. */
 @media (min-width: 1600px) {
   .reference-nav-inner,
   .reference-footer-columns,
   .reference-footer-bottom {
     width: min(100% - 96px, 1400px);
+  }
+}
+
+@media (min-width: 1900px) {
+  .reference-nav-inner,
+  .reference-footer-columns,
+  .reference-footer-bottom {
+    width: min(100% - 96px, 1600px);
   }
 }
 

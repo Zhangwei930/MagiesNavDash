@@ -403,10 +403,22 @@ describe('hero composition on large screens', () => {
   })
 
   it('scales the hero type with the wider shell', () => {
-    expect(homepage).toMatch(/\.hero-v2-title \{[\s\S]*?font-size: clamp\(4rem, 6\.3vw, 7rem\);/)
+    expect(homepage).toMatch(/\.hero-v2-title \{[\s\S]*?font-size: clamp\(4rem, 6\.3vw, 8rem\);/)
     expect(homepage).toMatch(/@media \(min-width: 1600px\) \{[\s\S]*?\.hero-claim \{\s*font-size: 1\.5rem;/)
     // and the wide shell must decide the measure, not main.css's 520px cap
     expect(homepage).toMatch(/@media \(min-width: 1600px\) \{[\s\S]*?\.hero-copy \{\s*max-width: 600px;/)
+  })
+
+  it('lets the copy own the empty half of the picture past 1900px', () => {
+    // The art paints its galaxy at 72% of the width; the left half is the copy's
+    // and has to be big enough to look owned rather than parked in it.
+    expect(homepage).toMatch(
+      /@media \(min-width: 1900px\) \{[\s\S]*?\.reference-container \{\s*width: min\(100% - 96px, 1600px\);/
+    )
+    expect(homepage).toMatch(/@media \(min-width: 1900px\) \{[\s\S]*?\.hero-copy \{\s*width: 52%;/)
+    expect(layout).toMatch(
+      /@media \(min-width: 1900px\) \{[\s\S]*?width: min\(100% - 96px, 1600px\);/
+    )
   })
 
   it('anchors the scroll cue to the shell instead of the viewport centre', () => {
