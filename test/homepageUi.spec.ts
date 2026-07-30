@@ -260,19 +260,20 @@ describe('hero and product-universe cross-star parity', () => {
 
   it('keeps the clipped star centred on the same point as the spark at every breakpoint', () => {
     // Both variables live on .hero-v2 and are read by the spark and by the clip,
-    // so no breakpoint can move one layer's star without the other's. --star-x
-    // is restated per crop band (it depends on the box height there), --star-y
-    // only where the crop regime changes.
+    // so no breakpoint can move one layer's star without the other's. Every
+    // value is derived from --art-w, so no breakpoint restates a measurement.
     const heroBlocks = homepage.split('.hero-v2 {').slice(1).map(b => b.slice(0, b.indexOf('}')))
-    const declaredX = heroBlocks.filter(b => b.includes('--star-x:')).length
-    const declaredY = heroBlocks.filter(b => b.includes('--star-y:')).length
-    expect(declaredX).toBeGreaterThanOrEqual(4)
-    expect(declaredY).toBeGreaterThanOrEqual(3)
+    const declarations = heroBlocks.flatMap(
+      b => b.split('\n').filter(l => /--star-(x|y):/.test(l))
+    )
+    expect(declarations.length).toBeGreaterThanOrEqual(3)
+    for (const line of declarations) {
+      expect(line, line).toContain('var(--art-w)')
+    }
     // nothing outside .hero-v2 may declare them, or the two layers can disagree
-    expect(homepage.match(/--star-(x|y):/g)!.length).toBe(declaredX + declaredY)
-    // the phone bands crop at 70% instead of right, so they carry that term
-    expect(homepage).toContain('--star-x: calc(70% + 760px * 0.0474)')
-    expect(homepage).toContain('--star-x: calc(70% + 720px * 0.0474)')
+    expect(homepage.match(/--star-(x|y):/g)!.length).toBe(declarations.length)
+    // the phone band crops at 70% instead of right, so it carries that term
+    expect(homepage).toContain('--star-x: calc(70% + var(--art-w) * 0.0237)')
   })
 
   it('mirrors the backdrop object-position so the clip tracks the crop', () => {
@@ -303,9 +304,10 @@ describe('hero copy fits its shell instead of being clipped', () => {
     const blocks = ruleBlocks('.hero-v2')
     expect(blocks.length).toBeGreaterThanOrEqual(4)
     for (const block of blocks) {
+      // a breakpoint may restate --hero-h, never a height of its own
       expect(block, block).not.toMatch(/(^|[^-])height: \d/)
     }
-    expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?min-height: clamp\(670px,/)
+    expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?min-height: var\(--hero-h\);/)
   })
 
   it('keeps the copy off the header when it does outgrow the shell', () => {
@@ -330,22 +332,41 @@ describe('hero copy fits its shell instead of being clipped', () => {
 })
 
 describe('hero composition on large screens', () => {
-  it('fills the fold without cropping the artwork', () => {
-    // The art is exactly 2:1 and full-bleed, so a hero taller than 50vw makes
-    // object-fit: cover switch to height-driven and slice the earth arc off the
-    // bottom. Height is therefore the fold, capped at 50vw, floored at 670px.
+  it('fills the fold, and crops the art on its empty side', () => {
+    // A 670px hero in a 1160px window left the stats bar and the products
+    // heading fighting over the first screen. Filling the fold makes the box
+    // taller than the art's 2:1, which is what we want: cover then crops
+    // horizontally, and object-position: right takes it off the empty left half
+    // instead of slicing the earth arc off the bottom.
     expect(homepage).toMatch(
-      /\.hero-v2 \{[\s\S]*?min-height: clamp\(670px, calc\(100svh - 76px\), 50vw\);/
+      /\.hero-v2 \{[\s\S]*?--hero-h: max\(670px, calc\(100svh - 76px\)\);/
     )
+    expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?min-height: var\(--hero-h\);/)
+  })
+
+  it('derives the rendered art width once and reuses it', () => {
+    // --art-w is the only place the crop regime is decided, and both the star
+    // position and its arm length are functions of it, so they cannot disagree
+    // with each other or with the height.
+    expect(homepage).toMatch(
+      /\.hero-v2 \{[\s\S]*?--art-w: max\(100vw, calc\(var\(--hero-h\) \* 2\)\);/
+    )
+    expect(homepage).toContain('--star-arm: calc(var(--art-w) * 0.0769)')
+    // the four hand-tuned arm lengths it replaces are gone
+    expect(homepage).not.toContain('7.7vw')
   })
 
   it('derives the star centre from the crop instead of a per-height constant', () => {
-    // In the width-driven regime the painted star sits at 0.4405 of the image
-    // height, so its offset from the hero centre is (0.4405 - 0.5) * 50vw.
-    // calc(50% - 3.2vw) stays locked to the star at every height, which a fixed
-    // percentage cannot do, and matches the height-driven bands at the switch.
-    expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?--star-y: calc\(50% - 3\.2vw\);/)
-    expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?--star-x: 72\.3%;/)
+    // The painted core sits at (0.7237, 0.4361) of the art, so subtracting the
+    // crop gives 100% - art-w * 0.2763 and 50% - art-w * 0.03195. One pair
+    // covers both crop regimes; the fixed percentages it replaces were each
+    // tuned at one size and drifted 57px off the star at 1110px wide.
+    expect(homepage).toMatch(
+      /\.hero-v2 \{[\s\S]*?--star-x: calc\(100% - var\(--art-w\) \* 0\.2763\);/
+    )
+    expect(homepage).toMatch(
+      /\.hero-v2 \{[\s\S]*?--star-y: calc\(50% - var\(--art-w\) \* 0\.03195\);/
+    )
   })
 
   it('drives the spark and the clip from one pair of variables', () => {
