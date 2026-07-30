@@ -283,3 +283,49 @@ describe('hero and product-universe cross-star parity', () => {
     expect(homepage.match(/object-position: 70% center/g)!.length).toBeGreaterThanOrEqual(3)
   })
 })
+
+describe('hero copy fits its shell instead of being clipped', () => {
+  const ruleBlocks = (selector: string) => {
+    const out: string[] = []
+    const needle = `${selector} {`
+    let at = homepage.indexOf(needle)
+    while (at !== -1) {
+      const end = homepage.indexOf('}', at)
+      out.push(homepage.slice(at + needle.length, end))
+      at = homepage.indexOf(needle, end)
+    }
+    return out
+  }
+
+  it('lets the hero grow rather than clip copy taller than the shell', () => {
+    // A fixed height plus overflow: hidden is what jammed the title under the
+    // header at >=1400px: the copy stack outgrew the box and align-items:
+    // center stopped centring. Every breakpoint states a floor, not a ceiling.
+    const blocks = ruleBlocks('.hero-v2')
+    expect(blocks.length).toBeGreaterThanOrEqual(4)
+    for (const block of blocks) {
+      expect(block, block).not.toMatch(/(^|[^-])height: \d/)
+    }
+    expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?min-height: 670px;/)
+  })
+
+  it('keeps the copy off the header when it does outgrow the shell', () => {
+    const [content] = ruleBlocks('.hero-content')
+    expect(content).toContain('min-height: inherit')
+    expect(content).toMatch(/padding: \d+px 0 58px;/)
+  })
+
+  it('measures the hero paragraphs by the copy column, not in Latin ch', () => {
+    // 1ch is the width of "0" (~13px here); a CJK glyph is a full em, so
+    // max-width: 18ch fitted 11 Chinese characters and broke the claim into a
+    // narrow ribbon three lines deep.
+    for (const block of [...ruleBlocks('.hero-claim'), ...ruleBlocks('.hero-description')]) {
+      expect(block, block).not.toMatch(/\d+ch/)
+    }
+  })
+
+  it('gives the copy column room for the widest title line', () => {
+    // "Automate." is 421px at the 6rem cap, so a 35% (413px) column overflowed
+    expect(homepage).toMatch(/\.hero-copy \{[\s\S]*?width: 42%;/)
+  })
+})

@@ -383,10 +383,14 @@ picture {
   z-index: 1;
 }
 
+/* The height is a floor, never a ceiling: the copy stack is fluid (a vw-scaled
+   title plus paragraphs whose line count depends on the locale), and a hard
+   height plus overflow: hidden meant that once the copy outgrew the box the
+   centring silently gave up and the title ended up jammed under the header. */
 .hero-v2 {
   position: relative;
   z-index: 1;
-  height: 670px;
+  min-height: 670px;
   overflow: hidden;
 }
 
@@ -545,14 +549,14 @@ picture {
 }
 
 .hero-content {
-  height: 100%;
+  min-height: inherit;
   display: flex;
   align-items: center;
-  padding-bottom: 58px;
+  padding: 24px 0 58px;
 }
 
 .hero-copy {
-  width: 35%;
+  width: 42%;
   min-width: 360px;
 }
 
@@ -599,8 +603,11 @@ picture {
   line-height: 1.5;
 }
 
+/* No max-width here or on .hero-description: the copy column is the measure for
+   both, so the whole stack shares one left and right edge. ch is a Latin unit
+   (the width of "0"), and one CJK glyph is a full em, so 18ch fitted only 11
+   Chinese characters. */
 .hero-claim {
-  max-width: 18ch;
   margin: 0 0 16px;
   color: #f2f3f7;
   font-size: 1.35rem;
@@ -609,7 +616,6 @@ picture {
 }
 
 .hero-description {
-  max-width: 35ch;
   margin: 0 0 24px;
   color: #aab2c9;
   font-size: 0.86rem;
@@ -1303,7 +1309,7 @@ picture {
   }
 
   .hero-v2 {
-    height: 610px;
+    min-height: 610px;
   }
 
   .hero-copy {
@@ -1329,7 +1335,7 @@ picture {
 
 @media (min-width: 821px) and (max-width: 1100px) {
   .hero-v2 {
-    height: 500px;
+    min-height: 500px;
   }
 
   .hero-content {
@@ -1572,7 +1578,7 @@ picture {
 
 @media (max-width: 820px) {
   .hero-v2 {
-    height: 760px;
+    min-height: 760px;
   }
 
   .hero-backdrop {
@@ -1653,7 +1659,7 @@ picture {
   }
 
   .hero-v2 {
-    height: 720px;
+    min-height: 720px;
   }
 
   .hero-core-star {
@@ -1690,12 +1696,10 @@ picture {
   }
 
   .hero-claim {
-    max-width: 17ch;
     font-size: 1.1rem;
   }
 
   .hero-description {
-    max-width: 32ch;
     font-size: 0.78rem;
   }
 
