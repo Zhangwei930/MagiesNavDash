@@ -43,8 +43,11 @@ describe('reference landing page composition', () => {
     )
     expect(homepage).toContain('@keyframes heroGalaxyTwinkle')
     expect(homepage).not.toContain('animation: corePulse')
+    // drop-shadow was deliberately removed from this keyframe: animating it
+    // re-rasterised a blended layer every frame (measured 49.6ms -> 33.2ms).
+    // brightness carries the flicker instead.
     expect(homepage).toMatch(
-      /@keyframes heroCoreSparkle \{\s*0%,\s*100% \{\s*filter: brightness\(0\.9\);\s*transform: translate\(-50%, -50%\) scale\(1\);\s*\}\s*50% \{\s*filter: brightness\(1\.42\) drop-shadow\(0 0 12px rgba\(205, 164, 255, 0\.72\)\);\s*transform: translate\(-50%, -50%\) scale\(1\.08\);/
+      /@keyframes heroCoreSparkle \{\s*0%,\s*100% \{\s*filter: brightness\(0\.9\);\s*transform: translate\(-50%, -50%\) scale\(1\);\s*\}\s*50% \{\s*filter: brightness\(1\.42\);\s*transform: translate\(-50%, -50%\) scale\(1\.08\);/
     )
 
     const brandCrossStars = layout.match(/class="brand-cross-star"/g) ?? []

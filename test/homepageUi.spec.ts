@@ -199,9 +199,50 @@ describe('cross-star sparkle consistency', () => {
       expect(f, name).toContain('brightness(0.9)')
       expect(f, name).toContain('brightness(1.42)')
       expect(f, name).toContain('scale(1.08)')
-      expect(f, name).toContain('drop-shadow(0 0 12px rgba(205, 164, 255, 0.72))')
+      // no drop-shadow here by design — see the animation performance budget
+      expect(f, name).not.toContain('drop-shadow')
     }
     expect(rule('.hero-core-spark')).toContain('2.8s ease-in-out infinite')
     expect(rule('.universe-core')).toContain('2.8s ease-in-out infinite')
+  })
+})
+
+describe('animation performance budget', () => {
+  const keyframeBlocks = () => {
+    const out: { name: string; body: string }[] = []
+    const re = /@keyframes\s+([\w-]+)\s*\{/g
+    let m: RegExpExecArray | null
+    while ((m = re.exec(homepage))) {
+      // walk braces to find the matching close
+      let depth = 1
+      let i = re.lastIndex
+      while (i < homepage.length && depth > 0) {
+        if (homepage[i] === '{') depth++
+        else if (homepage[i] === '}') depth--
+        i++
+      }
+      out.push({ name: m[1], body: homepage.slice(re.lastIndex, i) })
+    }
+    return out
+  }
+
+  it('never animates drop-shadow, which re-rasterises the layer every frame', () => {
+    const offenders = keyframeBlocks()
+      .filter(b => b.body.includes('drop-shadow'))
+      .map(b => b.name)
+    expect(offenders).toEqual([])
+  })
+
+  it('keeps the brightness flicker that drop-shadow was padding', () => {
+    const byName = Object.fromEntries(keyframeBlocks().map(b => [b.name, b.body]))
+    for (const n of [
+      'heroCoreSparkle',
+      'heroGalaxyTwinkle',
+      'universeCoreSparkle',
+      'galaxyTwinkle'
+    ]) {
+      expect(byName[n], n).toBeDefined()
+      expect(byName[n], n).toContain('brightness(')
+    }
   })
 })

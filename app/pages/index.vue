@@ -1192,7 +1192,7 @@ picture {
   }
 
   50% {
-    filter: brightness(1.42) drop-shadow(0 0 12px rgba(205, 164, 255, 0.72));
+    filter: brightness(1.42);
     transform: translate(-50%, -50%) scale(1.08);
   }
 }
@@ -1200,17 +1200,17 @@ picture {
 @keyframes heroGalaxyTwinkle {
   0% {
     opacity: 0.2;
-    filter: brightness(0.82) drop-shadow(0 0 2px rgba(107, 193, 255, 0.48));
+    filter: brightness(0.82);
   }
 
   48% {
     opacity: 0.78;
-    filter: brightness(1.42) drop-shadow(0 0 6px rgba(200, 142, 255, 0.76));
+    filter: brightness(1.42);
   }
 
   100% {
     opacity: 0.4;
-    filter: brightness(1.06) drop-shadow(0 0 3px rgba(87, 172, 255, 0.62));
+    filter: brightness(1.06);
   }
 }
 
@@ -1222,7 +1222,7 @@ picture {
   }
 
   50% {
-    filter: brightness(1.42) drop-shadow(0 0 12px rgba(205, 164, 255, 0.72));
+    filter: brightness(1.42);
     transform: scale(1.08);
   }
 }
@@ -1230,22 +1230,22 @@ picture {
 @keyframes galaxyTwinkle {
   0% {
     opacity: 0.05;
-    filter: brightness(0.5) drop-shadow(0 0 1px rgba(113, 194, 255, 0.35));
+    filter: brightness(0.5);
   }
 
   38% {
     opacity: 1;
-    filter: brightness(1.8) drop-shadow(0 0 9px rgba(194, 138, 255, 0.92));
+    filter: brightness(1.8);
   }
 
   64% {
     opacity: 0.16;
-    filter: brightness(0.72) drop-shadow(0 0 2px rgba(87, 181, 255, 0.45));
+    filter: brightness(0.72);
   }
 
   100% {
     opacity: 0.82;
-    filter: brightness(1.48) drop-shadow(0 0 7px rgba(87, 181, 255, 0.86));
+    filter: brightness(1.48);
   }
 }
 
