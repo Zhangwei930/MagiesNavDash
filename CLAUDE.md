@@ -67,4 +67,31 @@ docker compose up --build -d
 - Server: `ubuntu@150.230.47.207` (`qi`), key `~/Downloads/ssh-key-2026-03-27.key`
 - App dir: `/home/ubuntu/MagiesNavDash`
 - Public: `https://dash.magies.top`
-- Deploy: rsync + `sudo docker compose up --build -d` + install `nginx.conf`
+
+### Deploy
+
+Pull on the server — the repo is public, so no credentials are needed. Only
+committed, pushed code can ship, and `git` never touches untracked files, so
+the server's `.env` is safe.
+
+```bash
+ssh -i ~/Downloads/ssh-key-2026-03-27.key ubuntu@150.230.47.207
+cd /home/ubuntu/MagiesNavDash
+git fetch origin && git checkout -f -B <branch> origin/<branch>
+sudo docker compose up --build -d
+```
+
+Rollback: `git checkout -f <commit>` then rebuild.
+
+When `nginx.conf` changes, install it and **always gate the reload on the test** —
+this host also serves games/hrp/nav, so a bad config takes them down too:
+
+```bash
+sudo cp nginx.conf /etc/nginx/sites-available/dash.magies.top
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+Do **not** deploy by `rsync --delete`. `.env` is gitignored and therefore absent
+from the working tree, so `--delete` removes it from the server and compose then
+fails on `POSTGRES_PASSWORD`. If rsync is ever used anyway, pass
+`--exclude '.env'`.
