@@ -8,7 +8,7 @@
       <div class="reference-nav-inner">
         <NuxtLink to="/" class="reference-nav-brand" @click="menuOpen = false">
           <span class="reference-brand-mark" aria-hidden="true">
-            <img src="/brand/logo-mark-ring-512.png" alt="">
+            <img src="/brand/logo-mark-ring-144.png" alt="">
             <span class="brand-cross-star" />
           </span>
           <span>MAGIES</span>
@@ -104,7 +104,7 @@
         <div class="reference-footer-brand-block">
           <NuxtLink to="/" class="reference-footer-brand">
             <span class="reference-brand-mark" aria-hidden="true">
-              <img src="/brand/logo-mark-ring-512.png" alt="">
+              <img src="/brand/logo-mark-ring-144.png" alt="">
               <span class="brand-cross-star" />
             </span>
             <span>MAGIES</span>

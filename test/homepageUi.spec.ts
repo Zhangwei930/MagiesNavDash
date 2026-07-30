@@ -100,3 +100,70 @@ describe('shared visual components', () => {
     expect(starfield).toContain('glowTexture.dispose()')
   })
 })
+
+describe('homepage backdrop images', () => {
+  const BACKDROP_BASES = [
+    'magies-reference-hero',
+    'magies-reference-products',
+    'magies-reference-cta'
+  ]
+
+  // count markup in the template only — <style> prose can mention tag names
+  const homepageTemplate = homepage.slice(0, homepage.indexOf('<style'))
+
+  it('serves AVIF with a JPG fallback for every backdrop', () => {
+    for (const base of BACKDROP_BASES) {
+      expect(homepage).toContain(
+        `<source srcset="/brand/${base}.avif" type="image/avif">`
+      )
+      expect(homepage).toContain(`src="/brand/${base}.jpg"`)
+    }
+    // one <picture> per backdrop img: hero, universe-backdrop, universe-core, cta
+    expect(homepageTemplate.match(/<picture>/g)).toHaveLength(4)
+    expect(homepageTemplate.match(/<\/picture>/g)).toHaveLength(4)
+    expect(homepageTemplate.match(/<source srcset=/g)).toHaveLength(4)
+  })
+
+  it('keeps <picture> layout-neutral so absolute positioning is unchanged', () => {
+    expect(homepage).toMatch(/picture\s*\{\s*display:\s*contents;\s*\}/)
+  })
+
+  it('ships every AVIF variant referenced by the markup', () => {
+    for (const base of BACKDROP_BASES) {
+      const avif = fileURLToPath(
+        new URL(`../public/brand/${base}.avif`, import.meta.url)
+      )
+      expect(existsSync(avif)).toBe(true)
+    }
+  })
+})
+
+describe('homepage backdrop loading strategy', () => {
+  const template = homepage.slice(0, homepage.indexOf('<style'))
+
+  it('eagerly loads only the above-the-fold hero backdrop', () => {
+    const hero = template.slice(
+      template.indexOf('class="hero-backdrop"'),
+      template.indexOf('class="hero-backdrop"') + 220
+    )
+    expect(hero).toContain('fetchpriority="high"')
+    expect(hero).not.toContain('loading="lazy"')
+  })
+
+  it('defers only the CTA backdrop, the one far enough down to qualify', () => {
+    const cta = template.slice(
+      template.indexOf('class="cta-backdrop"'),
+      template.indexOf('class="cta-backdrop"') + 220
+    )
+    expect(cta).toContain('loading="lazy"')
+    // the product-universe backdrops sit ~330px below the fold, inside Chrome's
+    // eager threshold at every realistic viewport height, so lazy is inert there
+    expect(template.match(/loading="lazy"/g)).toHaveLength(1)
+  })
+
+  it('paints a matching fallback colour under the full-bleed backdrops', () => {
+    // average tone of the source art, so a late decode is not a visible pop
+    expect(homepage).toMatch(/\.universe-backdrop\s*\{[^}]*background-color:\s*#14112d/)
+    expect(homepage).toMatch(/\.cta-backdrop\s*\{[^}]*background-color:\s*#0a0f2c/)
+  })
+})
