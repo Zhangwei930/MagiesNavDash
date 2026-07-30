@@ -386,11 +386,34 @@ picture {
 /* The height is a floor, never a ceiling: the copy stack is fluid (a vw-scaled
    title plus paragraphs whose line count depends on the locale), and a hard
    height plus overflow: hidden meant that once the copy outgrew the box the
-   centring silently gave up and the title ended up jammed under the header. */
+   centring silently gave up and the title ended up jammed under the header.
+
+   Three terms, in order: fill the fold under the 76px navbar, because a 670px
+   hero in a 1122px window left the stats bar and the products heading fighting
+   for the first screen; cap at 50vw, because the art is exactly 2:1 and
+   full-bleed, so anything taller makes object-fit: cover switch to
+   height-driven and slice the earth arc off the bottom; never go under 670px. */
 .hero-v2 {
+  /* The painted cross-star's core sits at (0.7237, 0.4361) of the source art
+     (flood-filled the saturated core of the 1774x887 jpg). Which crop cover
+     applies decides how that maps into this box, and getting it wrong shows up
+     as *two* stars: the painted one and the clipped copy, side by side.
+
+     Here the box is never taller than the art's 2:1 (see min-height below), so
+     cover is width-driven: the image renders exactly 100% wide and 50vw tall,
+     and is cropped equally top and bottom. Nothing is cropped horizontally, so
+     x is just 0.7237 of the width; y lands (0.4361 - 0.5) * 50vw = -3.2vw from
+     the box's vertical centre, which follows any height -- the old hand-tuned
+     43.2% could not. It also meets the height-driven bands' 43.6% within 0.2px
+     at the 1340px switch, so crossing that boundary does not move the star.
+     Breakpoints whose box is taller than 2:1 override both below. */
+  --star-x: 72.3%;
+  --star-y: calc(50% - 3.2vw);
+  /* Left edge of .reference-container, for the layers that sit outside it. */
+  --shell-inset: max(24px, calc((100% - 1180px) / 2));
   position: relative;
   z-index: 1;
-  min-height: 670px;
+  min-height: clamp(670px, calc(100svh - 76px), 50vw);
   overflow: hidden;
 }
 
@@ -419,11 +442,9 @@ picture {
    scales and brightens instead of a gradient blob pulsing on top of a static
    star. Same technique and the *same keyframe* as .universe-core -- that motion
    is the reference, and sharing the keyframe means the two cannot drift apart.
-   --star-x/--star-y must track .hero-core-spark and .hero-backdrop's crop at
-   every breakpoint, so all three are overridden together below. */
+   --star-x/--star-y are declared on .hero-v2 and read by this clip and by
+   .hero-core-spark, so the two layers cannot land on different points. */
 .hero-core-star {
-  --star-x: 72.3%;
-  --star-y: 43.2%;
   /* The arm tip must stay inside the galaxy ring painted into the art, at the
      animation's peak. The ring measures 155px in the source image, so its size
      here is 155 * the object-fit: cover scale, i.e. max(width/1774, height/887).
@@ -474,8 +495,8 @@ picture {
 
 .hero-core-spark {
   position: absolute;
-  left: 72.3%;
-  top: 43.2%;
+  left: var(--star-x);
+  top: var(--star-y);
   z-index: 2;
   width: 190px;
   height: 190px;
@@ -556,13 +577,17 @@ picture {
 }
 
 .hero-copy {
-  width: 42%;
+  /* 44% keeps the Chinese claim on one line down to 1101px, where the column is
+     at its narrowest, and still clears the galaxy at every width. */
+  width: 44%;
   min-width: 360px;
 }
 
 .hero-v2-title {
   margin: 0 0 24px;
-  font-size: clamp(4rem, 6.3vw, 6rem);
+  /* The 6rem cap landed at 1524px, so every screen above it got the same 96px
+     title on an ever larger canvas. 7rem keeps growing to 1778px. */
+  font-size: clamp(4rem, 6.3vw, 7rem);
   font-weight: 780;
   line-height: 0.92;
   letter-spacing: -0.055em;
@@ -666,19 +691,20 @@ picture {
   border-color: rgba(180, 133, 255, 0.82);
 }
 
+/* Aligned with the copy column, not the viewport: centred, it sat in the gap
+   between the text and the galaxy and read as an orphan. */
 .hero-scroll-cue {
   position: absolute;
-  left: 50%;
+  left: var(--shell-inset);
   bottom: 38px;
   z-index: 3;
   display: grid;
-  justify-items: center;
+  justify-items: start;
   gap: 9px;
   color: #8791af;
   font-size: 0.62rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  transform: translateX(-50%);
 }
 
 .hero-scroll-cue i {
@@ -1303,12 +1329,73 @@ picture {
   }
 }
 
+/* Above 1600px a 1180px shell left ~400px of dead margin on each side of a
+   full-bleed hero, so the copy read as a narrow strip pinned to the middle of a
+   much larger picture. The shell widens with the screen and the copy scale goes
+   with it; .reference-nav-inner and the footer move on the same breakpoint in
+   the layout, or the chrome would stop lining up with the page. */
+@media (min-width: 1600px) {
+  .reference-container {
+    width: min(100% - 96px, 1400px);
+  }
+
+  .hero-v2 {
+    --shell-inset: max(48px, calc((100% - 1400px) / 2));
+  }
+
+  /* main.css caps .hero-copy at 520px for the older hero layouts; on the wide
+     shell that cap, not the 42%, was deciding the measure. */
+  .hero-copy {
+    max-width: 600px;
+  }
+
+  .hero-kicker {
+    font-size: 1.3rem;
+  }
+
+  .hero-claim {
+    font-size: 1.5rem;
+  }
+
+  .hero-description {
+    font-size: 0.95rem;
+  }
+
+  .reference-button {
+    min-width: 172px;
+    min-height: 52px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Height-driven bands. Below 1340px the 670px floor (and the 500px one below
+   1100px) makes the box taller than the art's 2:1, so cover scales the image to
+   the height -- it renders 2H wide and object-position: right crops (2H - W) off
+   the left. The star therefore sits at 0.7237 * 2H - (2H - W), i.e.
+   100% - 2H * 0.2763, and needs no crop term vertically because a height-driven
+   render fills the height exactly. Without this the clip stayed at 72.3% of the
+   width and drifted 57px off the painted star at 1110px wide. */
+@media (min-width: 1101px) and (max-width: 1339px) {
+  .hero-v2 {
+    --star-x: calc(100% - 670px * 0.5526);
+    --star-y: 43.6%;
+  }
+}
+
+@media (min-width: 821px) and (max-width: 1000px) {
+  .hero-v2 {
+    --star-x: calc(100% - 500px * 0.5526);
+    --star-y: 43.6%;
+  }
+}
+
 @media (max-width: 1100px) {
   .reference-container {
     width: min(100% - 48px, 960px);
   }
 
   .hero-v2 {
+    --shell-inset: max(24px, calc((100% - 960px) / 2));
     min-height: 610px;
   }
 
@@ -1335,6 +1422,9 @@ picture {
 
 @media (min-width: 821px) and (max-width: 1100px) {
   .hero-v2 {
+    /* The star pair is deliberately not set here: this band straddles the 2:1
+       crop switch at 1000px, so the two halves take it from the width-driven
+       base above and the height-driven block below respectively. */
     min-height: 500px;
   }
 
@@ -1386,13 +1476,11 @@ picture {
   }
 
   .hero-core-spark {
-    left: 69.5%;
     width: 126px;
     height: 126px;
   }
 
   .hero-core-star {
-    --star-x: 69.5%;
     /* .hero-v2 is 500px tall here, so the ring is smaller in element px */
     --star-arm: max(7.7vw, 77px);
   }
@@ -1578,6 +1666,11 @@ picture {
 
 @media (max-width: 820px) {
   .hero-v2 {
+    /* Portrait box, so height-driven again -- but .hero-backdrop switches to
+       object-position: 70% here, which crops only 0.7 of the overflow off the
+       left: x = 0.7237 * 2H - 0.7 * (2H - W) = 70% + 2H * 0.0237. */
+    --star-x: calc(70% + 760px * 0.0474);
+    --star-y: 43.6%;
     min-height: 760px;
   }
 
@@ -1586,15 +1679,11 @@ picture {
   }
 
   .hero-core-spark {
-    left: 75%;
-    top: 43.5%;
     width: clamp(120px, 24vw, 160px);
     height: clamp(120px, 24vw, 160px);
   }
 
   .hero-core-star {
-    --star-x: 75%;
-    --star-y: 43.5%;
     /* .hero-v2 is 760px tall here — the tallest — so the ring is largest */
     --star-arm: max(7.7vw, 117px);
     /* must mirror .hero-backdrop above, or the clip drifts off the painted star */
@@ -1659,6 +1748,9 @@ picture {
   }
 
   .hero-v2 {
+    /* Same 70%-crop formula as above, for the 720px box */
+    --star-x: calc(70% + 720px * 0.0474);
+    --shell-inset: 14px;
     min-height: 720px;
   }
 

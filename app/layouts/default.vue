@@ -608,14 +608,28 @@ onMounted(() => {
 }
 
 @media (min-width: 1200px) {
+  /* 48px, not 96px: .reference-container uses 48px, so wider gutters here left
+     the nav 24px narrower than the content under it between 1200 and 1276px,
+     where neither is capped at 1180px yet. Identical above 1276px. */
   .reference-nav-inner,
   .reference-footer-columns,
   .reference-footer-bottom {
-    width: min(100% - 96px, 1180px);
+    width: min(100% - 48px, 1180px);
   }
 
   .reference-nav-inner {
     grid-template-columns: 210px 1fr 190px;
+  }
+}
+
+/* Must stay in step with .reference-container in app/pages/index.vue: the page
+   shell widens here, and chrome that kept a 1180px shell would no longer line
+   up with the content under it. */
+@media (min-width: 1600px) {
+  .reference-nav-inner,
+  .reference-footer-columns,
+  .reference-footer-bottom {
+    width: min(100% - 96px, 1400px);
   }
 }
 

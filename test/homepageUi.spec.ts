@@ -188,9 +188,9 @@ describe('cross-star sparkle consistency', () => {
     // shrink this element to 126px / clamp(120px, 24vw, 160px)
     expect(spark).toMatch(/clip-path: polygon\((?:[^)]|\([^)]*\))*\)/)
     expect(spark).not.toMatch(/clip-path:[\s\S]*?\d+px[\s\S]*?\);/)
-    // position and blend deliberately unchanged
-    expect(spark).toContain('left: 72.3%')
-    expect(spark).toContain('top: 43.2%')
+    // position now comes from .hero-v2's variables so the clip cannot disagree
+    expect(spark).toContain('left: var(--star-x)')
+    expect(spark).toContain('top: var(--star-y)')
     expect(spark).toContain('mix-blend-mode: screen')
   })
 
@@ -259,21 +259,20 @@ describe('hero and product-universe cross-star parity', () => {
   })
 
   it('keeps the clipped star centred on the same point as the spark at every breakpoint', () => {
-    // --star-x/--star-y must equal .hero-core-spark's left/top, or the clip
-    // slides off the star painted into the artwork
-    const pairs: [string, string][] = [
-      ['72.3%', '43.2%'],
-      ['69.5%', ''],
-      ['75%', '43.5%']
-    ]
-    for (const [x, y] of pairs) {
-      expect(homepage, `--star-x: ${x}`).toContain(`--star-x: ${x}`)
-      expect(homepage, `left: ${x}`).toContain(`left: ${x}`)
-      if (y) {
-        expect(homepage, `--star-y: ${y}`).toContain(`--star-y: ${y}`)
-        expect(homepage, `top: ${y}`).toContain(`top: ${y}`)
-      }
-    }
+    // Both variables live on .hero-v2 and are read by the spark and by the clip,
+    // so no breakpoint can move one layer's star without the other's. --star-x
+    // is restated per crop band (it depends on the box height there), --star-y
+    // only where the crop regime changes.
+    const heroBlocks = homepage.split('.hero-v2 {').slice(1).map(b => b.slice(0, b.indexOf('}')))
+    const declaredX = heroBlocks.filter(b => b.includes('--star-x:')).length
+    const declaredY = heroBlocks.filter(b => b.includes('--star-y:')).length
+    expect(declaredX).toBeGreaterThanOrEqual(4)
+    expect(declaredY).toBeGreaterThanOrEqual(3)
+    // nothing outside .hero-v2 may declare them, or the two layers can disagree
+    expect(homepage.match(/--star-(x|y):/g)!.length).toBe(declaredX + declaredY)
+    // the phone bands crop at 70% instead of right, so they carry that term
+    expect(homepage).toContain('--star-x: calc(70% + 760px * 0.0474)')
+    expect(homepage).toContain('--star-x: calc(70% + 720px * 0.0474)')
   })
 
   it('mirrors the backdrop object-position so the clip tracks the crop', () => {
@@ -306,7 +305,7 @@ describe('hero copy fits its shell instead of being clipped', () => {
     for (const block of blocks) {
       expect(block, block).not.toMatch(/(^|[^-])height: \d/)
     }
-    expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?min-height: 670px;/)
+    expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?min-height: clamp\(670px,/)
   })
 
   it('keeps the copy off the header when it does outgrow the shell', () => {
@@ -326,6 +325,76 @@ describe('hero copy fits its shell instead of being clipped', () => {
 
   it('gives the copy column room for the widest title line', () => {
     // "Automate." is 421px at the 6rem cap, so a 35% (413px) column overflowed
-    expect(homepage).toMatch(/\.hero-copy \{[\s\S]*?width: 42%;/)
+    expect(homepage).toMatch(/\.hero-copy \{[\s\S]*?width: 44%;/)
+  })
+})
+
+describe('hero composition on large screens', () => {
+  it('fills the fold without cropping the artwork', () => {
+    // The art is exactly 2:1 and full-bleed, so a hero taller than 50vw makes
+    // object-fit: cover switch to height-driven and slice the earth arc off the
+    // bottom. Height is therefore the fold, capped at 50vw, floored at 670px.
+    expect(homepage).toMatch(
+      /\.hero-v2 \{[\s\S]*?min-height: clamp\(670px, calc\(100svh - 76px\), 50vw\);/
+    )
+  })
+
+  it('derives the star centre from the crop instead of a per-height constant', () => {
+    // In the width-driven regime the painted star sits at 0.4405 of the image
+    // height, so its offset from the hero centre is (0.4405 - 0.5) * 50vw.
+    // calc(50% - 3.2vw) stays locked to the star at every height, which a fixed
+    // percentage cannot do, and matches the height-driven bands at the switch.
+    expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?--star-y: calc\(50% - 3\.2vw\);/)
+    expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?--star-x: 72\.3%;/)
+  })
+
+  it('drives the spark and the clip from one pair of variables', () => {
+    // Both layers must land on the same point; reading the same custom property
+    // is the only version of that invariant a breakpoint cannot break.
+    expect(homepage).toMatch(/\.hero-core-spark \{[\s\S]*?left: var\(--star-x\);/)
+    expect(homepage).toMatch(/\.hero-core-spark \{[\s\S]*?top: var\(--star-y\);/)
+    const sparkBlocks = homepage.split('.hero-core-spark {').slice(1)
+    for (const block of sparkBlocks) {
+      const body = block.slice(0, block.indexOf('}'))
+      expect(body, body).not.toMatch(/(left|top): \d/)
+    }
+    // and the star must not redeclare them locally
+    const starBlocks = homepage.split('.hero-core-star {').slice(1)
+    for (const block of starBlocks) {
+      const body = block.slice(0, block.indexOf('}'))
+      expect(body, body).not.toMatch(/--star-(x|y):/)
+    }
+  })
+
+  it('widens the shell past 1600px in the nav, the page and the footer together', () => {
+    // A page shell wider than the nav shell is the misalignment it was meant
+    // to fix, so all three move on the same breakpoint.
+    expect(homepage).toMatch(
+      /@media \(min-width: 1600px\) \{[\s\S]*?\.reference-container \{\s*width: min\(100% - 96px, 1400px\);/
+    )
+    expect(layout).toMatch(
+      /@media \(min-width: 1600px\) \{[\s\S]*?width: min\(100% - 96px, 1400px\);/
+    )
+    expect(layout).toMatch(/@media \(min-width: 1600px\) \{[\s\S]*?\.reference-footer-columns/)
+    // the chrome's gutter must match .reference-container's 48px, or the nav is
+    // narrower than the content between 1200px and 1276px
+    expect(layout).not.toContain('min(100% - 96px, 1180px)')
+  })
+
+  it('scales the hero type with the wider shell', () => {
+    expect(homepage).toMatch(/\.hero-v2-title \{[\s\S]*?font-size: clamp\(4rem, 6\.3vw, 7rem\);/)
+    expect(homepage).toMatch(/@media \(min-width: 1600px\) \{[\s\S]*?\.hero-claim \{\s*font-size: 1\.5rem;/)
+    // and the wide shell must decide the measure, not main.css's 520px cap
+    expect(homepage).toMatch(/@media \(min-width: 1600px\) \{[\s\S]*?\.hero-copy \{\s*max-width: 600px;/)
+  })
+
+  it('anchors the scroll cue to the shell instead of the viewport centre', () => {
+    // Centred on the viewport it landed in the gap between the copy and the
+    // galaxy, aligned with neither.
+    const [cue] = homepage.split('.hero-scroll-cue {').slice(1)
+    const body = cue.slice(0, cue.indexOf('}'))
+    expect(body).toContain('left: var(--shell-inset)')
+    expect(body).not.toContain('translateX(-50%)')
+    expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?--shell-inset: max\(24px, calc\(\(100% - 1180px\) \/ 2\)\);/)
   })
 })
