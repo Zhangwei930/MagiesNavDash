@@ -428,13 +428,29 @@ picture {
   width: 190px;
   height: 190px;
   pointer-events: none;
-  border-radius: 50%;
+  /* Bright core stops unchanged from the original circular spark; the arms get
+     only a faint tail so they glint rather than reading as a solid slab. */
   background: radial-gradient(
     circle,
     #fff 0 4%,
     rgba(245, 208, 254, 0.98) 5%,
     rgba(192, 132, 252, 0.34) 13%,
-    transparent 36%
+    rgba(167, 139, 250, 0.1) 30%,
+    rgba(167, 139, 250, 0.035) 55%,
+    transparent 100%
+  );
+  /* Same 8-point construction as .universe-core so the scale pulse reads as a
+     star, not a breathing circle. Waist is kept narrow to match the slender
+     arms painted into the hero art instead of thickening them. */
+  clip-path: polygon(
+    50% 0%,
+    calc(50% + 9px) calc(50% - 9px),
+    100% 50%,
+    calc(50% + 9px) calc(50% + 9px),
+    50% 100%,
+    calc(50% - 9px) calc(50% + 9px),
+    0% 50%,
+    calc(50% - 9px) calc(50% - 9px)
   );
   mix-blend-mode: screen;
   transform: translate(-50%, -50%);

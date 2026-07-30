@@ -167,3 +167,37 @@ describe('homepage backdrop loading strategy', () => {
     expect(homepage).toMatch(/\.cta-backdrop\s*\{[^}]*background-color:\s*#0a0f2c/)
   })
 })
+
+describe('cross-star sparkle consistency', () => {
+  const rule = (sel: string) => {
+    const start = homepage.indexOf(`${sel} {`)
+    return start < 0 ? '' : homepage.slice(start, homepage.indexOf('\n}', start))
+  }
+  const frames = (name: string) => {
+    const start = homepage.indexOf(`@keyframes ${name}`)
+    return start < 0 ? '' : homepage.slice(start, homepage.indexOf('\n}', start))
+  }
+
+  it('shapes the hero sparkle as a star so its scaling reads like the universe core', () => {
+    const spark = rule('.hero-core-spark')
+    expect(spark).toContain('clip-path: polygon(')
+    // 8 vertices = 4 arms + 4 waist points, same construction as .universe-core
+    expect(spark.match(/calc\(50% [+-] \d+px\)/g)!.length).toBeGreaterThanOrEqual(8)
+    // position and blend deliberately unchanged
+    expect(spark).toContain('left: 72.3%')
+    expect(spark).toContain('top: 43.2%')
+    expect(spark).toContain('mix-blend-mode: screen')
+  })
+
+  it('keeps both sparkle animations numerically identical', () => {
+    for (const name of ['heroCoreSparkle', 'universeCoreSparkle']) {
+      const f = frames(name)
+      expect(f, name).toContain('brightness(0.9)')
+      expect(f, name).toContain('brightness(1.42)')
+      expect(f, name).toContain('scale(1.08)')
+      expect(f, name).toContain('drop-shadow(0 0 12px rgba(205, 164, 255, 0.72))')
+    }
+    expect(rule('.hero-core-spark')).toContain('2.8s ease-in-out infinite')
+    expect(rule('.universe-core')).toContain('2.8s ease-in-out infinite')
+  })
+})
