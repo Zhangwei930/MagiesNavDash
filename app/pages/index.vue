@@ -1,12 +1,16 @@
 <template>
   <div ref="root" class="reference-home" :lang="locale === 'zh' ? 'zh-CN' : 'en'">
     <section class="hero-v2" data-testid="home-hero" aria-labelledby="hero-title">
-      <img
-        class="hero-backdrop"
-        src="/brand/magies-reference-hero.jpg"
-        alt=""
-        aria-hidden="true"
-      >
+      <picture>
+        <source srcset="/brand/magies-reference-hero.avif" type="image/avif">
+        <img
+          class="hero-backdrop"
+          src="/brand/magies-reference-hero.jpg"
+          alt=""
+          aria-hidden="true"
+          fetchpriority="high"
+        >
+      </picture>
       <div class="hero-shade" aria-hidden="true" />
       <span class="hero-core-spark" aria-hidden="true" />
 
@@ -72,19 +76,25 @@
         </div>
 
         <div class="product-universe" data-reveal>
-          <img
-            class="universe-backdrop"
-            src="/brand/magies-reference-products.jpg"
-            alt=""
-            aria-hidden="true"
-          >
+          <picture>
+            <source srcset="/brand/magies-reference-products.avif" type="image/avif">
+            <img
+              class="universe-backdrop"
+              src="/brand/magies-reference-products.jpg"
+              alt=""
+              aria-hidden="true"
+            >
+          </picture>
           <span class="universe-twinkle" aria-hidden="true" />
-          <img
-            class="universe-core"
-            src="/brand/magies-reference-products.jpg"
-            alt=""
-            aria-hidden="true"
-          >
+          <picture>
+            <source srcset="/brand/magies-reference-products.avif" type="image/avif">
+            <img
+              class="universe-core"
+              src="/brand/magies-reference-products.jpg"
+              alt=""
+              aria-hidden="true"
+            >
+          </picture>
 
           <NuxtLink
             v-for="product in products"
@@ -185,12 +195,16 @@
       data-testid="home-cta"
       aria-labelledby="cta-title"
     >
-      <img
-        class="cta-backdrop"
-        src="/brand/magies-reference-cta.jpg"
-        alt=""
-        aria-hidden="true"
-      >
+      <picture>
+        <source srcset="/brand/magies-reference-cta.avif" type="image/avif">
+        <img
+          class="cta-backdrop"
+          src="/brand/magies-reference-cta.jpg"
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+        >
+      </picture>
       <div class="cta-shade" aria-hidden="true" />
       <div class="reference-container cta-panel" data-reveal>
         <h2 id="cta-title">{{ t('home.ctaTitle') }}</h2>
@@ -324,6 +338,12 @@ const testimonials = computed(() => [
 </script>
 
 <style scoped>
+/* AVIF sources wrap the backdrops in <picture>; generate no box so the
+   absolutely-positioned <img> inside keeps positioning against its section. */
+picture {
+  display: contents;
+}
+
 .reference-home {
   position: relative;
   overflow: hidden;
@@ -408,13 +428,31 @@ const testimonials = computed(() => [
   width: 190px;
   height: 190px;
   pointer-events: none;
-  border-radius: 50%;
+  /* Bright core stops unchanged from the original circular spark; the arms get
+     only a faint tail so they glint rather than reading as a solid slab. */
   background: radial-gradient(
     circle,
     #fff 0 4%,
     rgba(245, 208, 254, 0.98) 5%,
     rgba(192, 132, 252, 0.34) 13%,
-    transparent 36%
+    rgba(167, 139, 250, 0.1) 30%,
+    rgba(167, 139, 250, 0.035) 55%,
+    transparent 100%
+  );
+  /* Same 8-point construction as .universe-core so the scale pulse reads as a
+     star, not a breathing circle. Waist is kept narrow to match the slender
+     arms painted into the hero art instead of thickening them. Expressed in
+     percentages, not px, so the proportions hold when the breakpoints below
+     shrink this element to 126px / clamp(120px, 24vw, 160px). */
+  clip-path: polygon(
+    50% 0%,
+    54.7% 45.3%,
+    100% 50%,
+    54.7% 54.7%,
+    50% 100%,
+    45.3% 54.7%,
+    0% 50%,
+    45.3% 45.3%
   );
   mix-blend-mode: screen;
   transform: translate(-50%, -50%);
@@ -628,7 +666,6 @@ const testimonials = computed(() => [
     0 22px 54px rgba(0, 0, 0, 0.45),
     0 0 38px rgba(87, 66, 214, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(20px);
 }
 
 .stat-item {
@@ -725,6 +762,9 @@ const testimonials = computed(() => [
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* average tone of the art — lazy decode lands without a visible pop.
+     Hidden once loaded: object-fit cover leaves no gap. */
+  background-color: #14112d;
 }
 
 .product-universe::after {
@@ -1094,6 +1134,7 @@ const testimonials = computed(() => [
   height: 100%;
   object-fit: cover;
   object-position: center 68%;
+  background-color: #0a0f2c;
 }
 
 .cta-shade {
