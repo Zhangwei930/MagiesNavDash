@@ -472,7 +472,7 @@ onMounted(() => {
 }
 
 .reference-footer-columns {
-  width: min(100% - 48px, 1080px);
+  width: min(100% - 48px, 1180px);
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1.8fr repeat(3, 1fr);
@@ -531,7 +531,7 @@ onMounted(() => {
 }
 
 .reference-footer-bottom {
-  width: min(100% - 48px, 1080px);
+  width: min(100% - 48px, 1180px);
   margin: 30px auto 0;
   padding-top: 16px;
   border-top: 1px solid rgba(80, 92, 139, 0.2);
@@ -607,6 +607,17 @@ onMounted(() => {
   box-shadow: 0 0 16px rgba(167, 139, 250, 0.15);
 }
 
+/* Every shell width below mirrors .reference-container in app/pages/index.vue.
+   They have to: the hero is a panel in that shell now, so any difference shows
+   up as the navbar and the panel starting on different lines. */
+@media (min-width: 961px) and (max-width: 1100px) {
+  .reference-nav-inner,
+  .reference-footer-columns,
+  .reference-footer-bottom {
+    width: min(100% - 48px, 960px);
+  }
+}
+
 @media (min-width: 1200px) {
   /* 48px, not 96px: .reference-container uses 48px, so wider gutters here left
      the nav 24px narrower than the content under it between 1200 and 1276px,
@@ -647,7 +658,7 @@ onMounted(() => {
   }
 
   .reference-nav-inner {
-    width: min(100% - 32px, 820px);
+    width: min(100% - 48px, 960px);
     grid-template-columns: 150px 1fr 176px;
     gap: 14px;
   }
@@ -669,7 +680,7 @@ onMounted(() => {
 
   .reference-footer-columns,
   .reference-footer-bottom {
-    width: min(100% - 32px, 820px);
+    width: min(100% - 48px, 960px);
   }
 
   .reference-footer-columns {
@@ -784,21 +795,12 @@ onMounted(() => {
     height: 70px;
   }
 
-  .reference-nav-inner {
-    width: calc(100% - 24px);
-  }
-
   .reference-nav-links {
     top: 68px;
   }
 
   .reference-footer {
     min-height: 0;
-  }
-
-  .reference-footer-columns,
-  .reference-footer-bottom {
-    width: calc(100% - 24px);
   }
 
   .reference-footer-columns {
@@ -818,6 +820,16 @@ onMounted(() => {
 
   .footer-grid-5 {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Last, so it wins over the phone blocks above: .reference-container caps at
+   560px from 620px down, and the chrome follows it. */
+@media (max-width: 620px) {
+  .reference-nav-inner,
+  .reference-footer-columns,
+  .reference-footer-bottom {
+    width: min(100% - 28px, 560px);
   }
 }
 </style>

@@ -313,7 +313,7 @@ describe('hero copy fits its shell instead of being clipped', () => {
   it('keeps the copy off the header when it does outgrow the shell', () => {
     const [content] = ruleBlocks('.hero-content')
     expect(content).toContain('min-height: inherit')
-    expect(content).toMatch(/padding: \d+px 0 58px;/)
+    expect(content).toMatch(/padding: \d+px var\(--panel-pad\) 58px;/)
   })
 
   it('measures the hero paragraphs by the copy column, not in Latin ch', () => {
@@ -339,7 +339,7 @@ describe('hero composition on large screens', () => {
     // horizontally, and object-position: right takes it off the empty left half
     // instead of slicing the earth arc off the bottom.
     expect(homepage).toMatch(
-      /\.hero-v2 \{[\s\S]*?--hero-h: max\(670px, calc\(100svh - 76px\)\);/
+      /\.hero-v2 \{[\s\S]*?--hero-h: max\(670px, calc\(100svh - 100px\)\);/
     )
     expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?min-height: var\(--hero-h\);/)
   })
@@ -349,7 +349,7 @@ describe('hero composition on large screens', () => {
     // position and its arm length are functions of it, so they cannot disagree
     // with each other or with the height.
     expect(homepage).toMatch(
-      /\.hero-v2 \{[\s\S]*?--art-w: max\(100vw, calc\(var\(--hero-h\) \* 2\)\);/
+      /\.hero-v2 \{[\s\S]*?--art-w: max\(100cqw, calc\(var\(--hero-h\) \* 2\)\);/
     )
     expect(homepage).toContain('--star-arm: calc(var(--art-w) * 0.0769)')
     // the four hand-tuned arm lengths it replaces are gone
@@ -400,6 +400,19 @@ describe('hero composition on large screens', () => {
     // the chrome's gutter must match .reference-container's 48px, or the nav is
     // narrower than the content between 1200px and 1276px
     expect(layout).not.toContain('min(100% - 96px, 1180px)')
+    // and every other shell width must mirror .reference-container's caps too,
+    // now that the hero is a panel in that shell
+    for (const shell of [
+      'min(100% - 48px, 960px)',
+      'min(100% - 28px, 560px)',
+      'min(100% - 48px, 1180px)',
+      'min(100% - 96px, 1400px)',
+      'min(100% - 96px, 1600px)'
+    ]) {
+      expect(layout, shell).toContain(shell)
+      expect(homepage, shell).toContain(shell)
+    }
+    expect(layout).not.toContain('820px)')
   })
 
   it('scales the hero type with the wider shell', () => {
@@ -421,13 +434,28 @@ describe('hero composition on large screens', () => {
     )
   })
 
-  it('anchors the scroll cue to the shell instead of the viewport centre', () => {
+  it('anchors the scroll cue to the panel gutter, not the viewport centre', () => {
     // Centred on the viewport it landed in the gap between the copy and the
     // galaxy, aligned with neither.
     const [cue] = homepage.split('.hero-scroll-cue {').slice(1)
     const body = cue.slice(0, cue.indexOf('}'))
-    expect(body).toContain('left: var(--shell-inset)')
+    expect(body).toContain('left: var(--panel-pad)')
     expect(body).not.toContain('translateX(-50%)')
-    expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?--shell-inset: max\(24px, calc\(\(100% - 1180px\) \/ 2\)\);/)
+    expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?--panel-pad: clamp\(28px, 3\.4vw, 64px\);/)
+    expect(homepage).toMatch(/\.hero-content \{[\s\S]*?padding: 24px var\(--panel-pad\) 58px;/)
+    // and nothing may still reach for the deleted viewport-relative inset
+    expect(homepage).not.toContain('--shell-inset')
+  })
+
+  it('sits in the same shell as every other section, as a rounded panel', () => {
+    // Equal gutters on both sides and its edge on the same line as the navbar
+    // and the stats bar, which a full-bleed hero could not give.
+    expect(homepage).toContain('class="hero-v2 reference-container"')
+    expect(homepage).not.toContain('class="reference-container hero-content"')
+    expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?container-type: inline-size;/)
+    expect(homepage).toMatch(/\.hero-v2 \{[\s\S]*?border-radius: 18px;/)
+    // the copy lost .reference-container's stacking context with that move, and
+    // the art layers behind it are absolute with z-index 1 and 2
+    expect(homepage).toMatch(/\.hero-content \{[\s\S]*?position: relative;[\s\S]*?z-index: 3;/)
   })
 })

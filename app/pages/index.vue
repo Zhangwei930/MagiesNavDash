@@ -1,6 +1,10 @@
 <template>
   <div ref="root" class="reference-home" :lang="locale === 'zh' ? 'zh-CN' : 'en'">
-    <section class="hero-v2" data-testid="home-hero" aria-labelledby="hero-title">
+    <section
+      class="hero-v2 reference-container"
+      data-testid="home-hero"
+      aria-labelledby="hero-title"
+    >
       <picture>
         <source srcset="/brand/magies-reference-hero.avif" type="image/avif">
         <img
@@ -23,7 +27,7 @@
       </picture>
       <span class="hero-core-spark" aria-hidden="true" />
 
-      <div class="reference-container hero-content">
+      <div class="hero-content">
         <div class="hero-copy">
           <h1 id="hero-title" class="hero-v2-title" data-hero-in>
             <span class="hero-title-line hero-title-build">{{ t('home.heroBuild') }}</span>
@@ -396,28 +400,35 @@ picture {
 
    --art-w is the width the 2:1 art actually renders at under object-fit: cover.
    Taller than 2:1 and cover is height-driven: the art renders --art-w = 2H wide
-   and (--art-w - 100vw) is cropped off the left, which is the *empty* half of
+   and (--art-w - 100cqw) is cropped off the left, which is the *empty* half of
    the picture -- the galaxy moves toward the centre and the earth arc survives
-   intact. Wider than 2:1 and it is width-driven: --art-w = 100vw, and the crop
-   is vertical and centred instead. max() picks whichever applies. */
+   intact. Wider than 2:1 and it is width-driven: --art-w = the panel width, and
+   the crop is vertical and centred instead. max() picks whichever applies.
+
+   The panel takes .reference-container's width, so it sits in the same shell as
+   every other section -- equal gutters on both sides, its edge on the same line
+   as the navbar and the stats bar -- and container-type lets --art-w read that
+   width as 100cqw rather than restating the shell formula per breakpoint. */
 .hero-v2 {
-  --hero-h: max(670px, calc(100svh - 76px));
-  --art-w: max(100vw, calc(var(--hero-h) * 2));
+  --hero-h: max(670px, calc(100svh - 100px));
+  --art-w: max(100cqw, calc(var(--hero-h) * 2));
   /* The painted cross-star's core sits at (0.7237, 0.4361) of the art (flood
      filled the saturated core of the 1774x887 jpg). Mapping that into this box
      is where the old hand-tuned percentages drifted, and a drift shows up as
      *two* stars: the painted one and the clipped copy, side by side.
-       x = 0.7237 * art-w - (art-w - 100vw)      = 100% - art-w * 0.2763
+       x = 0.7237 * art-w - (art-w - 100cqw)     = 100% - art-w * 0.2763
        y = 0.4361 * art-w/2 - (art-w/2 - H) / 2  = 50%  - art-w * 0.03195
      Both hold in either crop regime, because art-w is what changes between
      them; the crop terms go to zero when nothing is cropped. */
   --star-x: calc(100% - var(--art-w) * 0.2763);
   --star-y: calc(50% - var(--art-w) * 0.03195);
-  /* Left edge of .reference-container, for the layers that sit outside it. */
-  --shell-inset: max(24px, calc((100% - 1180px) / 2));
+  /* Interior gutter, for the copy and for the layers outside it */
+  --panel-pad: clamp(28px, 3.4vw, 64px);
+  container-type: inline-size;
   position: relative;
   z-index: 1;
   min-height: var(--hero-h);
+  border-radius: 18px;
   overflow: hidden;
 }
 
@@ -574,10 +585,15 @@ picture {
 }
 
 .hero-content {
+  /* Must stay positioned above the art: the layers behind it are absolute with
+     z-index 1 and 2, so a static box here paints the copy underneath them. It
+     used to get this from .reference-container, which now sits on .hero-v2. */
+  position: relative;
+  z-index: 3;
   min-height: inherit;
   display: flex;
   align-items: center;
-  padding: 24px 0 58px;
+  padding: 24px var(--panel-pad) 58px;
 }
 
 .hero-copy {
@@ -700,7 +716,7 @@ picture {
    between the text and the galaxy and read as an orphan. */
 .hero-scroll-cue {
   position: absolute;
-  left: var(--shell-inset);
+  left: var(--panel-pad);
   bottom: 38px;
   z-index: 3;
   display: grid;
@@ -1344,10 +1360,6 @@ picture {
     width: min(100% - 96px, 1400px);
   }
 
-  .hero-v2 {
-    --shell-inset: max(48px, calc((100% - 1400px) / 2));
-  }
-
   /* main.css caps .hero-copy at 520px for the older hero layouts; on the wide
      shell that cap, not the 42%, was deciding the measure. */
   .hero-copy {
@@ -1384,10 +1396,6 @@ picture {
     width: min(100% - 96px, 1600px);
   }
 
-  .hero-v2 {
-    --shell-inset: max(48px, calc((100% - 1600px) / 2));
-  }
-
   .hero-copy {
     width: 52%;
     max-width: 840px;
@@ -1413,7 +1421,6 @@ picture {
 
   .hero-v2 {
     --hero-h: 610px;
-    --shell-inset: max(24px, calc((100% - 960px) / 2));
   }
 
   .hero-copy {
@@ -1756,7 +1763,6 @@ picture {
 
   .hero-v2 {
     --hero-h: 720px;
-    --shell-inset: 14px;
   }
 
   .hero-backdrop {
