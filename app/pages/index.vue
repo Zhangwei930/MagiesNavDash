@@ -12,6 +12,15 @@
         >
       </picture>
       <div class="hero-shade" aria-hidden="true" />
+      <picture>
+        <source srcset="/brand/magies-reference-hero.avif" type="image/avif">
+        <img
+          class="hero-core-star"
+          src="/brand/magies-reference-hero.jpg"
+          alt=""
+          aria-hidden="true"
+        >
+      </picture>
       <span class="hero-core-spark" aria-hidden="true" />
 
       <div class="reference-container hero-content">
@@ -400,6 +409,45 @@ picture {
     radial-gradient(circle at 88% 78%, rgba(99, 173, 255, 0.94) 0 1px, transparent 2.2px);
   mix-blend-mode: screen;
   animation: heroGalaxyTwinkle 3.4s ease-in-out infinite alternate;
+}
+
+/* A copy of the hero art clipped to the painted cross-star, so the star itself
+   scales and brightens instead of a gradient blob pulsing on top of a static
+   star. Same technique and the *same keyframe* as .universe-core -- that motion
+   is the reference, and sharing the keyframe means the two cannot drift apart.
+   --star-x/--star-y must track .hero-core-spark and .hero-backdrop's crop at
+   every breakpoint, so all three are overridden together below. */
+.hero-core-star {
+  --star-x: 72.3%;
+  --star-y: 43.2%;
+  /* The arm tip must stay inside the galaxy ring painted into the art, at the
+     animation's peak. The ring measures 155px in the source image, so its size
+     here is 155 * the object-fit: cover scale, i.e. max(width/1774, height/887).
+     The vw term is the width-driven case and is identical at every breakpoint;
+     only the height-driven floor changes, because .hero-v2 has a different
+     height per breakpoint. Arm is 88% of the ring so that arm * 1.08 clears it. */
+  --star-arm: max(7.7vw, 103px);
+  --star-waist: calc(var(--star-arm) * 0.087);
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  object-fit: cover;
+  object-position: right center;
+  clip-path: polygon(
+    var(--star-x) calc(var(--star-y) - var(--star-arm)),
+    calc(var(--star-x) + var(--star-waist)) calc(var(--star-y) - var(--star-waist)),
+    calc(var(--star-x) + var(--star-arm)) var(--star-y),
+    calc(var(--star-x) + var(--star-waist)) calc(var(--star-y) + var(--star-waist)),
+    var(--star-x) calc(var(--star-y) + var(--star-arm)),
+    calc(var(--star-x) - var(--star-waist)) calc(var(--star-y) + var(--star-waist)),
+    calc(var(--star-x) - var(--star-arm)) var(--star-y),
+    calc(var(--star-x) - var(--star-waist)) calc(var(--star-y) - var(--star-waist))
+  );
+  transform-origin: var(--star-x) var(--star-y);
+  animation: universeCoreSparkle 2.8s ease-in-out infinite;
 }
 
 .hero-backdrop {
@@ -1192,7 +1240,7 @@ picture {
   }
 
   50% {
-    filter: brightness(1.42) drop-shadow(0 0 12px rgba(205, 164, 255, 0.72));
+    filter: brightness(1.42);
     transform: translate(-50%, -50%) scale(1.08);
   }
 }
@@ -1200,17 +1248,17 @@ picture {
 @keyframes heroGalaxyTwinkle {
   0% {
     opacity: 0.2;
-    filter: brightness(0.82) drop-shadow(0 0 2px rgba(107, 193, 255, 0.48));
+    filter: brightness(0.82);
   }
 
   48% {
     opacity: 0.78;
-    filter: brightness(1.42) drop-shadow(0 0 6px rgba(200, 142, 255, 0.76));
+    filter: brightness(1.42);
   }
 
   100% {
     opacity: 0.4;
-    filter: brightness(1.06) drop-shadow(0 0 3px rgba(87, 172, 255, 0.62));
+    filter: brightness(1.06);
   }
 }
 
@@ -1222,7 +1270,7 @@ picture {
   }
 
   50% {
-    filter: brightness(1.42) drop-shadow(0 0 12px rgba(205, 164, 255, 0.72));
+    filter: brightness(1.42);
     transform: scale(1.08);
   }
 }
@@ -1230,22 +1278,22 @@ picture {
 @keyframes galaxyTwinkle {
   0% {
     opacity: 0.05;
-    filter: brightness(0.5) drop-shadow(0 0 1px rgba(113, 194, 255, 0.35));
+    filter: brightness(0.5);
   }
 
   38% {
     opacity: 1;
-    filter: brightness(1.8) drop-shadow(0 0 9px rgba(194, 138, 255, 0.92));
+    filter: brightness(1.8);
   }
 
   64% {
     opacity: 0.16;
-    filter: brightness(0.72) drop-shadow(0 0 2px rgba(87, 181, 255, 0.45));
+    filter: brightness(0.72);
   }
 
   100% {
     opacity: 0.82;
-    filter: brightness(1.48) drop-shadow(0 0 7px rgba(87, 181, 255, 0.86));
+    filter: brightness(1.48);
   }
 }
 
@@ -1335,6 +1383,12 @@ picture {
     left: 69.5%;
     width: 126px;
     height: 126px;
+  }
+
+  .hero-core-star {
+    --star-x: 69.5%;
+    /* .hero-v2 is 500px tall here, so the ring is smaller in element px */
+    --star-arm: max(7.7vw, 77px);
   }
 
   .stats-wrap {
@@ -1532,6 +1586,15 @@ picture {
     height: clamp(120px, 24vw, 160px);
   }
 
+  .hero-core-star {
+    --star-x: 75%;
+    --star-y: 43.5%;
+    /* .hero-v2 is 760px tall here — the tallest — so the ring is largest */
+    --star-arm: max(7.7vw, 117px);
+    /* must mirror .hero-backdrop above, or the clip drifts off the painted star */
+    object-position: 70% center;
+  }
+
   .hero-shade {
     background: linear-gradient(90deg, rgba(1, 4, 15, 0.74), rgba(1, 4, 15, 0.08) 78%);
   }
@@ -1591,6 +1654,11 @@ picture {
 
   .hero-v2 {
     height: 720px;
+  }
+
+  .hero-core-star {
+    /* .hero-v2 drops to 720px here, so the ring shrinks with it */
+    --star-arm: max(7.7vw, 111px);
   }
 
   .hero-backdrop {
@@ -1754,6 +1822,7 @@ picture {
   .hero-scroll-cue i::after,
   .hero-v2::before,
   .hero-core-spark,
+  .hero-core-star,
   .universe-core,
   .universe-twinkle,
   .universe-twinkle::before,

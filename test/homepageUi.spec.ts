@@ -118,10 +118,11 @@ describe('homepage backdrop images', () => {
       )
       expect(homepage).toContain(`src="/brand/${base}.jpg"`)
     }
-    // one <picture> per backdrop img: hero, universe-backdrop, universe-core, cta
-    expect(homepageTemplate.match(/<picture>/g)).toHaveLength(4)
-    expect(homepageTemplate.match(/<\/picture>/g)).toHaveLength(4)
-    expect(homepageTemplate.match(/<source srcset=/g)).toHaveLength(4)
+    // one <picture> per img drawn from the art: hero-backdrop, hero-core-star,
+    // universe-backdrop, universe-core, cta-backdrop
+    expect(homepageTemplate.match(/<picture>/g)).toHaveLength(5)
+    expect(homepageTemplate.match(/<\/picture>/g)).toHaveLength(5)
+    expect(homepageTemplate.match(/<source srcset=/g)).toHaveLength(5)
   })
 
   it('keeps <picture> layout-neutral so absolute positioning is unchanged', () => {
@@ -199,9 +200,86 @@ describe('cross-star sparkle consistency', () => {
       expect(f, name).toContain('brightness(0.9)')
       expect(f, name).toContain('brightness(1.42)')
       expect(f, name).toContain('scale(1.08)')
-      expect(f, name).toContain('drop-shadow(0 0 12px rgba(205, 164, 255, 0.72))')
+      // no drop-shadow here by design — see the animation performance budget
+      expect(f, name).not.toContain('drop-shadow')
     }
     expect(rule('.hero-core-spark')).toContain('2.8s ease-in-out infinite')
     expect(rule('.universe-core')).toContain('2.8s ease-in-out infinite')
+  })
+})
+
+describe('animation performance budget', () => {
+  const keyframeBlocks = () => {
+    const out: { name: string; body: string }[] = []
+    const re = /@keyframes\s+([\w-]+)\s*\{/g
+    let m: RegExpExecArray | null
+    while ((m = re.exec(homepage))) {
+      // walk braces to find the matching close
+      let depth = 1
+      let i = re.lastIndex
+      while (i < homepage.length && depth > 0) {
+        if (homepage[i] === '{') depth++
+        else if (homepage[i] === '}') depth--
+        i++
+      }
+      out.push({ name: m[1], body: homepage.slice(re.lastIndex, i) })
+    }
+    return out
+  }
+
+  it('never animates drop-shadow, which re-rasterises the layer every frame', () => {
+    const offenders = keyframeBlocks()
+      .filter(b => b.body.includes('drop-shadow'))
+      .map(b => b.name)
+    expect(offenders).toEqual([])
+  })
+
+  it('keeps the brightness flicker that drop-shadow was padding', () => {
+    const byName = Object.fromEntries(keyframeBlocks().map(b => [b.name, b.body]))
+    for (const n of [
+      'heroCoreSparkle',
+      'heroGalaxyTwinkle',
+      'universeCoreSparkle',
+      'galaxyTwinkle'
+    ]) {
+      expect(byName[n], n).toBeDefined()
+      expect(byName[n], n).toContain('brightness(')
+    }
+  })
+})
+
+describe('hero and product-universe cross-star parity', () => {
+  it('drives both cross-stars from the same keyframe so they cannot drift', () => {
+    expect(homepage).toMatch(
+      /\.hero-core-star\s*\{[\s\S]*?animation: universeCoreSparkle 2\.8s ease-in-out infinite;/
+    )
+    expect(homepage).toMatch(
+      /\.universe-core\s*\{[\s\S]*?animation: universeCoreSparkle 2\.8s ease-in-out infinite;/
+    )
+  })
+
+  it('keeps the clipped star centred on the same point as the spark at every breakpoint', () => {
+    // --star-x/--star-y must equal .hero-core-spark's left/top, or the clip
+    // slides off the star painted into the artwork
+    const pairs: [string, string][] = [
+      ['72.3%', '43.2%'],
+      ['69.5%', ''],
+      ['75%', '43.5%']
+    ]
+    for (const [x, y] of pairs) {
+      expect(homepage, `--star-x: ${x}`).toContain(`--star-x: ${x}`)
+      expect(homepage, `left: ${x}`).toContain(`left: ${x}`)
+      if (y) {
+        expect(homepage, `--star-y: ${y}`).toContain(`--star-y: ${y}`)
+        expect(homepage, `top: ${y}`).toContain(`top: ${y}`)
+      }
+    }
+  })
+
+  it('mirrors the backdrop object-position so the clip tracks the crop', () => {
+    const starRule = homepage.slice(homepage.indexOf('.hero-core-star {'))
+    expect(starRule).toContain('object-position: right center')
+    // and the small-screen override exists for both layers
+    expect(homepage.match(/object-position: 70% center/g)!.length).toBeGreaterThanOrEqual(3)
   })
 })
