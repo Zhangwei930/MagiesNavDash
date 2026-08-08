@@ -36,16 +36,16 @@
       <span
         class="const-icon"
         :data-logo="item.logo ? '' : null"
-        :data-logo-lg="item.key === 'office' || null"
+        :data-logo-lg="item.logoLarge || null"
       >
         <img
           v-if="item.logo"
           class="const-logo"
-          :class="{ 'const-logo-lg': item.key === 'office' }"
+          :class="{ 'const-logo-lg': item.logoLarge }"
           :src="item.logo"
           :alt="item.name"
-          :width="item.key === 'office' ? 30 : 22"
-          :height="item.key === 'office' ? 30 : 22"
+          :width="item.logoLarge ? 30 : 22"
+          :height="item.logoLarge ? 30 : 22"
           decoding="async"
         />
         <component v-else :is="item.icon" :size="18" :stroke-width="1.75" />
@@ -62,10 +62,9 @@
 <script setup lang="ts">
 import {
   Database,
-  Compass,
   type LucideIcon
 } from 'lucide-vue-next'
-import { toolLogo } from '~/utils/toolMeta'
+import { toolLogo, toolLogoIsLarge } from '~/utils/toolMeta'
 
 export type ConstellationItem = {
   key: string
@@ -74,6 +73,7 @@ export type ConstellationItem = {
   color: string
   icon?: LucideIcon
   logo?: string | null
+  logoLarge?: boolean
   to: string
 }
 
@@ -95,7 +95,8 @@ const FALLBACK: ConstellationItem[] = [
     name: 'Nav',
     short: 'Unified entry',
     color: '#60a5fa',
-    icon: Compass,
+    logo: toolLogo('magies-nav'),
+    logoLarge: toolLogoIsLarge('magies-nav'),
     to: '/products/magies-nav'
   },
   {
@@ -104,6 +105,7 @@ const FALLBACK: ConstellationItem[] = [
     short: 'AI documents',
     color: '#f472b6',
     logo: toolLogo('magies-office'),
+    logoLarge: toolLogoIsLarge('magies-office'),
     to: '/products/magies-office'
   },
   {
