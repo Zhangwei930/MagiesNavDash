@@ -130,7 +130,7 @@ onMounted(async () => {
     const map = Object.fromEntries(products.map((p) => [p.id, p]))
     items.value = releases.map((r) => ({ release: r, product: map[r.productId] }))
   } catch (e: any) {
-    error.value = e.message || '加载失败'
+    error.value = e.message || t('common.loadFailed')
   } finally {
     loading.value = false
   }

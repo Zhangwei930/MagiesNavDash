@@ -192,7 +192,7 @@ async function download(releaseId: number) {
     if (res.downloadUrl) window.open(res.downloadUrl, '_blank', 'noopener')
     else msg.value = res.message
   } catch (e: any) {
-    msg.value = e.message || '下载失败'
+    msg.value = e.message || t('common.downloadFailed')
   }
 }
 
@@ -202,7 +202,7 @@ onMounted(async () => {
     await loadCategories().catch(() => {})
     detail.value = await api(`/api/products/${route.params.slug}`)
   } catch (e: any) {
-    error.value = e.message || '加载失败'
+    error.value = e.message || t('common.loadFailed')
   } finally {
     loading.value = false
   }
