@@ -12,7 +12,7 @@
       <div v-else-if="!items.length" class="empty">{{ t('download.empty') }}</div>
 
       <div v-else class="dl-list">
-        <div v-for="item in items" :key="item.release.id" class="dl-card">
+        <div v-for="item in items" :key="item.product?.slug || item.release?.version" class="dl-card">
           <div class="dl-row">
             <div
               class="dl-icon"
@@ -72,6 +72,10 @@
 <script setup lang="ts">
 import { toolColor, toolLogo, toolLogoDisplaySize, toolLogoIsLarge } from '~/utils/toolMeta'
 import { statusLabel, statusMeta } from '~/utils/productStatus'
+import {
+  PRODUCT_RELEASE_SOURCES,
+  fetchGithubLatestMeta
+} from '~/utils/releaseFeed'
 
 const { t, locale } = useI18n()
 const loading = ref(true)
@@ -99,27 +103,22 @@ function siteUrl(item: any): string | null {
   return null
 }
 
-function mb(size: number): string {
-  return size ? `${(size / 1024 / 1024).toFixed(1)} MB` : ''
-}
-
 function releaseMeta(item: any) {
   const r = item.release
-  return [r.fileSize ? mb(r.fileSize) : '', r.platform, String(r.publishedAt || '').slice(0, 10)]
-    .filter(Boolean)
-    .join(' · ')
+  const date = String(r.publishedAt || '').slice(0, 10)
+  return [date, r.source === 'github' ? 'GitHub' : r.source].filter(Boolean).join(' · ')
 }
 
 /** Best-effort download logging; the anchor navigates regardless. */
 function track(item: any) {
-  if (!item.product?.id || !item.release?.id) return
+  if (!item.product?.id) return
   const { api } = useApi()
   const { sessionId } = useHubTrack()
   api('/api/downloads', {
     method: 'POST',
     body: JSON.stringify({
       productId: item.product.id,
-      releaseId: item.release.id,
+      releaseId: item.release?.id ?? null,
       sessionId: sessionId()
     })
   }).catch((e) => console.warn('Failed to record download', e))
@@ -128,12 +127,46 @@ function track(item: any) {
 onMounted(async () => {
   try {
     const { api } = useApi()
-    const [products, releases] = await Promise.all([
-      api<any[]>('/api/products'),
-      api<any[]>('/api/releases/latest')
-    ])
-    const map = Object.fromEntries(products.map((p) => [p.id, p]))
-    items.value = releases.map((r) => ({ release: r, product: map[r.productId] }))
+    const products = await api<any[]>('/api/products')
+    const bySlug = Object.fromEntries(products.map((p) => [p.slug, p]))
+
+    // Desktop products with GitHub release feeds — version from /releases/latest,
+    // not the stale product_release seed in Postgres.
+    const rows = await Promise.all(
+      PRODUCT_RELEASE_SOURCES.map(async (src) => {
+        const product = bySlug[src.slug]
+        if (!product) return null
+        try {
+          const meta = await fetchGithubLatestMeta(src.githubRepo)
+          return {
+            product,
+            release: {
+              id: null as number | null,
+              version: meta.version,
+              publishedAt: meta.publishedAt,
+              changelog: meta.name && meta.name !== `v${meta.version}` ? meta.name : '',
+              downloadUrl: SITE_BY_SLUG[src.slug] || meta.htmlUrl,
+              source: 'github' as const
+            }
+          }
+        } catch (e) {
+          console.warn(`GitHub latest failed for ${src.label}`, e)
+          return {
+            product,
+            release: {
+              id: null as number | null,
+              version: '',
+              publishedAt: '',
+              changelog: '',
+              downloadUrl: SITE_BY_SLUG[src.slug] || product.homepageUrl || '',
+              source: 'github' as const
+            }
+          }
+        }
+      })
+    )
+
+    items.value = rows.filter(Boolean)
   } catch (e: any) {
     error.value = e.message || t('common.loadFailed')
   } finally {

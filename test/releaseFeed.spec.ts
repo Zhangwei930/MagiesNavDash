@@ -4,9 +4,23 @@ import {
   detectPlatform,
   groupByOs,
   isCN,
+  normalizeReleaseVersion,
   pickDownloads,
   sourceOrder
 } from '../app/utils/releaseFeed'
+
+describe('normalizeReleaseVersion', () => {
+  it('strips a leading v and trims', () => {
+    expect(normalizeReleaseVersion('v0.6.2')).toBe('0.6.2')
+    expect(normalizeReleaseVersion('V3.0.0')).toBe('3.0.0')
+    expect(normalizeReleaseVersion(' 1.2.3 ')).toBe('1.2.3')
+  })
+
+  it('returns empty for blank input', () => {
+    expect(normalizeReleaseVersion('')).toBe('')
+    expect(normalizeReleaseVersion(null)).toBe('')
+  })
+})
 
 describe('isCN', () => {
   it('treats a zh-CN browser as domestic regardless of timezone', () => {
