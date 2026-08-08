@@ -675,6 +675,11 @@ picture {
   gap: 18px;
 }
 
+/* Pin to the copy column’s left edge — main.css centres .hero-actions globally. */
+.hero-actions {
+  justify-content: flex-start;
+}
+
 .reference-button {
   min-width: 158px;
   min-height: 46px;
@@ -1808,6 +1813,10 @@ picture {
   .hero-actions,
   .cta-actions {
     gap: 10px;
+  }
+
+  .hero-actions {
+    justify-content: flex-start !important;
   }
 
   .reference-button {
