@@ -73,11 +73,6 @@
             {{ t('nav.lang') }}
           </button>
           <NuxtLink
-            to="/account"
-            class="btn btn-outline btn-sm nav-login"
-            @click="menuOpen = false"
-          >{{ auth.isLoggedIn ? t('nav.account') : t('nav.login') }}</NuxtLink>
-          <NuxtLink
             to="/products"
             class="btn btn-primary btn-sm nav-cta"
             @click="menuOpen = false"
@@ -129,7 +124,7 @@
           <strong>{{ t('footer.products') }}</strong>
           <NuxtLink to="/products/magies-terminal">Magies Terminal</NuxtLink>
           <NuxtLink to="/products/magies-data-studio">Magies Data Studio</NuxtLink>
-          <NuxtLink to="/products/magies-pdf">Magies PDF</NuxtLink>
+          <NuxtLink to="/products/magies-office">Magies Office</NuxtLink>
           <NuxtLink to="/roadmap">Magies Future</NuxtLink>
         </nav>
 
@@ -183,7 +178,6 @@
           <div>
             <h4>{{ t('footer.support') }}</h4>
             <NuxtLink to="/contact">{{ t('footer.contact') }}</NuxtLink>
-            <NuxtLink to="/account">{{ t('nav.account') }}</NuxtLink>
             <NuxtLink to="/security">{{ t('security.title') }}</NuxtLink>
           </div>
           <div>
@@ -225,7 +219,6 @@ const year = new Date().getFullYear()
 const route = useRoute()
 const isHome = computed(() => route.path === '/')
 const { t, toggleLocale, initLocale, locale } = useI18n()
-const auth = useAuthStore()
 
 useHead(() => ({
   htmlAttrs: { lang: locale.value === 'zh' ? 'zh-CN' : 'en' }
@@ -552,11 +545,6 @@ onMounted(() => {
   color: inherit;
 }
 
-.nav-login {
-  min-height: 36px;
-  padding: 0 12px;
-}
-
 .nav-cta {
   min-height: 36px;
   padding: 0 14px;
@@ -689,10 +677,6 @@ onMounted(() => {
 
   .footer-grid-5 {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .nav-login {
-    display: none;
   }
 
   .nav-cta {

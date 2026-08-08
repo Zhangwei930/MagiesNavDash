@@ -53,8 +53,8 @@ const items: {
     icon: '◎',
     titleKey: 'contact.product',
     bodyKey: 'contact.productBody',
-    ctaKey: 'contact.gotoAccount',
-    to: '/account'
+    ctaKey: 'contact.email',
+    href: 'mailto:hello@magies.top'
   },
   {
     key: 'biz',

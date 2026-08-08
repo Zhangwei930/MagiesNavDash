@@ -21,7 +21,7 @@ export const SOLUTIONS: Solution[] = [
   },
   {
     slug: 'enterprise',
-    products: ['Magies PDF', 'WMS / MES / BI'],
+    products: ['Magies Office', 'WMS / MES / BI'],
     primaryAction: 'contact',
     primaryHref: '/contact'
   },

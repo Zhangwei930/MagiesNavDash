@@ -1,8 +1,8 @@
 <template>
   <article class="card product-card-m">
     <div class="card-top">
-      <div class="icon-circle" :style="{ color }">
-        <component :is="icon" :size="20" :stroke-width="2" />
+      <div class="icon-circle" :style="{ color }" :data-logo="logo ? '' : null">
+        <ProductIcon :product="product" :size="logo ? 28 : 20" />
       </div>
       <div>
         <h3>{{ product.name }}</h3>
@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { toolColor, toolIcon } from '~/utils/toolMeta'
+import { toolColor, toolLogo } from '~/utils/toolMeta'
 
 const props = defineProps<{
   product: {
@@ -37,6 +37,6 @@ const props = defineProps<{
   }
 }>()
 
-const icon = computed(() => toolIcon(props.product))
+const logo = computed(() => toolLogo(props.product))
 const color = computed(() => toolColor(props.product))
 </script>

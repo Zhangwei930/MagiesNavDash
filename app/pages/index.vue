@@ -271,10 +271,10 @@ const products = computed(() => [
     to: '/products/magies-terminal'
   },
   {
-    name: 'Magies PDF',
-    description: t('home.product.pdfDescShort'),
-    position: 'pdf',
-    to: '/products/magies-pdf'
+    name: 'Magies Office',
+    description: t('home.product.officeDescShort'),
+    position: 'office',
+    to: '/products/magies-office'
   },
   {
     name: 'Magies Data Studio',
@@ -1012,7 +1012,7 @@ picture {
   top: 25%;
 }
 
-.product-planet.pdf {
+.product-planet.office {
   left: 70%;
   top: 24%;
 }
@@ -1864,7 +1864,7 @@ picture {
     top: 25%;
   }
 
-  .product-planet.pdf {
+  .product-planet.office {
     left: 76%;
     top: 24%;
   }

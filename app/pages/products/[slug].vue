@@ -9,8 +9,8 @@
       <template v-else-if="detail">
         <header class="d-head" :style="{ '--tint': color }">
           <div class="d-glow" aria-hidden="true" />
-          <div class="product-icon" :style="{ '--tint': color }">
-            <component :is="icon" :size="22" :stroke-width="2" />
+          <div class="product-icon" :style="{ '--tint': color }" :data-logo="logo ? '' : null">
+            <ProductIcon :product="detail.product" :size="logo ? 40 : 22" />
           </div>
           <div class="d-id">
             <div class="d-title-row">
@@ -104,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { toolColor, toolIcon } from '~/utils/toolMeta'
+import { toolColor, toolLogo } from '~/utils/toolMeta'
 import { primaryAction, statusLabel, statusMeta } from '~/utils/productStatus'
 
 const { t, locale } = useI18n()
@@ -115,7 +115,7 @@ const loading = ref(true)
 const error = ref('')
 const msg = ref('')
 
-const icon = computed(() => toolIcon(detail.value?.product || {}))
+const logo = computed(() => toolLogo(detail.value?.product || {}))
 const color = computed(() => toolColor(detail.value?.product || {}))
 const lineName = computed(() => categoryLabel(detail.value?.product?.categoryId))
 
@@ -264,6 +264,11 @@ onMounted(async () => {
   );
   border: 1px solid color-mix(in srgb, var(--tint) 42%, transparent);
   box-shadow: 0 0 24px color-mix(in srgb, var(--tint) 25%, transparent);
+}
+
+.product-icon[data-logo] {
+  background: rgba(8, 10, 18, 0.45);
+  box-shadow: none;
 }
 
 .d-id,

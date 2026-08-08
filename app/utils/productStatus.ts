@@ -28,7 +28,8 @@ const STATUS_MAP: Record<string, StatusMeta> = {
   RELEASED: { key: 'RELEASED', labelZh: '正式发布', labelEn: 'Released', tone: 'ok', downloadable: true },
   PUBLISHED: { key: 'PUBLISHED', labelZh: '正式发布', labelEn: 'Released', tone: 'ok', downloadable: true },
   PUBLIC_BETA: { key: 'PUBLIC_BETA', labelZh: '公开测试', labelEn: 'Public Beta', tone: 'beta', downloadable: true },
-  OPEN: { key: 'OPEN', labelZh: '开放中', labelEn: 'Open', tone: 'ok', downloadable: true },
+  // OPEN is treated as released for display — downloadable clients ship as official builds.
+  OPEN: { key: 'OPEN', labelZh: '正式发布', labelEn: 'Released', tone: 'ok', downloadable: true },
   PRIVATE_BETA: { key: 'PRIVATE_BETA', labelZh: '邀请测试', labelEn: 'Private Beta', tone: 'beta', downloadable: false },
   ONLINE: { key: 'ONLINE', labelZh: '在线服务', labelEn: 'Online', tone: 'ok', downloadable: false },
   IN_DEVELOPMENT: {
