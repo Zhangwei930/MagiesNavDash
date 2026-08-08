@@ -199,7 +199,11 @@ export async function fetchTerminalChangelog(locale: 'zh' | 'en'): Promise<Chang
   return parseMarkdownChangelog(md)
 }
 
-export async function fetchOfficeChangelog(): Promise<ChangelogRelease[]> {
+/**
+ * Office GitHub release notes are authored in English. Locale is accepted so
+ * the API stays symmetric with Terminal; content language follows the source.
+ */
+export async function fetchOfficeChangelog(_locale: 'zh' | 'en' = 'en'): Promise<ChangelogRelease[]> {
   const data = await getJson(
     `https://api.github.com/repos/${OFFICE_GITHUB}/releases?per_page=12`
   )
@@ -224,7 +228,7 @@ export async function fetchOfficeChangelog(): Promise<ChangelogRelease[]> {
 export async function fetchProductChangelogs(locale: 'zh' | 'en'): Promise<ProductChangelog[]> {
   const [terminal, office] = await Promise.allSettled([
     fetchTerminalChangelog(locale),
-    fetchOfficeChangelog()
+    fetchOfficeChangelog(locale)
   ])
 
   return [
@@ -241,7 +245,7 @@ export async function fetchProductChangelogs(locale: 'zh' | 'en'): Promise<Produ
       key: 'office',
       slug: 'magies-office',
       label: 'Magies Office',
-      homepage: OFFICE_RELEASES_PAGE,
+      homepage: 'https://github.com/Zhangwei930/MagiesPdf',
       releases: office.status === 'fulfilled' ? office.value : [],
       source: 'github',
       error: office.status === 'rejected' ? String(office.reason?.message || office.reason) : undefined

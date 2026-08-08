@@ -47,13 +47,6 @@
               <div class="release-meta">
                 <code class="release-ver">v{{ rel.version }}</code>
                 <time v-if="rel.date" class="release-date">{{ rel.date }}</time>
-                <a
-                  v-if="rel.url"
-                  class="release-more"
-                  :href="rel.url"
-                  target="_blank"
-                  rel="noopener"
-                >{{ t('changelog.releaseLink') }}</a>
               </div>
 
               <template v-if="rel.sections.length">
@@ -81,10 +74,7 @@
 
 <script setup lang="ts">
 import { toolLogo } from '~/utils/toolMeta'
-import {
-  fetchProductChangelogs,
-  type ProductChangelog
-} from '~/utils/changelogFeed'
+import type { ProductChangelog } from '~/utils/changelogFeed'
 
 const { t, locale } = useI18n()
 const root = ref<HTMLElement | null>(null)
@@ -98,9 +88,14 @@ async function load() {
   loading.value = true
   error.value = ''
   try {
-    products.value = await fetchProductChangelogs(locale.value === 'en' ? 'en' : 'zh')
+    // Same-origin Nitro feed — Terminal markdown has no CORS, so the browser
+    // cannot pull shell.magies.top/changelog*.md directly.
+    const loc = locale.value === 'en' ? 'en' : 'zh'
+    products.value = await $fetch<ProductChangelog[]>('/feeds/changelogs', {
+      query: { locale: loc }
+    })
   } catch (e: any) {
-    error.value = e.message || t('common.loadFailed')
+    error.value = e?.data?.message || e.message || t('common.loadFailed')
   } finally {
     loading.value = false
   }
@@ -236,17 +231,6 @@ watch(locale, load)
 .release-date {
   font-size: 0.78rem;
   color: var(--text-muted);
-}
-
-.release-more {
-  margin-left: auto;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  text-decoration: none;
-}
-
-.release-more:hover {
-  color: var(--accent);
 }
 
 .section-title {
