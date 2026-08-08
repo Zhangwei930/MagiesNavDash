@@ -8,7 +8,8 @@
       <div class="reference-nav-inner">
         <NuxtLink to="/" class="reference-nav-brand" @click="menuOpen = false">
           <span class="reference-brand-mark" aria-hidden="true">
-            <MagiesMark />
+            <img src="/brand/logo-mark-ring-144.png" alt="">
+            <span class="brand-cross-star" />
           </span>
           <span>MAGIES</span>
         </NuxtLink>
@@ -98,7 +99,8 @@
         <div class="reference-footer-brand-block">
           <NuxtLink to="/" class="reference-footer-brand">
             <span class="reference-brand-mark" aria-hidden="true">
-              <MagiesMark />
+              <img src="/brand/logo-mark-ring-144.png" alt="">
+              <span class="brand-cross-star" />
             </span>
             <span>MAGIES</span>
           </NuxtLink>
@@ -287,10 +289,50 @@ onMounted(() => {
   place-items: center;
 }
 
+.reference-brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .reference-nav-brand .reference-brand-mark {
   width: 38px;
   height: 38px;
   filter: saturate(1.12) drop-shadow(0 0 9px rgba(167, 139, 250, 0.48));
+}
+
+.brand-cross-star {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 42%;
+  height: 42%;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 11%, #f5d0fe 18%, rgba(192, 132, 252, 0.38) 36%, transparent 68%);
+  mix-blend-mode: screen;
+  transform: translate(-50%, -50%);
+}
+
+.brand-cross-star::before,
+.brand-cross-star::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: linear-gradient(90deg, transparent, #fff, transparent);
+  transform: translate(-50%, -50%);
+}
+
+.brand-cross-star::before {
+  width: 100%;
+  height: 1px;
+}
+
+.brand-cross-star::after {
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, #fff, transparent);
 }
 
 .reference-nav-links {
