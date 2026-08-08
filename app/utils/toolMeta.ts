@@ -49,7 +49,8 @@ const PRODUCT_LOGOS: Record<string, string> = {
   'magies-terminal': '/brand/product-terminal-64.png',
   'magies-shell': '/brand/product-terminal-64.png',
   'magies-game': '/brand/product-game-64.png',
-  'magies-nav': '/brand/product-nav-64.png'
+  'magies-nav': '/brand/product-nav-64.png',
+  'magies-data-studio': '/brand/product-studio-64.png'
 }
 
 const KEY_ICON: Record<string, LucideIcon> = Object.fromEntries(
@@ -87,7 +88,8 @@ export function toolLogoDisplaySize(
     slug === 'magies-office' ||
     slug === 'magies-pdf' ||
     slug === 'magies-game' ||
-    slug === 'magies-nav'
+    slug === 'magies-nav' ||
+    slug === 'magies-data-studio'
   if (slot === 'detail') return large ? 56 : 40
   if (slot === 'const') return large ? 30 : 22
   return large ? 38 : 28
@@ -100,7 +102,8 @@ export function toolLogoIsLarge(product?: { slug?: string } | string | null): bo
     slug === 'magies-office' ||
     slug === 'magies-pdf' ||
     slug === 'magies-game' ||
-    slug === 'magies-nav'
+    slug === 'magies-nav' ||
+    slug === 'magies-data-studio'
   )
 }
 

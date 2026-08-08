@@ -60,10 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  Database,
-  type LucideIcon
-} from 'lucide-vue-next'
+import { type LucideIcon } from 'lucide-vue-next'
 import { toolLogo, toolLogoIsLarge } from '~/utils/toolMeta'
 
 export type ConstellationItem = {
@@ -113,7 +110,8 @@ const FALLBACK: ConstellationItem[] = [
     name: 'Data Studio',
     short: 'Collect & clean',
     color: '#a78bfa',
-    icon: Database,
+    logo: toolLogo('magies-data-studio'),
+    logoLarge: toolLogoIsLarge('magies-data-studio'),
     to: '/products/magies-data-studio'
   }
 ]
