@@ -7,7 +7,7 @@
  * is not populated yet just costs one failed request.
  */
 
-export type Os = 'mac' | 'win' | 'linux' | 'unknown'
+export type Os = 'mac' | 'win' | 'linux' | 'android' | 'unknown'
 export type Arch = 'arm64' | 'x64'
 
 export interface ReleaseAsset {
@@ -29,18 +29,45 @@ export interface LatestRelease {
   source: 'mirror' | 'github'
 }
 
-/** Mainland timezones — same list shell.magies.top ships. */
-const CN_TIMEZONES = ['Asia/Shanghai', 'Asia/Urumqi', 'Asia/Chongqing', 'Asia/Harbin']
-
-/** GitHub repo holding the Magies PDF builds. */
-const PDF_GITHUB_REPO = 'Zhangwei930/MagiesPdf'
+/** Product-scoped feed endpoints used by the download center. */
+export interface ProductReleaseSource {
+  slug: string
+  githubRepo: string
+  mirror: string
+  label: string
+}
 
 /**
- * Cloudflare mirror prefix — the magiespdf-mirror Worker proxies GitHub
- * Releases in real time, so it tracks the same latest release the direct
- * source does. Product-scoped so it coexists with Terminal's /stable route.
+ * Products whose install packages are read live from a release feed.
+ * Magies Terminal uses the same sources as shell.magies.top.
+ * Magies Office keeps the MagiesPdf binary path (repo/mirror names unchanged).
  */
-const PDF_MIRROR = 'https://dl.magies.top/magiespdf/stable'
+export const PRODUCT_RELEASE_SOURCES: ProductReleaseSource[] = [
+  {
+    slug: 'magies-terminal',
+    githubRepo: 'JasonZhangDad/MgTerminal-releases',
+    mirror: 'https://dl.magies.top/stable',
+    label: 'Magies Terminal'
+  },
+  {
+    slug: 'magies-office',
+    githubRepo: 'Zhangwei930/MagiesPdf',
+    mirror: 'https://dl.magies.top/magiespdf/stable',
+    label: 'Magies Office'
+  }
+]
+
+const SOURCE_BY_SLUG = Object.fromEntries(
+  PRODUCT_RELEASE_SOURCES.map((s) => [s.slug, s])
+) as Record<string, ProductReleaseSource>
+
+export function releaseSourceFor(slug?: string | null): ProductReleaseSource | null {
+  if (!slug) return null
+  return SOURCE_BY_SLUG[slug] || null
+}
+
+/** Mainland timezones — same list shell.magies.top ships. */
+const CN_TIMEZONES = ['Asia/Shanghai', 'Asia/Urumqi', 'Asia/Chongqing', 'Asia/Harbin']
 
 export function isCN(language?: string, timeZone?: string): boolean {
   if (language && /^zh-CN/i.test(language)) return true
@@ -72,7 +99,7 @@ export function detectPlatform(ua: string, platform: string, cores: number): { o
   const s = `${ua} ${platform}`.toLowerCase()
   const arm = /arm64|aarch64|armv8/.test(s)
 
-  if (/android/.test(s)) return { os: 'unknown', arch: arm ? 'arm64' : 'x64' }
+  if (/android/.test(s)) return { os: 'android', arch: arm ? 'arm64' : 'x64' }
   if (/mac/.test(s)) return { os: 'mac', arch: cores >= 8 ? 'arm64' : 'x64' }
   if (/win/.test(s)) return { os: 'win', arch: arm ? 'arm64' : 'x64' }
   if (/linux|x11/.test(s)) return { os: 'linux', arch: arm ? 'arm64' : 'x64' }
@@ -101,11 +128,13 @@ export async function detectPlatformHere(): Promise<{ os: Os; arch: Arch }> {
 function isInstallable(name: string): boolean {
   const n = name.toLowerCase()
   if (n.endsWith('.yml') || n.endsWith('.yaml') || n.endsWith('.blockmap')) return false
-  return /\.(dmg|zip|exe|appimage|deb)$/.test(n)
+  // Match Terminal site: installer packages only (not rpm/pacman extras).
+  return /\.(dmg|zip|exe|appimage|deb|apk)$/.test(n)
 }
 
 function assetOs(name: string): Os {
   const n = name.toLowerCase()
+  if (n.includes('android') || n.endsWith('.apk')) return 'android'
   if (n.includes('mac') || n.endsWith('.dmg')) return 'mac'
   if (n.includes('linux') || n.endsWith('.appimage') || n.endsWith('.deb')) return 'linux'
   if (n.includes('win') || n.endsWith('.exe')) return 'win'
@@ -125,10 +154,11 @@ function assetRank(name: string, os: Os): number {
     if (n.endsWith('.exe')) return n.includes('portable') ? 1 : 0
     return 2
   }
+  if (os === 'android') return n.endsWith('.apk') ? 0 : 1
   return 9
 }
 
-const OS_ORDER: Os[] = ['mac', 'win', 'linux']
+const OS_ORDER: Os[] = ['mac', 'win', 'linux', 'android']
 
 /** Group a release's assets into one entry per os/arch, best file first. */
 export function pickDownloads(assets: ReleaseAsset[]): PlatformDownload[] {
@@ -211,24 +241,25 @@ export function sourceOrder(cn: boolean): ('mirror' | 'github')[] {
 }
 
 /**
- * Fetch the latest Magies PDF release, preferring whichever source is closer to
- * the visitor. Throws only when both sources fail.
+ * Fetch the latest release for a product feed, preferring whichever source is
+ * closer to the visitor. Throws only when both sources fail.
  */
-export async function fetchLatestPdfRelease(): Promise<LatestRelease> {
+export async function fetchLatestRelease(source: ProductReleaseSource): Promise<LatestRelease> {
   const sources = sourceOrder(isCNHere()).map((name) =>
-    name === 'mirror' ? () => fromMirror(PDF_MIRROR) : () => fromGithub(PDF_GITHUB_REPO)
+    name === 'mirror' ? () => fromMirror(source.mirror) : () => fromGithub(source.githubRepo)
   )
 
   let lastError: unknown
-  for (const source of sources) {
+  for (const load of sources) {
     try {
-      const release = await source()
+      const release = await load()
       if (release.downloads.length) return release
       lastError = new Error('release carried no installable assets')
     } catch (e) {
       lastError = e
-      console.warn('Failed to fetch the latest Magies PDF release from a source', e)
+      console.warn(`Failed to fetch the latest ${source.label} release from a source`, e)
     }
   }
   throw lastError instanceof Error ? lastError : new Error('No release source responded')
 }
+

@@ -73,11 +73,6 @@
             {{ t('nav.lang') }}
           </button>
           <NuxtLink
-            to="/account"
-            class="btn btn-outline btn-sm nav-login"
-            @click="menuOpen = false"
-          >{{ auth.isLoggedIn ? t('nav.account') : t('nav.login') }}</NuxtLink>
-          <NuxtLink
             to="/products"
             class="btn btn-primary btn-sm nav-cta"
             @click="menuOpen = false"
@@ -129,7 +124,7 @@
           <strong>{{ t('footer.products') }}</strong>
           <NuxtLink to="/products/magies-terminal">Magies Terminal</NuxtLink>
           <NuxtLink to="/products/magies-data-studio">Magies Data Studio</NuxtLink>
-          <NuxtLink to="/products/magies-pdf">Magies PDF</NuxtLink>
+          <NuxtLink to="/products/magies-office">Magies Office</NuxtLink>
           <NuxtLink to="/roadmap">Magies Future</NuxtLink>
         </nav>
 
@@ -183,7 +178,6 @@
           <div>
             <h4>{{ t('footer.support') }}</h4>
             <NuxtLink to="/contact">{{ t('footer.contact') }}</NuxtLink>
-            <NuxtLink to="/account">{{ t('nav.account') }}</NuxtLink>
             <NuxtLink to="/security">{{ t('security.title') }}</NuxtLink>
           </div>
           <div>
@@ -225,7 +219,6 @@ const year = new Date().getFullYear()
 const route = useRoute()
 const isHome = computed(() => route.path === '/')
 const { t, toggleLocale, initLocale, locale } = useI18n()
-const auth = useAuthStore()
 
 useHead(() => ({
   htmlAttrs: { lang: locale.value === 'zh' ? 'zh-CN' : 'en' }
@@ -472,7 +465,7 @@ onMounted(() => {
 }
 
 .reference-footer-columns {
-  width: min(100% - 48px, 1080px);
+  width: min(100% - 48px, 1180px);
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1.8fr repeat(3, 1fr);
@@ -531,7 +524,7 @@ onMounted(() => {
 }
 
 .reference-footer-bottom {
-  width: min(100% - 48px, 1080px);
+  width: min(100% - 48px, 1180px);
   margin: 30px auto 0;
   padding-top: 16px;
   border-top: 1px solid rgba(80, 92, 139, 0.2);
@@ -550,11 +543,6 @@ onMounted(() => {
 
 .reference-footer-bottom a {
   color: inherit;
-}
-
-.nav-login {
-  min-height: 36px;
-  padding: 0 12px;
 }
 
 .nav-cta {
@@ -607,15 +595,48 @@ onMounted(() => {
   box-shadow: 0 0 16px rgba(167, 139, 250, 0.15);
 }
 
-@media (min-width: 1200px) {
+/* Every shell width below mirrors .reference-container in app/pages/index.vue.
+   They have to: the hero is a panel in that shell now, so any difference shows
+   up as the navbar and the panel starting on different lines. */
+@media (min-width: 961px) and (max-width: 1100px) {
   .reference-nav-inner,
   .reference-footer-columns,
   .reference-footer-bottom {
-    width: min(100% - 96px, 1180px);
+    width: min(100% - 48px, 960px);
+  }
+}
+
+@media (min-width: 1200px) {
+  /* 48px, not 96px: .reference-container uses 48px, so wider gutters here left
+     the nav 24px narrower than the content under it between 1200 and 1276px,
+     where neither is capped at 1180px yet. Identical above 1276px. */
+  .reference-nav-inner,
+  .reference-footer-columns,
+  .reference-footer-bottom {
+    width: min(100% - 48px, 1180px);
   }
 
   .reference-nav-inner {
     grid-template-columns: 210px 1fr 190px;
+  }
+}
+
+/* Must stay in step with .reference-container in app/pages/index.vue: the page
+   shell widens on these two breakpoints, and chrome that kept a 1180px shell
+   would no longer line up with the content under it. */
+@media (min-width: 1600px) {
+  .reference-nav-inner,
+  .reference-footer-columns,
+  .reference-footer-bottom {
+    width: min(100% - 96px, 1400px);
+  }
+}
+
+@media (min-width: 1900px) {
+  .reference-nav-inner,
+  .reference-footer-columns,
+  .reference-footer-bottom {
+    width: min(100% - 96px, 1600px);
   }
 }
 
@@ -625,7 +646,7 @@ onMounted(() => {
   }
 
   .reference-nav-inner {
-    width: min(100% - 32px, 820px);
+    width: min(100% - 48px, 960px);
     grid-template-columns: 150px 1fr 176px;
     gap: 14px;
   }
@@ -647,7 +668,7 @@ onMounted(() => {
 
   .reference-footer-columns,
   .reference-footer-bottom {
-    width: min(100% - 32px, 820px);
+    width: min(100% - 48px, 960px);
   }
 
   .reference-footer-columns {
@@ -656,10 +677,6 @@ onMounted(() => {
 
   .footer-grid-5 {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .nav-login {
-    display: none;
   }
 
   .nav-cta {
@@ -762,21 +779,12 @@ onMounted(() => {
     height: 70px;
   }
 
-  .reference-nav-inner {
-    width: calc(100% - 24px);
-  }
-
   .reference-nav-links {
     top: 68px;
   }
 
   .reference-footer {
     min-height: 0;
-  }
-
-  .reference-footer-columns,
-  .reference-footer-bottom {
-    width: calc(100% - 24px);
   }
 
   .reference-footer-columns {
@@ -796,6 +804,16 @@ onMounted(() => {
 
   .footer-grid-5 {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Last, so it wins over the phone blocks above: .reference-container caps at
+   560px from 620px down, and the chrome follows it. */
+@media (max-width: 620px) {
+  .reference-nav-inner,
+  .reference-footer-columns,
+  .reference-footer-bottom {
+    width: min(100% - 28px, 560px);
   }
 }
 </style>

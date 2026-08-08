@@ -816,6 +816,12 @@ textarea {
   box-shadow: 0 0 18px color-mix(in srgb, var(--tint) 16%, transparent);
 }
 
+/* Custom product marks already carry their own chrome — keep the slot quiet. */
+.icon-circle[data-logo] {
+  background: rgba(8, 10, 18, 0.4);
+  box-shadow: none;
+}
+
 .product-card-m h3 {
   margin: 0 0 4px;
 }

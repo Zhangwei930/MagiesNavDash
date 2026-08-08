@@ -33,8 +33,17 @@
       :to="item.to"
       :style="{ '--neon': item.color, '--delay': `${i * 0.35}s` }"
     >
-      <span class="const-icon">
-        <component :is="item.icon" :size="18" :stroke-width="1.75" />
+      <span class="const-icon" :data-logo="item.logo ? '' : null">
+        <img
+          v-if="item.logo"
+          class="const-logo"
+          :src="item.logo"
+          :alt="item.name"
+          width="22"
+          height="22"
+          decoding="async"
+        />
+        <component v-else :is="item.icon" :size="18" :stroke-width="1.75" />
       </span>
       <div class="const-meta">
         <strong>{{ item.name }}</strong>
@@ -47,19 +56,19 @@
 
 <script setup lang="ts">
 import {
-  Terminal,
-  FileText,
   Database,
   Compass,
   type LucideIcon
 } from 'lucide-vue-next'
+import { toolLogo } from '~/utils/toolMeta'
 
 export type ConstellationItem = {
   key: string
   name: string
   short?: string
   color: string
-  icon: LucideIcon
+  icon?: LucideIcon
+  logo?: string | null
   to: string
 }
 
@@ -73,7 +82,7 @@ const FALLBACK: ConstellationItem[] = [
     name: 'Terminal',
     short: 'Dev workspace',
     color: '#22d3ee',
-    icon: Terminal,
+    logo: toolLogo('magies-terminal'),
     to: '/products/magies-terminal'
   },
   {
@@ -85,12 +94,12 @@ const FALLBACK: ConstellationItem[] = [
     to: '/products/magies-nav'
   },
   {
-    key: 'pdf',
-    name: 'PDF',
+    key: 'office',
+    name: 'Office',
     short: 'AI documents',
     color: '#f472b6',
-    icon: FileText,
-    to: '/products/magies-pdf'
+    logo: toolLogo('magies-office'),
+    to: '/products/magies-office'
   },
   {
     key: 'studio',
@@ -246,6 +255,19 @@ const display = computed(() => {
     rgba(8, 10, 18, 0.65);
   border: 1px solid color-mix(in srgb, var(--neon) 40%, transparent);
   box-shadow: 0 0 16px color-mix(in srgb, var(--neon) 22%, transparent);
+}
+
+.const-icon[data-logo] {
+  background: rgba(8, 10, 18, 0.45);
+  padding: 4px;
+}
+
+.const-logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  border-radius: 5px;
+  display: block;
 }
 
 .const-meta {

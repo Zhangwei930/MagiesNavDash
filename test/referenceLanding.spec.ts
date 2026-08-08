@@ -93,7 +93,7 @@ describe('reference landing page composition', () => {
       /\.product-planet i \{[\s\S]*?position: absolute;[\s\S]*?left: 50%;[\s\S]*?top: 78%;[\s\S]*?margin-top: 0;/
     )
     expect(homepage).toMatch(/\.product-planet\.terminal \{[\s\S]*?top: 25%;/)
-    expect(homepage).toMatch(/\.product-planet\.pdf \{[\s\S]*?top: 24%;/)
+    expect(homepage).toMatch(/\.product-planet\.office \{[\s\S]*?top: 24%;/)
     expect(homepage).toMatch(/\.product-planet\.studio \{[\s\S]*?top: 69%;/)
     expect(homepage).toMatch(/\.product-planet\.future \{[\s\S]*?top: 65%;/)
   })

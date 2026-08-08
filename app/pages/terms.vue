@@ -11,7 +11,7 @@
           <h2>账号</h2>
           <p>你应对账号下的活动负责，不得滥用验证码、干扰服务或尝试未授权访问。我们可在滥用或风险情况下限制或终止账号。</p>
           <h2>软件与下载</h2>
-          <p>客户端软件按所附许可或产品页说明提供。公开测试版可能不稳定；企业版需授权。你不得对安装包进行恶意篡改后重新分发。</p>
+          <p>客户端软件按所附许可或产品页说明提供，下载中心提供的为正式版。企业版如需另行授权以产品说明为准。你不得对安装包进行恶意篡改后重新分发。</p>
           <h2>免责</h2>
           <p>在法律允许范围内，服务按「现状」提供。实验项目与开发中产品不承诺稳定性或持续提供。</p>
           <h2>变更</h2>
@@ -23,7 +23,7 @@
           <h2>Accounts</h2>
           <p>You are responsible for activity under your account. Do not abuse verification codes, disrupt the service, or attempt unauthorized access. We may restrict or terminate accounts for abuse or risk.</p>
           <h2>Software & downloads</h2>
-          <p>Client software is provided under its license or product page terms. Public betas may be unstable; enterprise builds require authorization. Do not redistribute tampered packages.</p>
+          <p>Client software is provided under its license or product page terms. Downloads from this site are official releases. Enterprise licensing, where applicable, follows the product terms. Do not redistribute tampered packages.</p>
           <h2>Disclaimer</h2>
           <p>To the extent permitted by law, services are provided “as is.” Experimental and in-development products make no stability guarantees.</p>
           <h2>Changes</h2>

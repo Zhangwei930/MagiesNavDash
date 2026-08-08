@@ -35,7 +35,19 @@ const SLUG_ICON: Record<string, LucideIcon> = {
   'magies-terminal': Terminal,
   'magies-data-studio': Database,
   'magies-pdf': FileText,
+  'magies-office': FileText,
   'magies-game': Gamepad2
+}
+
+/**
+ * Custom 64×64 product marks. Only products with a finalized logo live here —
+ * everything else keeps the Lucide fallback until a mark is ready.
+ */
+const PRODUCT_LOGOS: Record<string, string> = {
+  'magies-office': '/brand/product-office-64.png',
+  'magies-pdf': '/brand/product-office-64.png',
+  'magies-terminal': '/brand/product-terminal-64.png',
+  'magies-shell': '/brand/product-terminal-64.png'
 }
 
 const KEY_ICON: Record<string, LucideIcon> = Object.fromEntries(
@@ -48,6 +60,13 @@ export function toolIcon(product?: { slug?: string; icon?: string }): LucideIcon
   return LayoutGrid
 }
 
+/** Returns a public PNG path when the product has a custom mark, else null. */
+export function toolLogo(product?: { slug?: string } | string | null): string | null {
+  const slug = typeof product === 'string' ? product : product?.slug
+  if (!slug) return null
+  return PRODUCT_LOGOS[slug] || null
+}
+
 export function toolColor(product: { slug?: string; accentColor?: string }): string {
   // Prefer palette aligned with star-ring logo (blue / violet / orange)
   const map: Record<string, string> = {
@@ -57,6 +76,7 @@ export function toolColor(product: { slug?: string; accentColor?: string }): str
     'magies-terminal': '#2ad4c8',
     'magies-data-studio': '#22d3ee',
     'magies-pdf': '#6366f1',
+    'magies-office': '#6366f1',
     'magies-game': '#94a3b8'
   }
   if (product.slug && map[product.slug]) return map[product.slug]

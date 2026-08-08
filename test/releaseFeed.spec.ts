@@ -75,7 +75,7 @@ describe('detectPlatform', () => {
     })
   })
 
-  it('reads linux and keeps android out of it', () => {
+  it('reads linux and treats android as its own platform', () => {
     expect(detectPlatform('Mozilla/5.0 (X11; Linux x86_64)', 'Linux x86_64', 8)).toEqual({
       os: 'linux',
       arch: 'x64'
@@ -84,9 +84,10 @@ describe('detectPlatform', () => {
       os: 'linux',
       arch: 'arm64'
     })
-    expect(detectPlatform('Mozilla/5.0 (Linux; Android 14; Pixel 8)', 'Linux armv8l', 8).os).toBe(
-      'unknown'
-    )
+    expect(detectPlatform('Mozilla/5.0 (Linux; Android 14; Pixel 8)', 'Linux armv8l', 8)).toEqual({
+      os: 'android',
+      arch: 'arm64'
+    })
   })
 
   it('gives up rather than guessing on an unrecognised agent', () => {
@@ -109,6 +110,7 @@ const ASSETS = [
   'MagiesPdf-1.0.1-linux-arm64.AppImage',
   'MagiesPdf-1.0.1-linux-amd64.deb',
   'MagiesPdf-1.0.1-linux-arm64.deb',
+  'MagiesTerminal-0.6.2-android.apk',
   'MagiesPdf-1.0.1-mac-arm64.dmg.blockmap',
   'MagiesPdf-1.0.1-win-x64.exe.blockmap',
   'latest.yml',
@@ -131,6 +133,7 @@ describe('pickDownloads', () => {
 
   it('covers every os/arch combination the release ships', () => {
     expect(downloads.map((d) => `${d.os}-${d.arch}`).sort()).toEqual([
+      'android-x64',
       'linux-arm64',
       'linux-x64',
       'mac-arm64',
@@ -138,6 +141,12 @@ describe('pickDownloads', () => {
       'win-arm64',
       'win-x64'
     ])
+  })
+
+  it('keeps android apk installable under the android column', () => {
+    expect(find('android', 'x64', downloads)!.files[0]!.name).toBe(
+      'MagiesTerminal-0.6.2-android.apk'
+    )
   })
 
   it('leads each mac build with the dmg', () => {
@@ -182,8 +191,8 @@ describe('archFromUAData', () => {
 describe('groupByOs', () => {
   it('collapses the arch variants into one column per os, in release order', () => {
     const grouped = groupByOs(pickDownloads(ASSETS))
-    expect(grouped.map((g) => g.os)).toEqual(['mac', 'win', 'linux'])
-    expect(grouped.map((g) => g.variants.length)).toEqual([2, 2, 2])
+    expect(grouped.map((g) => g.os)).toEqual(['mac', 'win', 'linux', 'android'])
+    expect(grouped.map((g) => g.variants.length)).toEqual([2, 2, 2, 1])
   })
 
   it('leads with the architecture most people on that os are running', () => {

@@ -13,11 +13,43 @@
       </div>
     </div>
 
-    <div v-if="!auth.isLoggedIn" class="panel" style="padding:20px">
-      请先 <NuxtLink to="/account" style="color:var(--accent)">登录</NuxtLink>
+    <div v-if="!auth.isLoggedIn" class="panel" style="padding:20px;max-width:420px">
+      <p class="muted" style="margin:0 0 14px">后台登录（仅管理员）</p>
+      <div style="margin-bottom:12px">
+        <label class="label">邮箱</label>
+        <input v-model="auth.email" type="email" class="field" placeholder="admin@magies.top" />
+      </div>
+      <div style="margin-bottom:12px">
+        <label class="label">验证码</label>
+        <div style="display:flex;gap:8px">
+          <input
+            v-model="auth.code"
+            type="text"
+            maxlength="6"
+            class="field"
+            placeholder="6 位"
+            style="font-family:ui-monospace,monospace;letter-spacing:0.12em"
+          />
+          <button
+            type="button"
+            class="btn btn-secondary"
+            :disabled="auth.loading || !auth.email"
+            @click="auth.sendVerificationCode()"
+          >发送</button>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="btn btn-primary"
+        :disabled="auth.loading || auth.code.length !== 6"
+        @click="auth.verifyCodeAndLogin()"
+      >登录</button>
+      <p v-if="auth.message" class="ok" style="margin:12px 0 0">{{ auth.message }}</p>
+      <p v-if="auth.error" class="err" style="margin:12px 0 0">{{ auth.error }}</p>
     </div>
     <div v-else-if="auth.user?.role !== 'ADMIN'" class="panel muted" style="padding:20px">
       需要管理员账号（admin@magies.top）
+      <button type="button" class="btn btn-secondary" style="margin-left:12px" @click="auth.logout()">退出</button>
     </div>
     <div v-else-if="error" class="err">{{ error }}</div>
     <div v-else>

@@ -1,6 +1,10 @@
 <template>
   <div ref="root" class="reference-home" :lang="locale === 'zh' ? 'zh-CN' : 'en'">
-    <section class="hero-v2" data-testid="home-hero" aria-labelledby="hero-title">
+    <section
+      class="hero-v2 reference-container"
+      data-testid="home-hero"
+      aria-labelledby="hero-title"
+    >
       <picture>
         <source srcset="/brand/magies-reference-hero.avif" type="image/avif">
         <img
@@ -23,7 +27,7 @@
       </picture>
       <span class="hero-core-spark" aria-hidden="true" />
 
-      <div class="reference-container hero-content">
+      <div class="hero-content">
         <div class="hero-copy">
           <h1 id="hero-title" class="hero-v2-title" data-hero-in>
             <span class="hero-title-line hero-title-build">{{ t('home.heroBuild') }}</span>
@@ -267,10 +271,10 @@ const products = computed(() => [
     to: '/products/magies-terminal'
   },
   {
-    name: 'Magies PDF',
-    description: t('home.product.pdfDescShort'),
-    position: 'pdf',
-    to: '/products/magies-pdf'
+    name: 'Magies Office',
+    description: t('home.product.officeDescShort'),
+    position: 'office',
+    to: '/products/magies-office'
   },
   {
     name: 'Magies Data Studio',
@@ -383,10 +387,48 @@ picture {
   z-index: 1;
 }
 
+/* The hero is the artwork, so its geometry is derived, not tuned. Two variables
+   describe it and everything else -- the height, the clipped cross-star, that
+   star's arm length -- falls out of them.
+
+   --hero-h is a floor, never a ceiling: the copy stack is fluid (a vw-scaled
+   title plus paragraphs whose line count depends on the locale), and the hard
+   670px it used to be meant that once the copy outgrew the box, align-items:
+   center silently gave up and the title ended up jammed under the navbar. It
+   fills the fold because a 670px hero in a 1160px window left the stats bar and
+   the products heading fighting over the first screen.
+
+   --art-w is the width the 2:1 art actually renders at under object-fit: cover.
+   Taller than 2:1 and cover is height-driven: the art renders --art-w = 2H wide
+   and (--art-w - 100cqw) is cropped off the left, which is the *empty* half of
+   the picture -- the galaxy moves toward the centre and the earth arc survives
+   intact. Wider than 2:1 and it is width-driven: --art-w = the panel width, and
+   the crop is vertical and centred instead. max() picks whichever applies.
+
+   The panel takes .reference-container's width, so it sits in the same shell as
+   every other section -- equal gutters on both sides, its edge on the same line
+   as the navbar and the stats bar -- and container-type lets --art-w read that
+   width as 100cqw rather than restating the shell formula per breakpoint. */
 .hero-v2 {
+  --hero-h: max(670px, calc(100svh - 100px));
+  --art-w: max(100cqw, calc(var(--hero-h) * 2));
+  /* The painted cross-star's core sits at (0.7237, 0.4361) of the art (flood
+     filled the saturated core of the 1774x887 jpg). Mapping that into this box
+     is where the old hand-tuned percentages drifted, and a drift shows up as
+     *two* stars: the painted one and the clipped copy, side by side.
+       x = 0.7237 * art-w - (art-w - 100cqw)     = 100% - art-w * 0.2763
+       y = 0.4361 * art-w/2 - (art-w/2 - H) / 2  = 50%  - art-w * 0.03195
+     Both hold in either crop regime, because art-w is what changes between
+     them; the crop terms go to zero when nothing is cropped. */
+  --star-x: calc(100% - var(--art-w) * 0.2763);
+  --star-y: calc(50% - var(--art-w) * 0.03195);
+  /* Interior gutter, for the copy and for the layers outside it */
+  --panel-pad: clamp(28px, 3.4vw, 64px);
+  container-type: inline-size;
   position: relative;
   z-index: 1;
-  height: 670px;
+  min-height: var(--hero-h);
+  border-radius: 18px;
   overflow: hidden;
 }
 
@@ -415,18 +457,16 @@ picture {
    scales and brightens instead of a gradient blob pulsing on top of a static
    star. Same technique and the *same keyframe* as .universe-core -- that motion
    is the reference, and sharing the keyframe means the two cannot drift apart.
-   --star-x/--star-y must track .hero-core-spark and .hero-backdrop's crop at
-   every breakpoint, so all three are overridden together below. */
+   --star-x/--star-y are declared on .hero-v2 and read by this clip and by
+   .hero-core-spark, so the two layers cannot land on different points. */
 .hero-core-star {
-  --star-x: 72.3%;
-  --star-y: 43.2%;
   /* The arm tip must stay inside the galaxy ring painted into the art, at the
-     animation's peak. The ring measures 155px in the source image, so its size
-     here is 155 * the object-fit: cover scale, i.e. max(width/1774, height/887).
-     The vw term is the width-driven case and is identical at every breakpoint;
-     only the height-driven floor changes, because .hero-v2 has a different
-     height per breakpoint. Arm is 88% of the ring so that arm * 1.08 clears it. */
-  --star-arm: max(7.7vw, 103px);
+     animation's peak. The ring measures 155px in the source image and the art
+     renders at --art-w / 1774 of that, so the ring is --art-w * 0.0874 here;
+     the arm takes 88% of it so that arm * 1.08 still clears it. This reproduces
+     all four hand-tuned values it replaces (153px at 1990px wide, 103 / 77 /
+     117 / 111 at the breakpoints) to within a pixel. */
+  --star-arm: calc(var(--art-w) * 0.0769);
   --star-waist: calc(var(--star-arm) * 0.087);
   position: absolute;
   inset: 0;
@@ -470,8 +510,8 @@ picture {
 
 .hero-core-spark {
   position: absolute;
-  left: 72.3%;
-  top: 43.2%;
+  left: var(--star-x);
+  top: var(--star-y);
   z-index: 2;
   width: 190px;
   height: 190px;
@@ -545,20 +585,30 @@ picture {
 }
 
 .hero-content {
-  height: 100%;
+  /* Must stay positioned above the art: the layers behind it are absolute with
+     z-index 1 and 2, so a static box here paints the copy underneath them. It
+     used to get this from .reference-container, which now sits on .hero-v2. */
+  position: relative;
+  z-index: 3;
+  min-height: inherit;
   display: flex;
   align-items: center;
-  padding-bottom: 58px;
+  padding: 24px var(--panel-pad) 58px;
 }
 
 .hero-copy {
-  width: 35%;
+  /* 44% keeps the Chinese claim on one line down to 1101px, where the column is
+     at its narrowest, and still clears the galaxy at every width. */
+  width: 44%;
   min-width: 360px;
 }
 
 .hero-v2-title {
   margin: 0 0 24px;
-  font-size: clamp(4rem, 6.3vw, 6rem);
+  /* The 6rem cap landed at 1524px, so every screen above it got the same 96px
+     title on an ever larger canvas. 8rem keeps it growing to 2032px, which is
+     also why the wide-shell blocks below do not restate it: no breakpoint jump. */
+  font-size: clamp(4rem, 6.3vw, 8rem);
   font-weight: 780;
   line-height: 0.92;
   letter-spacing: -0.055em;
@@ -599,8 +649,11 @@ picture {
   line-height: 1.5;
 }
 
+/* No max-width here or on .hero-description: the copy column is the measure for
+   both, so the whole stack shares one left and right edge. ch is a Latin unit
+   (the width of "0"), and one CJK glyph is a full em, so 18ch fitted only 11
+   Chinese characters. */
 .hero-claim {
-  max-width: 18ch;
   margin: 0 0 16px;
   color: #f2f3f7;
   font-size: 1.35rem;
@@ -609,7 +662,6 @@ picture {
 }
 
 .hero-description {
-  max-width: 35ch;
   margin: 0 0 24px;
   color: #aab2c9;
   font-size: 0.86rem;
@@ -660,19 +712,20 @@ picture {
   border-color: rgba(180, 133, 255, 0.82);
 }
 
+/* Aligned with the copy column, not the viewport: centred, it sat in the gap
+   between the text and the galaxy and read as an orphan. */
 .hero-scroll-cue {
   position: absolute;
-  left: 50%;
+  left: var(--panel-pad);
   bottom: 38px;
   z-index: 3;
   display: grid;
-  justify-items: center;
+  justify-items: start;
   gap: 9px;
   color: #8791af;
   font-size: 0.62rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  transform: translateX(-50%);
 }
 
 .hero-scroll-cue i {
@@ -959,7 +1012,7 @@ picture {
   top: 25%;
 }
 
-.product-planet.pdf {
+.product-planet.office {
   left: 70%;
   top: 24%;
 }
@@ -1297,13 +1350,77 @@ picture {
   }
 }
 
+/* Above 1600px a 1180px shell left ~400px of dead margin on each side of a
+   full-bleed hero, so the copy read as a narrow strip pinned to the middle of a
+   much larger picture. The shell widens with the screen and the copy scale goes
+   with it; .reference-nav-inner and the footer move on the same breakpoint in
+   the layout, or the chrome would stop lining up with the page. */
+@media (min-width: 1600px) {
+  .reference-container {
+    width: min(100% - 96px, 1400px);
+  }
+
+  /* main.css caps .hero-copy at 520px for the older hero layouts; on the wide
+     shell that cap, not the 42%, was deciding the measure. */
+  .hero-copy {
+    max-width: 600px;
+  }
+
+  .hero-kicker {
+    font-size: 1.3rem;
+  }
+
+  .hero-claim {
+    font-size: 1.5rem;
+  }
+
+  .hero-description {
+    font-size: 0.95rem;
+  }
+
+  .reference-button {
+    min-width: 172px;
+    min-height: 52px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Past 1900px even the 1400px shell left ~260px of black on the left of a
+   full-bleed hero, with the copy reading as a strip in the middle of a much
+   larger picture. The art puts its galaxy at 72% of the width, so the left half
+   is where the copy belongs -- it just has to be big enough to own it. Centring
+   the copy instead was tried and is worse: it lands the title on the galaxy and
+   leaves dead black on both sides. */
+@media (min-width: 1900px) {
+  .reference-container {
+    width: min(100% - 96px, 1600px);
+  }
+
+  .hero-copy {
+    width: 52%;
+    max-width: 840px;
+  }
+
+  .hero-kicker {
+    font-size: 1.45rem;
+  }
+
+  .hero-claim {
+    font-size: 1.7rem;
+  }
+
+  .hero-description {
+    font-size: 1.05rem;
+  }
+}
+
 @media (max-width: 1100px) {
   .reference-container {
     width: min(100% - 48px, 960px);
   }
 
   .hero-v2 {
-    height: 610px;
+    --hero-h: 610px;
   }
 
   .hero-copy {
@@ -1329,7 +1446,7 @@ picture {
 
 @media (min-width: 821px) and (max-width: 1100px) {
   .hero-v2 {
-    height: 500px;
+    --hero-h: 500px;
   }
 
   .hero-content {
@@ -1380,15 +1497,8 @@ picture {
   }
 
   .hero-core-spark {
-    left: 69.5%;
     width: 126px;
     height: 126px;
-  }
-
-  .hero-core-star {
-    --star-x: 69.5%;
-    /* .hero-v2 is 500px tall here, so the ring is smaller in element px */
-    --star-arm: max(7.7vw, 77px);
   }
 
   .stats-wrap {
@@ -1572,7 +1682,12 @@ picture {
 
 @media (max-width: 820px) {
   .hero-v2 {
-    height: 760px;
+    --hero-h: 760px;
+    /* .hero-backdrop switches to object-position: 70% here, so only 0.7 of the
+       horizontal overflow comes off the left:
+         x = 0.7237 * art-w - 0.7 * (art-w - 100vw) = 70% + art-w * 0.0237
+       y is unaffected -- the vertical half of object-position is still center. */
+    --star-x: calc(70% + var(--art-w) * 0.0237);
   }
 
   .hero-backdrop {
@@ -1580,17 +1695,11 @@ picture {
   }
 
   .hero-core-spark {
-    left: 75%;
-    top: 43.5%;
     width: clamp(120px, 24vw, 160px);
     height: clamp(120px, 24vw, 160px);
   }
 
   .hero-core-star {
-    --star-x: 75%;
-    --star-y: 43.5%;
-    /* .hero-v2 is 760px tall here — the tallest — so the ring is largest */
-    --star-arm: max(7.7vw, 117px);
     /* must mirror .hero-backdrop above, or the clip drifts off the painted star */
     object-position: 70% center;
   }
@@ -1653,12 +1762,7 @@ picture {
   }
 
   .hero-v2 {
-    height: 720px;
-  }
-
-  .hero-core-star {
-    /* .hero-v2 drops to 720px here, so the ring shrinks with it */
-    --star-arm: max(7.7vw, 111px);
+    --hero-h: 720px;
   }
 
   .hero-backdrop {
@@ -1690,12 +1794,10 @@ picture {
   }
 
   .hero-claim {
-    max-width: 17ch;
     font-size: 1.1rem;
   }
 
   .hero-description {
-    max-width: 32ch;
     font-size: 0.78rem;
   }
 
@@ -1762,7 +1864,7 @@ picture {
     top: 25%;
   }
 
-  .product-planet.pdf {
+  .product-planet.office {
     left: 76%;
     top: 24%;
   }

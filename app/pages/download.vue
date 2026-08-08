@@ -14,8 +14,12 @@
       <div v-else class="dl-list">
         <div v-for="item in items" :key="item.release.id" class="dl-card">
           <div class="dl-row">
-            <div class="dl-icon" :style="{ '--tint': toolColor(item.product || {}) }">
-              <component :is="toolIcon(item.product || {})" :size="20" :stroke-width="2" />
+            <div
+              class="dl-icon"
+              :style="{ '--tint': toolColor(item.product || {}) }"
+              :data-logo="toolLogo(item.product || {}) ? '' : null"
+            >
+              <ProductIcon :product="item.product || {}" :size="toolLogo(item.product || {}) ? 28 : 20" />
             </div>
 
             <div class="dl-info">
@@ -81,7 +85,7 @@
             </div>
           </div>
 
-          <p v-else-if="feedError && item.product?.slug === PDF_SLUG" class="dl-feed-err">
+          <p v-else-if="feedFailed(item)" class="dl-feed-err">
             {{ t('download.feedError') }}
           </p>
         </div>
@@ -94,32 +98,38 @@
 </template>
 
 <script setup lang="ts">
-import { toolColor, toolIcon } from '~/utils/toolMeta'
+import { toolColor, toolLogo } from '~/utils/toolMeta'
 import { statusLabel, statusMeta } from '~/utils/productStatus'
 import {
   detectPlatformHere,
-  fetchLatestPdfRelease,
+  fetchLatestRelease,
   groupByOs,
+  PRODUCT_RELEASE_SOURCES,
+  releaseSourceFor,
   type Arch,
   type LatestRelease,
   type Os,
   type PlatformDownload
 } from '~/utils/releaseFeed'
 
-/** The one product whose per-platform files come from a live release feed. */
-const PDF_SLUG = 'magies-pdf'
-
 const { t, locale } = useI18n()
 const loading = ref(true)
 const error = ref('')
 const toast = ref('')
 const items = ref<any[]>([])
-const pdfFeed = ref<LatestRelease | null>(null)
-const feedError = ref(false)
+/** Live release feeds keyed by product slug (Terminal-style download mode). */
+const feeds = ref<Record<string, LatestRelease>>({})
+const feedErrors = ref<Record<string, boolean>>({})
 const current = ref<{ os: Os; arch: Arch }>({ os: 'unknown', arch: 'x64' })
 
 function feedFor(item: any): LatestRelease | null {
-  return item.product?.slug === PDF_SLUG ? pdfFeed.value : null
+  const slug = item.product?.slug
+  return slug && feeds.value[slug] ? feeds.value[slug] : null
+}
+
+function feedFailed(item: any): boolean {
+  const slug = item.product?.slug
+  return !!(slug && feedErrors.value[slug] && releaseSourceFor(slug))
 }
 
 /** The build matching the visitor's own machine, if this release ships one. */
@@ -140,11 +150,13 @@ function osName(os: Os): string {
   if (os === 'mac') return 'macOS'
   if (os === 'win') return 'Windows'
   if (os === 'linux') return 'Linux'
+  if (os === 'android') return 'Android'
   return ''
 }
 
 function archName(os: Os, arch: Arch): string {
   if (os === 'mac') return arch === 'arm64' ? 'Apple Silicon' : 'Intel'
+  if (os === 'android') return 'APK'
   return arch === 'arm64' ? 'ARM64' : 'x64'
 }
 
@@ -153,6 +165,7 @@ function fileKind(name: string): string {
   if (n.endsWith('.dmg')) return 'DMG'
   if (n.endsWith('.appimage')) return 'AppImage'
   if (n.endsWith('.deb')) return 'DEB'
+  if (n.endsWith('.apk')) return 'APK'
   if (n.endsWith('.zip')) return 'ZIP'
   if (n.endsWith('.exe')) return n.includes('portable') ? t('download.portable') : 'EXE'
   return name
@@ -169,9 +182,12 @@ function sourceNote(feed: LatestRelease): string {
 function releaseMeta(item: any) {
   const feed = feedFor(item)
   const r = item.release
+  const platforms = feed
+    ? [...new Set(feed.downloads.map((d) => osName(d.os)).filter(Boolean))].join(' · ')
+    : r.platform
   return [
     feed ? '' : r.fileSize ? mb(r.fileSize) : '',
-    feed ? 'macOS · Windows · Linux' : r.platform,
+    platforms,
     String(feed?.publishedAt || r.publishedAt || '').slice(0, 10)
   ]
     .filter(Boolean)
@@ -202,6 +218,26 @@ async function download(item: any) {
   }
 }
 
+/** Load live feeds for every product that has Terminal-style release sources. */
+async function loadFeeds() {
+  const present = new Set(
+    items.value.map((i) => i.product?.slug).filter((s): s is string => !!s)
+  )
+  const sources = PRODUCT_RELEASE_SOURCES.filter((s) => present.has(s.slug))
+  if (!sources.length) return
+
+  await Promise.all(
+    sources.map(async (source) => {
+      try {
+        feeds.value[source.slug] = await fetchLatestRelease(source)
+      } catch (e) {
+        feedErrors.value[source.slug] = true
+        console.warn(`${source.label} release feed unavailable`, e)
+      }
+    })
+  )
+}
+
 onMounted(async () => {
   current.value = await detectPlatformHere()
   try {
@@ -219,13 +255,7 @@ onMounted(async () => {
     loading.value = false
   }
 
-  if (!items.value.some((i) => i.product?.slug === PDF_SLUG)) return
-  try {
-    pdfFeed.value = await fetchLatestPdfRelease()
-  } catch (e) {
-    feedError.value = true
-    console.warn('Magies PDF release feed unavailable', e)
-  }
+  await loadFeeds()
 })
 </script>
 
@@ -288,6 +318,11 @@ onMounted(async () => {
     color-mix(in srgb, var(--tint) 8%, transparent)
   );
   border: 1px solid color-mix(in srgb, var(--tint) 38%, transparent);
+}
+
+.dl-icon[data-logo] {
+  background: rgba(8, 10, 18, 0.4);
+  box-shadow: none;
 }
 
 .dl-info {

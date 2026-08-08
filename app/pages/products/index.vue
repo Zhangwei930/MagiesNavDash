@@ -62,8 +62,12 @@
             :style="{ '--neon': toolColor(p) }"
           >
             <div class="p-head">
-              <div class="icon-circle" :style="{ '--tint': toolColor(p) }">
-                <component :is="toolIcon(p)" :size="20" :stroke-width="2" />
+              <div
+                class="icon-circle"
+                :style="{ '--tint': toolColor(p) }"
+                :data-logo="toolLogo(p) ? '' : null"
+              >
+                <ProductIcon :product="p" :size="toolLogo(p) ? 28 : 20" />
               </div>
               <div class="p-id">
                 <h3>{{ p.name }}</h3>
@@ -101,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { toolColor, toolIcon } from '~/utils/toolMeta'
+import { toolColor, toolLogo } from '~/utils/toolMeta'
 import { primaryAction, statusLabel, statusMeta, statusSortRank } from '~/utils/productStatus'
 
 const { t, locale } = useI18n()
