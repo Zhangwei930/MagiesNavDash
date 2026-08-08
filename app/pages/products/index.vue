@@ -66,7 +66,7 @@
                 class="icon-circle"
                 :style="{ '--tint': toolColor(p) }"
                 :data-logo="toolLogo(p) ? '' : null"
-                :data-logo-lg="toolLogo(p) && toolLogoDisplaySize(p, 'list') > 32 ? '' : null"
+                :data-logo-lg="toolLogoIsLarge(p) || null"
               >
                 <ProductIcon
                   :product="p"
@@ -109,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import { toolColor, toolLogo, toolLogoDisplaySize } from '~/utils/toolMeta'
+import { toolColor, toolLogo, toolLogoDisplaySize, toolLogoIsLarge } from '~/utils/toolMeta'
 import { primaryAction, statusLabel, statusMeta, statusSortRank } from '~/utils/productStatus'
 
 const { t, locale } = useI18n()

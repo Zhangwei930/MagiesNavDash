@@ -13,7 +13,7 @@
             class="product-icon"
             :style="{ '--tint': color }"
             :data-logo="logo ? '' : null"
-            :data-logo-lg="isOfficeLogo || null"
+            :data-logo-lg="isLargeLogo || null"
           >
             <ProductIcon
               :product="detail.product"
@@ -112,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-import { toolColor, toolLogo, toolLogoDisplaySize } from '~/utils/toolMeta'
+import { toolColor, toolLogo, toolLogoDisplaySize, toolLogoIsLarge } from '~/utils/toolMeta'
 import { primaryAction, statusLabel, statusMeta } from '~/utils/productStatus'
 
 const { t, locale } = useI18n()
@@ -124,10 +124,7 @@ const error = ref('')
 const msg = ref('')
 
 const logo = computed(() => toolLogo(detail.value?.product || {}))
-const isOfficeLogo = computed(() => {
-  const s = detail.value?.product?.slug
-  return s === 'magies-office' || s === 'magies-pdf'
-})
+const isLargeLogo = computed(() => toolLogoIsLarge(detail.value?.product || {}))
 const color = computed(() => toolColor(detail.value?.product || {}))
 const lineName = computed(() => categoryLabel(detail.value?.product?.categoryId))
 
