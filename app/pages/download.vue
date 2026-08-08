@@ -104,9 +104,7 @@ function siteUrl(item: any): string | null {
 }
 
 function releaseMeta(item: any) {
-  const r = item.release
-  const date = String(r.publishedAt || '').slice(0, 10)
-  return [date, r.source === 'github' ? 'GitHub' : r.source].filter(Boolean).join(' · ')
+  return String(item.release?.publishedAt || '').slice(0, 10)
 }
 
 /** Best-effort download logging; the anchor navigates regardless. */
