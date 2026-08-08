@@ -88,7 +88,7 @@ const SITE_BY_SLUG: Record<string, string> = {
   'magies-office': 'https://github.com/Zhangwei930/MagiesPdf/releases/latest',
   'magies-pdf': 'https://github.com/Zhangwei930/MagiesPdf/releases/latest',
   'magies-nav': 'https://nav.magies.top',
-  'magies-game': 'https://tech.magies.top'
+  'magies-game': 'https://games.magies.top'
 }
 
 function siteUrl(item: any): string | null {
