@@ -8,7 +8,8 @@ export interface SiteLink {
 export const SITE_LINKS: SiteLink[] = [
   { key: 'hub', href: '/', external: false },
   { key: 'terminal', href: 'https://shell.magies.top', external: true },
-  { key: 'nav', href: 'https://nav.magies.top', external: true }
+  { key: 'nav', href: 'https://nav.magies.top', external: true },
+  { key: 'game', href: 'https://tech.magies.top', external: true }
 ]
 
 /** Primary public nav — keep ≤ 7 items (ecosystem plan §5.1). */

@@ -67,6 +67,23 @@ export function toolLogo(product?: { slug?: string } | string | null): string | 
   return PRODUCT_LOGOS[slug] || null
 }
 
+function productSlug(product?: { slug?: string } | string | null): string | null {
+  if (!product) return null
+  return typeof product === 'string' ? product : product.slug || null
+}
+
+/** Office mark reads small at card size — bump its CSS box (asset stays 64×64). */
+export function toolLogoDisplaySize(
+  product?: { slug?: string } | string | null,
+  slot: 'list' | 'detail' | 'const' = 'list'
+): number {
+  const slug = productSlug(product)
+  const isOffice = slug === 'magies-office' || slug === 'magies-pdf'
+  if (slot === 'detail') return isOffice ? 56 : 40
+  if (slot === 'const') return isOffice ? 30 : 22
+  return isOffice ? 38 : 28
+}
+
 export function toolColor(product: { slug?: string; accentColor?: string }): string {
   // Prefer palette aligned with star-ring logo (blue / violet / orange)
   const map: Record<string, string> = {

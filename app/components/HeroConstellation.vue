@@ -33,14 +33,19 @@
       :to="item.to"
       :style="{ '--neon': item.color, '--delay': `${i * 0.35}s` }"
     >
-      <span class="const-icon" :data-logo="item.logo ? '' : null">
+      <span
+        class="const-icon"
+        :data-logo="item.logo ? '' : null"
+        :data-logo-lg="item.key === 'office' || null"
+      >
         <img
           v-if="item.logo"
           class="const-logo"
+          :class="{ 'const-logo-lg': item.key === 'office' }"
           :src="item.logo"
           :alt="item.name"
-          width="22"
-          height="22"
+          :width="item.key === 'office' ? 30 : 22"
+          :height="item.key === 'office' ? 30 : 22"
           decoding="async"
         />
         <component v-else :is="item.icon" :size="18" :stroke-width="1.75" />
@@ -262,12 +267,24 @@ const display = computed(() => {
   padding: 4px;
 }
 
+.const-icon[data-logo-lg] {
+  width: 42px;
+  height: 42px;
+  padding: 5px;
+}
+
 .const-logo {
   width: 22px;
   height: 22px;
   object-fit: contain;
   border-radius: 5px;
   display: block;
+}
+
+.const-logo-lg {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
 }
 
 .const-meta {

@@ -168,6 +168,7 @@
             <NuxtLink to="/solutions">{{ t('nav.solutions') }}</NuxtLink>
             <a href="https://shell.magies.top" target="_blank" rel="noopener">{{ t('site.terminal') }}</a>
             <a href="https://nav.magies.top" target="_blank" rel="noopener">{{ t('site.nav') }}</a>
+            <a href="https://tech.magies.top" target="_blank" rel="noopener">{{ t('site.game') }}</a>
           </div>
           <div>
             <h4>{{ t('footer.resources') }}</h4>
