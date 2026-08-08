@@ -209,13 +209,38 @@ async function getJson(url: string): Promise<any> {
   return res.json()
 }
 
+/** Normalize GitHub `tag_name` / mirror `version` for UI display. */
+export function normalizeReleaseVersion(raw: string | null | undefined): string {
+  return String(raw || '').replace(/^v/i, '').trim()
+}
+
+/**
+ * Version + publish date only from GitHub `/releases/latest`.
+ * Used by the download center so the badge always tracks the live tag,
+ * independent of installable assets or the DB seed.
+ */
+export async function fetchGithubLatestMeta(repo: string): Promise<{
+  version: string
+  publishedAt: string
+  name: string
+  htmlUrl: string
+}> {
+  const data = await getJson(`https://api.github.com/repos/${repo}/releases/latest`)
+  return {
+    version: normalizeReleaseVersion(data.tag_name || data.name),
+    publishedAt: String(data.published_at || ''),
+    name: String(data.name || ''),
+    htmlUrl: String(data.html_url || `https://github.com/${repo}/releases/latest`)
+  }
+}
+
 async function fromGithub(repo: string): Promise<LatestRelease> {
   const data = await getJson(`https://api.github.com/repos/${repo}/releases/latest`)
   const assets: ReleaseAsset[] = (data.assets || [])
     .filter((a: any) => a?.name && a?.browser_download_url)
     .map((a: any) => ({ name: a.name, url: a.browser_download_url, size: a.size || 0 }))
   return {
-    version: String(data.tag_name || '').replace(/^v/i, ''),
+    version: normalizeReleaseVersion(data.tag_name),
     publishedAt: data.published_at || '',
     downloads: pickDownloads(assets),
     source: 'github'
@@ -228,7 +253,7 @@ async function fromMirror(base: string): Promise<LatestRelease> {
     .filter((f: any) => f?.name && f?.url)
     .map((f: any) => ({ name: f.name, url: f.url, size: f.size || 0 }))
   return {
-    version: String(data.version || data.tag || '').replace(/^v/i, ''),
+    version: normalizeReleaseVersion(data.version || data.tag),
     publishedAt: data.publishedAt || '',
     downloads: pickDownloads(assets),
     source: 'mirror'
