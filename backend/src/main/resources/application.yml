@@ -36,6 +36,11 @@ magies:
     url: ${MAIL_GATEWAY_URL:http://127.0.0.1:8090}
   cors:
     origins: ${CORS_ORIGINS:http://localhost:3000,https://dash.magies.top,http://dash.magies.top}
+  # Stats board login (username / password). Override in production .env if needed.
+  stats:
+    username: ${STATS_USERNAME:magies}
+    password: ${STATS_PASSWORD:MagiesStats2026!}
+
 
 logging:
   level:

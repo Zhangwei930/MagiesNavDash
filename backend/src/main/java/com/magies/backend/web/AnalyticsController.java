@@ -1,6 +1,7 @@
 package com.magies.backend.web;
 
 import com.magies.backend.service.AnalyticsService;
+import com.magies.backend.service.StatsAuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,9 +12,11 @@ import java.util.Map;
 public class AnalyticsController {
 
     private final AnalyticsService analyticsService;
+    private final StatsAuthService statsAuthService;
 
-    public AnalyticsController(AnalyticsService analyticsService) {
+    public AnalyticsController(AnalyticsService analyticsService, StatsAuthService statsAuthService) {
         this.analyticsService = analyticsService;
+        this.statsAuthService = statsAuthService;
     }
 
     /** Public beacon — page views & optional client-side download events. */
@@ -23,7 +26,29 @@ public class AnalyticsController {
         return Map.of("ok", true);
     }
 
-    /** Admin analytics payload for the stats dashboard. */
+    /** Username / password login for the stats board. */
+    @PostMapping("/api/stats/login")
+    public Map<String, Object> login(@RequestBody Map<String, Object> body) {
+        String username = body.get("username") == null ? "" : String.valueOf(body.get("username")).trim();
+        String password = body.get("password") == null ? "" : String.valueOf(body.get("password"));
+        return statsAuthService.login(username, password);
+    }
+
+    /** Stats dashboard payload (role STATS or ADMIN). */
+    @GetMapping("/api/stats/dashboard")
+    public Map<String, Object> statsDashboard(@RequestParam(defaultValue = "30") int days) {
+        return analyticsService.dashboard(days);
+    }
+
+    @GetMapping("/api/stats/recent")
+    public List<Map<String, Object>> statsRecent(
+            @RequestParam(defaultValue = "50") int limit,
+            @RequestParam(defaultValue = "all") String eventType
+    ) {
+        return analyticsService.recent(limit, eventType);
+    }
+
+    /** Legacy admin path — same payload, ADMIN only via security. */
     @GetMapping("/api/admin/analytics")
     public Map<String, Object> dashboard(@RequestParam(defaultValue = "30") int days) {
         return analyticsService.dashboard(days);
