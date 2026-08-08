@@ -9,8 +9,16 @@
       <template v-else-if="detail">
         <header class="d-head" :style="{ '--tint': color }">
           <div class="d-glow" aria-hidden="true" />
-          <div class="product-icon" :style="{ '--tint': color }" :data-logo="logo ? '' : null">
-            <ProductIcon :product="detail.product" :size="logo ? 40 : 22" />
+          <div
+            class="product-icon"
+            :style="{ '--tint': color }"
+            :data-logo="logo ? '' : null"
+            :data-logo-lg="isOfficeLogo || null"
+          >
+            <ProductIcon
+              :product="detail.product"
+              :size="logo ? toolLogoDisplaySize(detail.product, 'detail') : 22"
+            />
           </div>
           <div class="d-id">
             <div class="d-title-row">
@@ -104,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-import { toolColor, toolLogo } from '~/utils/toolMeta'
+import { toolColor, toolLogo, toolLogoDisplaySize } from '~/utils/toolMeta'
 import { primaryAction, statusLabel, statusMeta } from '~/utils/productStatus'
 
 const { t, locale } = useI18n()
@@ -116,6 +124,10 @@ const error = ref('')
 const msg = ref('')
 
 const logo = computed(() => toolLogo(detail.value?.product || {}))
+const isOfficeLogo = computed(() => {
+  const s = detail.value?.product?.slug
+  return s === 'magies-office' || s === 'magies-pdf'
+})
 const color = computed(() => toolColor(detail.value?.product || {}))
 const lineName = computed(() => categoryLabel(detail.value?.product?.categoryId))
 
@@ -269,6 +281,12 @@ onMounted(async () => {
 .product-icon[data-logo] {
   background: rgba(8, 10, 18, 0.45);
   box-shadow: none;
+}
+
+.product-icon[data-logo-lg] {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
 }
 
 .d-id,

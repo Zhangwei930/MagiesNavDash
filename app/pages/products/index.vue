@@ -66,8 +66,12 @@
                 class="icon-circle"
                 :style="{ '--tint': toolColor(p) }"
                 :data-logo="toolLogo(p) ? '' : null"
+                :data-logo-lg="toolLogo(p) && toolLogoDisplaySize(p, 'list') > 32 ? '' : null"
               >
-                <ProductIcon :product="p" :size="toolLogo(p) ? 28 : 20" />
+                <ProductIcon
+                  :product="p"
+                  :size="toolLogo(p) ? toolLogoDisplaySize(p, 'list') : 20"
+                />
               </div>
               <div class="p-id">
                 <h3>{{ p.name }}</h3>
@@ -105,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import { toolColor, toolLogo } from '~/utils/toolMeta'
+import { toolColor, toolLogo, toolLogoDisplaySize } from '~/utils/toolMeta'
 import { primaryAction, statusLabel, statusMeta, statusSortRank } from '~/utils/productStatus'
 
 const { t, locale } = useI18n()

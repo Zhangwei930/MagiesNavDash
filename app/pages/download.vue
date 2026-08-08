@@ -18,8 +18,20 @@
               class="dl-icon"
               :style="{ '--tint': toolColor(item.product || {}) }"
               :data-logo="toolLogo(item.product || {}) ? '' : null"
+              :data-logo-lg="
+                toolLogo(item.product || {}) && toolLogoDisplaySize(item.product || {}, 'list') > 32
+                  ? ''
+                  : null
+              "
             >
-              <ProductIcon :product="item.product || {}" :size="toolLogo(item.product || {}) ? 28 : 20" />
+              <ProductIcon
+                :product="item.product || {}"
+                :size="
+                  toolLogo(item.product || {})
+                    ? toolLogoDisplaySize(item.product || {}, 'list')
+                    : 20
+                "
+              />
             </div>
 
             <div class="dl-info">
@@ -98,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import { toolColor, toolLogo } from '~/utils/toolMeta'
+import { toolColor, toolLogo, toolLogoDisplaySize } from '~/utils/toolMeta'
 import { statusLabel, statusMeta } from '~/utils/productStatus'
 import {
   detectPlatformHere,
@@ -323,6 +335,11 @@ onMounted(async () => {
 .dl-icon[data-logo] {
   background: rgba(8, 10, 18, 0.4);
   box-shadow: none;
+}
+
+.dl-icon[data-logo-lg] {
+  width: 48px;
+  height: 48px;
 }
 
 .dl-info {
