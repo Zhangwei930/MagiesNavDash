@@ -47,7 +47,8 @@ const PRODUCT_LOGOS: Record<string, string> = {
   'magies-office': '/brand/product-office-64.png',
   'magies-pdf': '/brand/product-office-64.png',
   'magies-terminal': '/brand/product-terminal-64.png',
-  'magies-shell': '/brand/product-terminal-64.png'
+  'magies-shell': '/brand/product-terminal-64.png',
+  'magies-game': '/brand/product-game-64.png'
 }
 
 const KEY_ICON: Record<string, LucideIcon> = Object.fromEntries(
@@ -72,16 +73,25 @@ function productSlug(product?: { slug?: string } | string | null): string | null
   return typeof product === 'string' ? product : product.slug || null
 }
 
-/** Office mark reads small at card size — bump its CSS box (asset stays 64×64). */
+/**
+ * Dense app marks (Office / Game) read small at card size — bump CSS box.
+ * Source assets stay 64×64.
+ */
 export function toolLogoDisplaySize(
   product?: { slug?: string } | string | null,
   slot: 'list' | 'detail' | 'const' = 'list'
 ): number {
   const slug = productSlug(product)
-  const isOffice = slug === 'magies-office' || slug === 'magies-pdf'
-  if (slot === 'detail') return isOffice ? 56 : 40
-  if (slot === 'const') return isOffice ? 30 : 22
-  return isOffice ? 38 : 28
+  const large = slug === 'magies-office' || slug === 'magies-pdf' || slug === 'magies-game'
+  if (slot === 'detail') return large ? 56 : 40
+  if (slot === 'const') return large ? 30 : 22
+  return large ? 38 : 28
+}
+
+/** True when the product mark should use the larger icon slot. */
+export function toolLogoIsLarge(product?: { slug?: string } | string | null): boolean {
+  const slug = productSlug(product)
+  return slug === 'magies-office' || slug === 'magies-pdf' || slug === 'magies-game'
 }
 
 export function toolColor(product: { slug?: string; accentColor?: string }): string {

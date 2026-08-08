@@ -18,11 +18,7 @@
               class="dl-icon"
               :style="{ '--tint': toolColor(item.product || {}) }"
               :data-logo="toolLogo(item.product || {}) ? '' : null"
-              :data-logo-lg="
-                toolLogo(item.product || {}) && toolLogoDisplaySize(item.product || {}, 'list') > 32
-                  ? ''
-                  : null
-              "
+              :data-logo-lg="toolLogoIsLarge(item.product || {}) || null"
             >
               <ProductIcon
                 :product="item.product || {}"
@@ -110,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import { toolColor, toolLogo, toolLogoDisplaySize } from '~/utils/toolMeta'
+import { toolColor, toolLogo, toolLogoDisplaySize, toolLogoIsLarge } from '~/utils/toolMeta'
 import { statusLabel, statusMeta } from '~/utils/productStatus'
 import {
   detectPlatformHere,
