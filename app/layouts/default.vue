@@ -235,7 +235,7 @@ const homeNavLinks: { key: MsgKey; to: string }[] = [
 function resourceLabel(key: string): MsgKey {
   if (key === 'download') return 'nav.download'
   if (key === 'roadmap') return 'nav.roadmap'
-  if (key === 'changelog') return 'changelog.title'
+  if (key === 'changelog') return 'nav.blog'
   if (key === 'contact') return 'footer.contact'
   return 'nav.home'
 }
