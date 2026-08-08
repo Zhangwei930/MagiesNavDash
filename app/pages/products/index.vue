@@ -2,9 +2,8 @@
   <div ref="root" class="page products-page">
     <div class="container">
       <PageHero
-        :eyebrow="t('home.productsTitle')"
         :title="t('products.title')"
-        :desc="t('products.desc')"
+        :desc="t('home.productsTitle')"
       />
 
       <div v-if="loading" class="muted text-center">{{ t('products.loading') }}</div>
@@ -66,11 +65,11 @@
                 class="icon-circle"
                 :style="{ '--tint': toolColor(p) }"
                 :data-logo="toolLogo(p) ? '' : null"
-                :data-logo-lg="toolLogoIsLarge(p) || null"
               >
                 <ProductIcon
                   :product="p"
-                  :size="toolLogo(p) ? toolLogoDisplaySize(p, 'list') : 20"
+                  :size="toolLogo(p) ? 48 : 20"
+                  :fill="!!toolLogo(p)"
                 />
               </div>
               <div class="p-id">
@@ -109,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { toolColor, toolLogo, toolLogoDisplaySize, toolLogoIsLarge } from '~/utils/toolMeta'
+import { toolColor, toolLogo } from '~/utils/toolMeta'
 import { primaryAction, statusLabel, statusMeta, statusSortRank } from '~/utils/productStatus'
 
 const { t, locale } = useI18n()
@@ -239,6 +238,24 @@ onMounted(async () => {
   display: flex;
   gap: 12px;
   align-items: center;
+}
+
+/* Logo fills the rounded square exactly — no inset gap. */
+.p-head .icon-circle[data-logo] {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.p-head .icon-circle[data-logo] :deep(.product-logo) {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 12px;
+  object-fit: cover;
 }
 
 .p-id {

@@ -5,9 +5,8 @@
         class="icon-circle"
         :style="{ color }"
         :data-logo="logo ? '' : null"
-        :data-logo-lg="toolLogoIsLarge(product) || null"
       >
-        <ProductIcon :product="product" :size="logo ? logoSize : 20" />
+        <ProductIcon :product="product" :size="logo ? 48 : 20" :fill="!!logo" />
       </div>
       <div>
         <h3>{{ product.name }}</h3>
@@ -28,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { toolColor, toolLogo, toolLogoDisplaySize, toolLogoIsLarge } from '~/utils/toolMeta'
+import { toolColor, toolLogo } from '~/utils/toolMeta'
 
 const props = defineProps<{
   product: {
@@ -43,6 +42,24 @@ const props = defineProps<{
 }>()
 
 const logo = computed(() => toolLogo(props.product))
-const logoSize = computed(() => toolLogoDisplaySize(props.product, 'list'))
 const color = computed(() => toolColor(props.product))
 </script>
+
+<style scoped>
+.icon-circle[data-logo] {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.icon-circle[data-logo] :deep(.product-logo) {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 12px;
+  object-fit: cover;
+}
+</style>
