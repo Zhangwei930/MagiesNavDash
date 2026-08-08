@@ -1,39 +1,39 @@
 <template>
   <div class="stats-root">
-    <!-- Admin login (same JWT as /admin) -->
-    <div v-if="!auth.isLoggedIn || !auth.isAdmin" class="login-page">
+    <!-- Username / password login (not the email admin OTP) -->
+    <div v-if="!signedIn" class="login-page">
       <form class="login-card" @submit.prevent="onLogin">
         <div class="login-brand">
           <img src="/brand/logo-mark-128.png" width="56" height="56" alt="" />
           <p class="login-series">MAGIES HUB · STATS</p>
         </div>
         <h1>数据大屏</h1>
-        <p>管理员登录后查看访问与下载分析</p>
-        <template v-if="!auth.isLoggedIn">
-          <label class="sr-only" for="stats-email">邮箱</label>
-          <input id="stats-email" v-model="auth.email" type="email" placeholder="admin@magies.top" required />
-          <label class="sr-only" for="stats-code">验证码</label>
-          <div class="code-row">
-            <input
-              id="stats-code"
-              v-model="auth.code"
-              type="text"
-              maxlength="6"
-              placeholder="6 位验证码"
-              required
-            />
-            <button type="button" class="tool-btn" :disabled="auth.loading || !auth.email" @click="auth.sendVerificationCode()">
-              发送
-            </button>
-          </div>
-          <button type="submit" :disabled="auth.loading || auth.code.length !== 6">登录</button>
-          <p v-if="auth.message" class="login-ok">{{ auth.message }}</p>
-          <p v-if="auth.error" class="login-error">{{ auth.error }}</p>
-        </template>
-        <template v-else>
-          <p class="login-error">需要管理员账号（admin@magies.top）</p>
-          <button type="button" class="tool-btn" @click="auth.logout()">退出</button>
-        </template>
+        <p>输入用户名与密码进入分析看板</p>
+        <label class="sr-only" for="stats-username">用户名</label>
+        <input
+          id="stats-username"
+          v-model="username"
+          type="text"
+          autocomplete="username"
+          placeholder="用户名"
+          required
+        />
+        <div class="password-field">
+          <label class="sr-only" for="stats-password">密码</label>
+          <input
+            id="stats-password"
+            v-model="password"
+            :type="showPassword ? 'text' : 'password'"
+            autocomplete="current-password"
+            placeholder="密码"
+            required
+          />
+          <button type="button" class="toggle-password" @click="showPassword = !showPassword">
+            {{ showPassword ? '隐藏' : '显示' }}
+          </button>
+        </div>
+        <button type="submit" :disabled="loginLoading">{{ loginLoading ? '登录中…' : '登录' }}</button>
+        <p v-if="loginError" class="login-error" role="alert">{{ loginError }}</p>
       </form>
     </div>
 
@@ -62,8 +62,7 @@
             {{ paused ? '继续' : '暂停' }}
           </button>
           <button type="button" class="tool-btn" :disabled="loading" @click="load">刷新</button>
-          <NuxtLink class="tool-btn" to="/admin">后台</NuxtLink>
-          <button type="button" class="ghost-btn" @click="auth.logout()">退出</button>
+          <button type="button" class="ghost-btn" @click="logout">退出</button>
         </div>
       </header>
 
@@ -322,8 +321,15 @@ type DashboardPayload = {
   }[]
 }
 
-const auth = useAuthStore()
-const { api } = useApi()
+const TOKEN_KEY = 'magies_stats_token'
+
+const token = ref('')
+const username = ref('')
+const password = ref('')
+const showPassword = ref(false)
+const loginLoading = ref(false)
+const loginError = ref('')
+const signedIn = computed(() => !!token.value)
 
 const payload = ref<DashboardPayload | null>(null)
 const loading = ref(false)
@@ -331,6 +337,26 @@ const error = ref('')
 const rangeDays = ref(30)
 const paused = ref(false)
 const countdown = ref(60)
+
+if (import.meta.client) {
+  token.value = sessionStorage.getItem(TOKEN_KEY) || ''
+}
+
+async function statsApi<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const headers = new Headers(options.headers || {})
+  if (!headers.has('Content-Type') && options.body) {
+    headers.set('Content-Type', 'application/json')
+  }
+  if (token.value) headers.set('Authorization', `Bearer ${token.value}`)
+  const res = await fetch(path, { ...options, headers })
+  const data = await res.json().catch(() => ({}))
+  if (res.status === 401 || res.status === 403) {
+    logout()
+    throw new Error(data.message || '登录已过期，请重新登录')
+  }
+  if (!res.ok) throw new Error(data.message || `请求失败 (${res.status})`)
+  return data as T
+}
 const recentFilter = ref<'all' | 'page_view' | 'download'>('all')
 const recentFilters = [
   { id: 'all' as const, label: '全部' },
@@ -598,11 +624,11 @@ function renderCharts() {
 }
 
 async function load() {
-  if (!auth.isAdmin) return
+  if (!token.value) return
   loading.value = true
   error.value = ''
   try {
-    payload.value = await api<DashboardPayload>(`/api/admin/analytics?days=${rangeDays.value}`)
+    payload.value = await statsApi<DashboardPayload>(`/api/stats/dashboard?days=${rangeDays.value}`)
     countdown.value = 60
     renderCharts()
   } catch (e: any) {
@@ -618,8 +644,35 @@ function setRange(d: number) {
 }
 
 async function onLogin() {
-  await auth.verifyCodeAndLogin()
-  if (auth.isAdmin) await load()
+  loginLoading.value = true
+  loginError.value = ''
+  try {
+    const data = await fetch('/api/stats/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username.value.trim(), password: password.value })
+    }).then(async (res) => {
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.message || '用户名或密码错误')
+      return body as { token: string }
+    })
+    token.value = data.token
+    sessionStorage.setItem(TOKEN_KEY, data.token)
+    password.value = ''
+    await load()
+    startLoop()
+  } catch (e: any) {
+    loginError.value = e.message || '登录失败'
+  } finally {
+    loginLoading.value = false
+  }
+}
+
+function logout() {
+  token.value = ''
+  payload.value = null
+  sessionStorage.removeItem(TOKEN_KEY)
+  stopLoop()
 }
 
 function onResize() {
@@ -644,24 +697,11 @@ function stopLoop() {
 
 onMounted(async () => {
   window.addEventListener('resize', onResize)
-  if (auth.isAdmin) {
+  if (token.value) {
     await load()
     startLoop()
   }
 })
-
-watch(
-  () => auth.isAdmin,
-  async (ok) => {
-    if (ok) {
-      await load()
-      startLoop()
-    } else {
-      stopLoop()
-      payload.value = null
-    }
-  }
-)
 
 onBeforeUnmount(() => {
   stopLoop()
@@ -773,15 +813,29 @@ onBeforeUnmount(() => {
   color: var(--ink);
 }
 
-.code-row {
-  display: flex;
-  gap: 0.5rem;
+.password-field {
+  position: relative;
   margin-bottom: 0.75rem;
 }
 
-.code-row input {
+.password-field input {
   margin-bottom: 0;
-  flex: 1;
+  padding-right: 4.2rem;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 0.45rem;
+  transform: translateY(-50%);
+  min-width: 3.2rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid rgba(140, 150, 220, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+  font-size: 0.78rem;
+  cursor: pointer;
 }
 
 .login-card button[type='submit'] {
