@@ -2,11 +2,12 @@
   <img
     v-if="src"
     class="product-logo"
+    :class="{ fill }"
     :src="src"
     :alt="alt"
     :width="size"
     :height="size"
-    :style="{ width: sizePx, height: sizePx }"
+    :style="fill ? undefined : { width: sizePx, height: sizePx }"
     decoding="async"
   />
   <component
@@ -28,12 +29,15 @@ const props = withDefaults(
     slug?: string
     size?: number
     strokeWidth?: number
+    /** Stretch logo to fill the parent icon square. */
+    fill?: boolean
   }>(),
   {
     product: null,
     slug: '',
     size: 20,
-    strokeWidth: 2
+    strokeWidth: 2,
+    fill: false
   }
 )
 
@@ -51,5 +55,12 @@ const sizePx = computed(() => `${props.size}px`)
   object-fit: contain;
   border-radius: 20%;
   flex-shrink: 0;
+}
+
+.product-logo.fill {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
 }
 </style>
