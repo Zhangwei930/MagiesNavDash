@@ -50,8 +50,10 @@ describe('reference landing page composition', () => {
       /@keyframes heroCoreSparkle \{\s*0%,\s*100% \{\s*filter: brightness\(0\.9\);\s*transform: translate\(-50%, -50%\) scale\(1\);\s*\}\s*50% \{\s*filter: brightness\(1\.42\);\s*transform: translate\(-50%, -50%\) scale\(1\.08\);/
     )
 
-    const brandCrossStars = layout.match(/class="brand-cross-star"/g) ?? []
-    expect(brandCrossStars).toHaveLength(2)
+    // Brand mark uses animated galaxy core (MagiesMark), not a flat cross-star.
+    const brandMarks = layout.match(/<MagiesMark\s*\/>/g) ?? []
+    expect(brandMarks.length).toBeGreaterThanOrEqual(2)
+    expect(layout).not.toContain('class="brand-cross-star"')
     expect(layout).not.toContain('@keyframes brandCross')
   })
 
