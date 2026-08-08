@@ -22,17 +22,20 @@ public class ProductService {
     private final ProductFeatureRepository featureRepository;
     private final ProductReleaseRepository releaseRepository;
     private final ProductDownloadLogRepository downloadLogRepository;
+    private final AnalyticsService analyticsService;
 
     public ProductService(
             ProductRepository productRepository,
             ProductFeatureRepository featureRepository,
             ProductReleaseRepository releaseRepository,
-            ProductDownloadLogRepository downloadLogRepository
+            ProductDownloadLogRepository downloadLogRepository,
+            AnalyticsService analyticsService
     ) {
         this.productRepository = productRepository;
         this.featureRepository = featureRepository;
         this.releaseRepository = releaseRepository;
         this.downloadLogRepository = downloadLogRepository;
+        this.analyticsService = analyticsService;
     }
 
     /** Statuses hidden from the public catalog and product pages. */
@@ -62,7 +65,7 @@ public class ProductService {
     }
 
     @Transactional
-    public Map<String, Object> recordDownload(Long productId, Long releaseId, String ip, String ua) {
+    public Map<String, Object> recordDownload(Long productId, Long releaseId, String ip, String ua, String sessionId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("产品不存在"));
         ProductRelease release = releaseId != null
@@ -75,6 +78,9 @@ public class ProductService {
         log.setIp(ip);
         log.setUserAgent(ua);
         downloadLogRepository.save(log);
+
+        // Also feed the hub stats board (page_view / download analytics).
+        analyticsService.trackDownload(product.getId(), product.getName(), ip, ua, sessionId);
 
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("success", true);

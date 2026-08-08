@@ -54,6 +54,7 @@ public class ProductController {
         if (ip == null || ip.isBlank()) {
             ip = request.getRemoteAddr();
         }
-        return productService.recordDownload(productId, releaseId, ip, request.getHeader("User-Agent"));
+        String sessionId = body.get("sessionId") == null ? null : String.valueOf(body.get("sessionId"));
+        return productService.recordDownload(productId, releaseId, ip, request.getHeader("User-Agent"), sessionId);
     }
 }
