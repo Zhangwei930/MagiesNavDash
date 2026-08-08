@@ -26,7 +26,7 @@
                 class="cat-chip"
                 :class="{ active: activeCategorySlug === c.slug }"
                 @click="setCategory(c.slug)"
-              >{{ c.name }}</button>
+              >{{ categoryName(c) }}</button>
             </div>
           </div>
 
@@ -117,7 +117,7 @@ const router = useRouter()
 const root = ref<HTMLElement | null>(null)
 useReveal(root)
 
-const { categories, loadCategories, categoryLabel } = useCategories()
+const { categories, loadCategories, categoryLabel, categoryName } = useCategories()
 const products = useState<any[]>('hub-products', () => [])
 const loading = ref(true)
 const error = ref('')
@@ -191,7 +191,7 @@ onMounted(async () => {
       products.value.length ? Promise.resolve() : api('/api/products').then((r: any) => (products.value = r))
     ])
   } catch (e: any) {
-    error.value = e.message || '加载失败'
+    error.value = e.message || t('common.loadFailed')
   } finally {
     loading.value = false
   }

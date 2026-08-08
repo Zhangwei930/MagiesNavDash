@@ -20,14 +20,16 @@
         :href="product.homepageUrl"
         target="_blank"
         rel="noopener"
-      >打开</a>
-      <NuxtLink class="btn btn-outline btn-sm" :to="`/products/${product.slug}`">详情</NuxtLink>
+      >{{ t('products.open') }}</a>
+      <NuxtLink class="btn btn-outline btn-sm" :to="`/products/${product.slug}`">{{ t('products.detail') }}</NuxtLink>
     </div>
   </article>
 </template>
 
 <script setup lang="ts">
 import { toolColor, toolLogo } from '~/utils/toolMeta'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   product: {
