@@ -48,7 +48,8 @@ const PRODUCT_LOGOS: Record<string, string> = {
   'magies-pdf': '/brand/product-office-64.png',
   'magies-terminal': '/brand/product-terminal-64.png',
   'magies-shell': '/brand/product-terminal-64.png',
-  'magies-game': '/brand/product-game-64.png'
+  'magies-game': '/brand/product-game-64.png',
+  'magies-nav': '/brand/product-nav-64.png'
 }
 
 const KEY_ICON: Record<string, LucideIcon> = Object.fromEntries(
@@ -82,7 +83,11 @@ export function toolLogoDisplaySize(
   slot: 'list' | 'detail' | 'const' = 'list'
 ): number {
   const slug = productSlug(product)
-  const large = slug === 'magies-office' || slug === 'magies-pdf' || slug === 'magies-game'
+  const large =
+    slug === 'magies-office' ||
+    slug === 'magies-pdf' ||
+    slug === 'magies-game' ||
+    slug === 'magies-nav'
   if (slot === 'detail') return large ? 56 : 40
   if (slot === 'const') return large ? 30 : 22
   return large ? 38 : 28
@@ -91,7 +96,12 @@ export function toolLogoDisplaySize(
 /** True when the product mark should use the larger icon slot. */
 export function toolLogoIsLarge(product?: { slug?: string } | string | null): boolean {
   const slug = productSlug(product)
-  return slug === 'magies-office' || slug === 'magies-pdf' || slug === 'magies-game'
+  return (
+    slug === 'magies-office' ||
+    slug === 'magies-pdf' ||
+    slug === 'magies-game' ||
+    slug === 'magies-nav'
+  )
 }
 
 export function toolColor(product: { slug?: string; accentColor?: string }): string {
