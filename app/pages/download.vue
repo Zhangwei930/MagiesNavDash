@@ -114,9 +114,14 @@ function releaseMeta(item: any) {
 function track(item: any) {
   if (!item.product?.id || !item.release?.id) return
   const { api } = useApi()
+  const { sessionId } = useHubTrack()
   api('/api/downloads', {
     method: 'POST',
-    body: JSON.stringify({ productId: item.product.id, releaseId: item.release.id })
+    body: JSON.stringify({
+      productId: item.product.id,
+      releaseId: item.release.id,
+      sessionId: sessionId()
+    })
   }).catch((e) => console.warn('Failed to record download', e))
 }
 

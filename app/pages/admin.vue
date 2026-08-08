@@ -6,7 +6,8 @@
         <h1 class="page-title" style="margin:0">后台管理</h1>
         <p class="page-desc" style="margin:6px 0 0">产品、用户与邮件日志</p>
       </div>
-      <div v-if="auth.isAdmin" style="display:flex;gap:8px">
+      <div v-if="auth.isAdmin" style="display:flex;gap:8px;flex-wrap:wrap">
+        <NuxtLink class="btn btn-secondary" to="/stats">数据大屏</NuxtLink>
         <button class="btn btn-secondary" :disabled="loading" @click="load">刷新</button>
         <button class="btn btn-secondary" @click="openCatCreate">添加分类</button>
         <button class="btn btn-primary" @click="openCreate">添加产品</button>

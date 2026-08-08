@@ -41,7 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**", "/api/health").permitAll()
                         // 下载中心是公开页面；同样的 release 数据已经通过 GET /api/products/** 公开返回。
                         .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories", "/api/releases/**", "/api/stats/public").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/downloads/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/downloads/**", "/api/stats/track").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
